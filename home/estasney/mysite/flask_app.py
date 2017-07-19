@@ -4,8 +4,8 @@
 from flask import Flask, render_template, request
 from gensim.models import Doc2Vec
 
-model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
-# model = Doc2Vec.load('mymodel.model')
+# model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
+model = Doc2Vec.load('mymodel.model')
 
 app = Flask(__name__)
 
@@ -14,19 +14,25 @@ def hello_world():
     return render_template('main_page.html')
 
 @app.route('/', methods=['POST'])
+# https://stackoverflow.com/questions/19794695/flask-python-buttons
 def my_form_post():
-    user_query = request.form['query'].lower()
-    try:
-        result = dict(model.similar_by_word(user_query))
-        return render_template('results.html', result=result, success='True')
-    except KeyError as error:
-        error_message = str(error)
-        offending_term = error_message.split("'")[1]
-        result = offending_term.title()
-        return render_template('results.html', result=result, success='False')
+    print(request.form['button'])
+    if request.form['button'] == 'query':  # similar words search
+        user_query = request.form['query'].lower()
+        try:
+            result = dict(model.similar_by_word(user_query))
+            return render_template('results.html', result=result, success='True')
+        except KeyError as error:
+            error_message = str(error)
+            offending_term = error_message.split("'")[1]
+            result = offending_term.title()
+            return render_template('results.html', result=result, success='False')
+    elif request.form['button'] == 'math':
+        return "hello world"
+
 
 # Launch server locally
-"""
+
+
 if __name__ == '__main__':
     app.run()
-"""

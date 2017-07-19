@@ -39,6 +39,12 @@
   .container-fluid {
       padding: 60px 50px;
   }
+  .bg-blue {
+      background-color: #7bdff2
+  }
+  .bg-green {
+      background-color: #b2f7ef
+  }
   .bg-grey {
       background-color: #f6f6f6;
   }
@@ -217,6 +223,33 @@
       </div>
     </div>
   </form>
+</div>
+
+<!-- Container (This plus that) -->
+<div class="container-fluid bg-green text-center">
+<form class="form-inline" method="POST">
+
+  <label class="sr-only" for="word1input">Word 1</label>
+  <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="word1input" placeholder="Cloud">
+
+    <label>+</label>
+
+  <label class="sr-only" for="word2input">Word 2</label>
+    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="word2input" placeholder="Security">
+      <label>-</label>
+    <label class="sr-only" for="word3input">Word 3</label>
+    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="word3input" placeholder="Engineer">
+    <label>   =   </label>
+    <br>
+    <br>
+    <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
+
+
+
+
+</form>
+
+
 </div>
 
 <!-- Container (About Section) -->
