@@ -4,8 +4,8 @@
 from flask import Flask, render_template, request
 from gensim.models import Doc2Vec
 
-# model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
-model = Doc2Vec.load('mymodel.model')
+model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
+#model = Doc2Vec.load('mymodel.model')
 
 app = Flask(__name__)
 
@@ -56,6 +56,7 @@ def my_form_post():
 
 # Launch server locally
 
-
+"""
 if __name__ == '__main__':
     app.run()
+"""
