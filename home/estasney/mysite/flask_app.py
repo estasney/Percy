@@ -28,18 +28,29 @@ def my_form_post():
             return render_template('results.html', result=result, success='False')
     elif request.form['button'] == 'math':
         pos_words = [request.form['word1'].lower(), request.form['word2'].lower()]
-        if request.form['word3'] == '':
-            neg_words = ['']
+        neg_words = list(request.form['word3'].lower())
+        if neg_words != '':
+            try:
+                result = dict(model.most_similar(positive=pos_words))
+                print(result)
+                return render_template('results.html', result=result, success='True', title_h2='Word Equation Results', title_th='Score')
+            except KeyError as error:
+                error_message = str(error)
+                print(error_message)
+                offending_term = error_message.split("'")[1]
+                result = offending_term.title()
+                return render_template('results.html', result=result, success='False')
         else:
-            neg_words = [request.form['word3'].lower()]
-        try:
-            result = dict(model.most_similar(positive=pos_words, negative=neg_words))
-            return render_template('results.html', result=result, success='True', title_h2='Word Equation Results', title_th='Score')
-        except KeyError as error:
-            error_message = str(error)
-            offending_term = error_message.split("'")[1]
-            result = offending_term.title()
-            return render_template('results.html', result=result, success='False')
+            try:
+                result = dict(model.most_similar(positive=pos_words, negative=neg_words))
+                print(result)
+                return render_template('results.html', result=result, success='True', title_h2='Word Equation Results', title_th='Score')
+            except KeyError as error:
+                error_message = str(error)
+                print(error_message)
+                offending_term = error_message.split("'")[1]
+                result = offending_term.title()
+                return render_template('results.html', result=result, success='False')
 
 
 
