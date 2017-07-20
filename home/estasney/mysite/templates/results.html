@@ -37,14 +37,24 @@
       font-family: Montserrat, sans-serif;
       margin-bottom: 0;
   }
+  .addition-word {
+      background-color: rgba(69, 228, 57, 0.27);
+  }
+  .subtraction-word {
+      background-color: rgba(210, 136, 144, 0.49);
+  }
+  operator {
+      margin: 25px;
+      font-size: larger;
+  }
   .container-fluid {
       padding: 60px 50px;
   }
   .bg-blue {
-      background-color: #6599FF
+      background-color: #6599FF;
   }
   .bg-green {
-      background-color: #b2f7ef
+      background-color: #b2f7ef;
   }
   .bg-grey {
       background-color: #f6f6f6;
@@ -240,21 +250,23 @@
   <h3>Word Equations</h3>
 <form class="form-inline" method="POST">
   <label class="sr-only" for="word1input">Word 1</label>
-  <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="word1" id="word1input">
-  <label>+</label>
+  <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0 addition-word" name="word1" id="word1input">
+  <operator>+</operator>
   <label class="sr-only" for="word2input">Word 2</label>
-  <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="word2" id="word2input">
-  <label>-</label>
+  <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0 addition-word" name="word2" id="word2input">
+  <operator>-</operator>
     <label class="sr-only" for="word3input">Word 3</label>
-    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="word3" id="word3input">
-    <label>   =   </label>
+    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0 subtraction-word" name="word3" id="word3input">
+    <operator>=</operator>
     <br>
     <br>
     <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
 </form>
-
+  <h5>Hints:</h5>
+  <p>You can leave the third box (word subtraction) blank.</p>
+  <p>Try Hardware + Software</p>
 {% if success == 'True' %}
-<div class="container">
+<div class="container-fluid bg-grey">
   <h2> {{title_h2}} </h2>
   <p>According to my calculations...</p>
   <table class="table">
@@ -276,7 +288,7 @@
   </table>
 </div>
 {% else %}
-<div class="container">
+<div class="container-fluid">
     <h2>Oops!</h2>
     <p>It would appear that the word <strong>{{ result }}</strong> is not in my vocabulary.</p>
 
