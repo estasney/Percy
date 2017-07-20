@@ -35,9 +35,16 @@
       color: #fff;
       padding: 100px 25px;
       font-family: Montserrat, sans-serif;
+      margin-bottom: 0;
   }
   .container-fluid {
       padding: 60px 50px;
+  }
+  .bg-blue {
+      background-color: #6599FF
+  }
+  .bg-green {
+      background-color: #b2f7ef
   }
   .bg-grey {
       background-color: #f6f6f6;
@@ -209,24 +216,52 @@
 <div class="jumbotron text-center">
   <h1>Percy</h1>
   <p>A Neural Network Trained from Resumes</p>
+  <div class="row">
   <form action="." method="POST">
-    <div class="input-group">
+    <div class="row">
+      <div class="col-lg-4 col-lg-offset-4">
+      <div class="input-group">
       <input type="query" name="query" class="form-control" size="50" placeholder="Percy...what are some similar words to...?" required>
       <div class="input-group-btn">
         <button type="query" name="button" value="query" class="btn btn-danger">Ask Percy</button>
       </div>
+      </div>
+      </div>
+      </div>
     </div>
   </form>
 </div>
+
+
+<!-- Container (This plus that) -->
+<div class="container-fluid text-center">
+  <h2>What Else Can Percy Do?
+  </h2>
+  <h3>Word Equations</h3>
+<form class="form-inline" method="POST">
+  <label class="sr-only" for="word1input">Word 1</label>
+  <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="word1" id="word1input" placeholder="Cloud">
+  <label>+</label>
+  <label class="sr-only" for="word2input">Word 2</label>
+  <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="word2" id="word2input" placeholder="Security">
+  <label>-</label>
+    <label class="sr-only" for="word3input">Word 3</label>
+    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" name="word3" id="word3input" placeholder="Engineer">
+    <label>   =   </label>
+    <br>
+    <br>
+    <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
+</form>
+
 {% if success == 'True' %}
 <div class="container">
-  <h2>Most Similar Words</h2>
+  <h2> {{title_h2}} </h2>
   <p>According to my calculations...</p>
   <table class="table">
     <thead>
       <tr>
         <th>Word</th>
-        <th>Similarity Score</th>
+        <th>{{title_th}}</th>
       </tr>
     </thead>
     <tbody>

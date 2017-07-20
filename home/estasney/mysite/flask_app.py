@@ -16,19 +16,31 @@ def hello_world():
 @app.route('/', methods=['POST'])
 # https://stackoverflow.com/questions/19794695/flask-python-buttons
 def my_form_post():
-    print(request.form['button'])
     if request.form['button'] == 'query':  # similar words search
         user_query = request.form['query'].lower()
         try:
             result = dict(model.similar_by_word(user_query))
-            return render_template('results.html', result=result, success='True')
+            return render_template('results.html', result=result, success='True', title_h2='Word Similarity Score', title_th='Similarity Score')
         except KeyError as error:
             error_message = str(error)
             offending_term = error_message.split("'")[1]
             result = offending_term.title()
             return render_template('results.html', result=result, success='False')
     elif request.form['button'] == 'math':
-        return "hello world"
+        pos_words = [request.form['word1'].lower(), request.form['word2'].lower()]
+        if request.form['word3'] == '':
+            neg_words = ['']
+        else:
+            neg_words = [request.form['word3'].lower()]
+        try:
+            result = dict(model.most_similar(positive=pos_words, negative=neg_words))
+            return render_template('results.html', result=result, success='True', title_h2='Word Equation Results', title_th='Score')
+        except KeyError as error:
+            error_message = str(error)
+            offending_term = error_message.split("'")[1]
+            result = offending_term.title()
+            return render_template('results.html', result=result, success='False')
+
 
 
 # Launch server locally
