@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+ <form action="." method="POST">
+    <div class="row">
+      <div class="col-lg-4 col-lg-offset-4">
+      <div class="input-group">
+      <input type="query" name="query" class="form-control" size="50" placeholder="Percy...what are some similar words to...?" required>
+      <div class="input-group-btn">
+        <button type="query" name="button" value="query" class="btn btn-danger">Ask Percy</button>
+      </div>
+      </div>
+      </div>
+      </div>
+    </div>
+  </form>
+{% if success == 'True' %}
+<div class="container-fluid bg-grey">
+  <h2> {{title_h2}} </h2>
+  <p>According to my calculations...</p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="text-center">Word</th>
+        <th class="text-center">{{title_th}}</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for key, value in result.items() %}
+      <tr>
+        <td> {{ key }} </td>
+        <td> {{ value }} </td>
+      </tr>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% elif success == 'False' %}
+<div class="container-fluid">
+    <h2>Oops!</h2>
+    <p>It would appear that the word <strong>{{ result }}</strong> is not in my vocabulary.</p>
+
+</div>
+{% endif %}
+{% endblock %}
