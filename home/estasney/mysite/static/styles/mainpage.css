@@ -1,17 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <!-- Theme Made By www.w3schools.com - No Copyright -->
-  <title>Percy - Sourcing Reborn</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <style>
-  body {
+body {
       font: 400 15px Lato, sans-serif;
       line-height: 1.8;
       color: #818181;
@@ -30,6 +17,7 @@
       font-weight: 400;
       margin-bottom: 30px;
   }
+
   .jumbotron {
       background-color: #f4511e;
       color: #fff;
@@ -53,11 +41,11 @@
   .bg-blue {
       background-color: #6599FF;
   }
-  .bg-lgrey {
-      background-color: rgba(220, 212, 210, 0.19);
-  }
   .bg-green {
       background-color: #b2f7ef;
+  }
+  .bg-lgrey {
+      background-color: rgba(220, 212, 210, 0.19);
   }
   .bg-grey {
       background-color: #f6f6f6;
@@ -208,94 +196,3 @@
         font-size: 150px;
     }
   }
-  </style>
-</head>
-<body id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">
-
-<nav class="navbar navbar-default navbar-fixed-top">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-    </div>
-  </div>
-</nav>
-
-<div class="jumbotron text-center">
-  <h1>Percy</h1>
-  <p>A Neural Network Trained from Resumes</p>
-  <div class="row">
-  <form action="." method="POST">
-    <div class="row">
-      <div class="col-lg-4 col-lg-offset-4">
-      <div class="input-group">
-      <input type="query" name="query" class="form-control" size="50" placeholder="Percy...what are some similar words to...?" required>
-      <div class="input-group-btn">
-        <button type="query" name="button" value="query" class="btn btn-danger">Ask Percy</button>
-      </div>
-      </div>
-      </div>
-      </div>
-    </div>
-  </form>
-</div>
-
-
-<!-- Container (This plus that) -->
-<div class="container-fluid text-center">
-  <h2>What Else Can Percy Do?
-  </h2>
-  <h3>Word Equations</h3>
-<form class="form-inline" method="POST">
-  <label class="sr-only" for="word1input">Word 1</label>
-  <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0 addition-word" name="word1" id="word1input">
-  <operator>+</operator>
-  <label class="sr-only" for="word2input">Word 2</label>
-  <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0 addition-word" name="word2" id="word2input">
-  <operator>-</operator>
-    <label class="sr-only" for="word3input">Word 3</label>
-    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0 subtraction-word" name="word3" id="word3input">
-    <operator>=</operator>
-    <br>
-    <br>
-    <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
-</form>
-  <h5>Hints:</h5>
-  <p>You can leave the third box (word subtraction) blank.</p>
-  <p>Try Hardware + Software</p>
-{% if success == 'True' %}
-<div class="container-fluid bg-grey">
-  <h2> {{title_h2}} </h2>
-  <p>According to my calculations...</p>
-  <table class="table">
-    <thead>
-      <tr>
-        <th class="text-center">Word</th>
-        <th class="text-center">{{title_th}}</th>
-      </tr>
-    </thead>
-    <tbody>
-        {% for key, value in result.items() %}
-      <tr>
-        <td> {{ key }} </td>
-        <td> {{ value }} </td>
-      </tr>
-        {% endfor %}
-      </tr>
-    </tbody>
-  </table>
-</div>
-{% else %}
-<div class="container-fluid">
-    <h2>Oops!</h2>
-    <p>It would appear that the word <strong>{{ result }}</strong> is not in my vocabulary.</p>
-
-</div>
-{% endif %}
-</body>
-</html>
