@@ -2,27 +2,41 @@ from flask import Flask, render_template, request
 from gensim.models import Doc2Vec
 from gensim.summarization import keywords as KW
 from nltk.tokenize import sent_tokenize
-model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
+from nltk.stem.porter import PorterStemmer
+model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
 
+# for web
+
+# model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
 
 
 app = Flask(__name__)
+
 
 @app.route('/')
 def hello_world():
     return render_template('home_page.html')
 
+
+@app.route('/stemmed')
+def stemmed():
+    return render_template('stemmed.html')
+
+
 @app.route('/keywords')
 def keywords():
     return render_template('keywords.html')
+
 
 @app.route('/related')
 def related():
     return render_template('related.html')
 
+
 @app.route('/thisplusthat')
 def thisplusthat():
     return render_template('thisplusthat.html')
+
 
 @app.route('/', methods=['POST'])
 def my_sims():
@@ -55,7 +69,7 @@ def my_sims():
             return render_template('thisplusthat.html', result=result, success='False')
     elif request.form['button'] == 'keywords':
         try:
-            raw_text = request.form['raw_text']
+            raw_text = str(request.form['raw_text'])
             raw_text = ' '.join([word for word in raw_text.split()])
             sentences = sent_tokenize(raw_text)
             sentence_keywords = []
@@ -75,12 +89,17 @@ def my_sims():
             return render_template('keywords.html', keywords=user_keywords, success='True')
         except:
             return render_template('keywords.html', success='False')
-
-
-
-
-
-
+    elif request.form['button'] == 'raw_stem':
+        raw_text = str(request.form['raw_stem'])
+        raw_text = ' '.join([word for word in raw_text.split()])
+        unstemmed_words = raw_text.split()
+        stemmer = PorterStemmer()
+        stemmed_words = []
+        for word in unstemmed_words:
+            s_w = stemmer.stem(word)
+            s_w = s_w + "*"
+            stemmed_words.append(s_w)
+        return render_template('stemmed.html', stemmed_words=stemmed_words, success='True')
 
 if __name__ == '__main__':
     app.run()
