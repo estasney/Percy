@@ -3,11 +3,12 @@ from gensim.models import Doc2Vec
 from gensim.summarization import keywords as KW
 from nltk.tokenize import sent_tokenize
 from nltk.stem.porter import PorterStemmer
+import re
 model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
 
 # for web
 
-# model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
+#model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
 
 
 app = Flask(__name__)
@@ -90,7 +91,11 @@ def my_sims():
         except:
             return render_template('keywords.html', success='False')
     elif request.form['button'] == 'raw_stem':
+        regex_punctuation = re.compile(
+            r"(!|\"|#|\$|%|&|\||\)|\(|\*|\+|,|-|\.|\/|:|;|<|=|>|\?|@|\[|\\|\]|\^|_|`|\{|\||\}|~|')"
+        )
         raw_text = str(request.form['raw_stem'])
+        raw_text = regex_punctuation.sub(" ", raw_text)
         raw_text = ' '.join([word for word in raw_text.split()])
         unstemmed_words = raw_text.split()
         stemmer = PorterStemmer()
