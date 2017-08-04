@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from gensim.models import Doc2Vec
 from gensim.summarization import keywords as KW
+from nltk.tokenize import sent_tokenize
 model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
 
 
@@ -56,7 +57,21 @@ def my_sims():
         try:
             raw_text = request.form['raw_text']
             raw_text = ' '.join([word for word in raw_text.split()])
-            user_keywords = KW(raw_text).splitlines()
+            sentences = sent_tokenize(raw_text)
+            sentence_keywords = []
+            for sentence in sentences:
+                try:
+                    sent_keyw = KW(sentence)
+                    if len(sent_keyw) > 0:
+                        sent_keyw = sent_keyw.splitlines()
+                        if len(sent_keyw) > 1:
+                            sent_keyw = ', '.join([word for word in sent_keyw if len(sent_keyw) > 1])
+                        else:
+                            sent_keyw = ' '.join([word for word in sent_keyw])
+                        sentence_keywords.append(sent_keyw)
+                except:
+                    pass
+            user_keywords = sentence_keywords
             return render_template('keywords.html', keywords=user_keywords, success='True')
         except:
             return render_template('keywords.html', success='False')
