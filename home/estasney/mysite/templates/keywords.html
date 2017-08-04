@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+<form action="." method="POST">
+<div class="form-group">
+  <label for="raw_text">Enter Text to Find Keywords</label>
+  <textarea class="form-control" rows="5" id="raw_text" name="raw_text"></textarea>
+    <div class="input-group-btn">
+        <button type="keywords" name="button" value="keywords" class="btn btn-danger">Get Keywords</button>
+      </div>
+</div>
+</form>
+{% if success == 'True' %}
+<div class="container-fluid bg-grey text-center">
+  <h2> {{title_h2}} </h2>
+  <p>These are the keywords I found...</p>
+    <div class="container-fluid bg-grey text-center">
+        <ul class="list-group">
+                {% for keyword in keywords %}
+                <li class="list-group-item">{{keyword}}</li>
+                {% endfor %}
+        </ul>
+    </div>
+</div>
+{% elif success == 'False' %}
+<div class="container-fluid">
+    <h2>Oops!</h2>
+    <p>Something went wrong, try entering a longer block of text</p>
+</div>
+{% else %}
+{% endif %}
+{% endblock %}

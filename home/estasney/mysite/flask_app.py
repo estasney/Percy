@@ -1,16 +1,19 @@
-
-
-
 from flask import Flask, render_template, request
 from gensim.models import Doc2Vec
+from gensim.summarization import keywords as KW
+model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
 
-model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
+
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
     return render_template('home_page.html')
+
+@app.route('/keywords')
+def keywords():
+    return render_template('keywords.html')
 
 @app.route('/related')
 def related():
@@ -49,6 +52,20 @@ def my_sims():
             offending_term = error_message.split("'")[1]
             result = offending_term.title()
             return render_template('thisplusthat.html', result=result, success='False')
+    elif request.form['button'] == 'keywords':
+        try:
+            raw_text = request.form['raw_text']
+            raw_text = ' '.join([word for word in raw_text.split()])
+            user_keywords = KW(raw_text).splitlines()
+            return render_template('keywords.html', keywords=user_keywords, success='True')
+        except:
+            return render_template('keywords.html', success='False')
+
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run()
