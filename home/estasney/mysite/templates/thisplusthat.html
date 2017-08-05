@@ -2,7 +2,23 @@
 {% block content %}
  <div class="container-fluid text-center">
      <h3>Let's Try Some Word Equations</h3>
-<form class="form-inline" action="." method="POST">
+ {% if success == 'True' %}
+ <form class="form-inline" action="." method="POST">
+  <label class="sr-only" for="word1input">Word 1</label>
+     <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word1" id="word1input" value="{{word_one}}">
+  <operator>+</operator>
+  <label class="sr-only" for="word2input">Word 2</label>
+     <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word2" id="word2input" value="{{word_two}}">
+  <operator>-</operator>
+    <label class="sr-only" for="word3input">{{ word_three }}</label>
+    <input type="text" class="subtraction-word form-control mb-2 mr-sm-2 mb-sm-0" name="word3" id="word3input" value="{{word_three}}">
+    <operator>=</operator>
+    <br>
+    <br>
+    <button type="query" name="button" value="math" class="btn btn-danger">Ask Percy</button>
+</form>
+ {% else %}
+     <form class="form-inline" action="." method="POST">
   <label class="sr-only" for="word1input">Word 1</label>
   <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word1" id="word1input">
   <operator>+</operator>
@@ -16,6 +32,7 @@
     <br>
     <button type="query" name="button" value="math" class="btn btn-danger">Ask Percy</button>
 </form>
+ {% endif %}
   <h5>Hints:</h5>
   <p>You can leave the third box (word subtraction) blank.</p>
      <p>Percy recognizes terms. For "Quality Assurance", type quality_assurance</p>
