@@ -128,7 +128,7 @@ def my_sims():
         stemmed_bool = ' '.join(mod_terms)
         return render_template('stemmed.html', stemmed_bool=stemmed_bool, success='True', original=search)
     elif request.form['button'] == 'infer_name':
-        f = open("/home/estasney/corpora/tree_classifier.pickle", "rb")
+        f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
         # f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
         tree_model = pickle.load(f)
         f.close()
