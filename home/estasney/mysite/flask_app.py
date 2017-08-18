@@ -192,8 +192,8 @@ def retrieve_name(name, name_dict):
                 winner = ('F', 999)
         return winner, message
     except KeyError:
-        print("I have not see the name {} before".format(name.title()))
-        return False
+        message = "I have not see the name {} before".format(name.title())
+        return False, message
 
 
 
