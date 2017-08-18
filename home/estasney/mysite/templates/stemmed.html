@@ -1,27 +1,35 @@
 {% extends "layout.html" %}
 {% block content %}
+{% if success == 'True' %}
 <form action="." method="POST">
-<div class="form-group">
+<div class="form-group text-center">
+    <p> Easily capture all possible forms with a word using wildcards</p>
+  <label for="raw_stem">Enter Words To Convert them to Their Stemmed Forms</label>
+  <textarea class="form-control" rows="5" id="raw_stem" name="raw_stem">{{ original }}</textarea>
+    <div class="input-group-btn">
+        <button type="raw_stem" name="button" value="raw_stem" class="btn btn-danger">Get Wildcard Boolean</button>
+      </div>
+</div>
+</form>
+{% else %}
+<form action="." method="POST">
+<div class="form-group text-center">
     <p> Easily capture all possible forms with a word using wildcards</p>
   <label for="raw_stem">Enter Words To Convert them to Their Stemmed Forms</label>
   <textarea class="form-control" rows="5" id="raw_stem" name="raw_stem"></textarea>
     <div class="input-group-btn">
-        <button type="raw_stem" name="button" value="raw_stem" class="btn btn-danger">Get Stemmed Words</button>
+        <button type="raw_stem" name="button" value="raw_stem" class="btn btn-danger">Get Wildcard Boolean</button>
       </div>
 </div>
 </form>
+{% endif %}
 {% if success == 'True' %}
-<div class="container-fluid bg-grey text-center">
-  <h2> {{title_h2}} </h2>
-  <p>Here are the stemmed versions of your words</p>
-    <div class="container-fluid bg-grey text-center">
-        <ul class="list-group">
-                {% for stem_word in stemmed_words %}
-                <li class="list-group-item">{{stem_word}}</li>
-                {% endfor %}
-        </ul>
+<div class="container-fluid text-center">
+    <div class="well well-lg">
+        <h1>{{stemmed_bool}} </h1>
     </div>
 </div>
+
 {% elif success == 'False' %}
 <div class="container-fluid">
     <h2>Oops!</h2>

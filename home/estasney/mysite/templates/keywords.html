@@ -1,5 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
+{% if success == 'True' %}
+<form action="." method="POST">
+<div class="form-group">
+  <label for="raw_text">Enter Text to Find Keywords</label>
+  <textarea class="form-control" rows="5" id="raw_text" name="raw_text"> {{ original }}</textarea>
+    <div class="input-group-btn">
+        <button type="keywords" name="button" value="keywords" class="btn btn-danger">Get Keywords</button>
+      </div>
+</div>
+</form>
+{% else %}
 <form action="." method="POST">
 <div class="form-group">
   <label for="raw_text">Enter Text to Find Keywords</label>
@@ -9,6 +20,7 @@
       </div>
 </div>
 </form>
+{% endif %}
 {% if success == 'True' %}
 <div class="container-fluid bg-grey text-center">
   <h2> {{title_h2}} </h2>

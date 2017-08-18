@@ -1,5 +1,20 @@
 {% extends "layout.html" %}
 {% block content %}
+{% if success == 'True' %}
+ <form action="." method="POST">
+    <div class="row">
+      <div class="col-lg-4 col-lg-offset-4">
+      <div class="input-group">
+      <input type="query" name="query" class="form-control" size="50" value="{{original}}" required>
+      <div class="input-group-btn">
+        <button type="query" name="button" value="query" class="btn btn-danger">Ask Percy</button>
+      </div>
+      </div>
+      </div>
+      </div>
+    </div>
+  </form>
+{% else %}
  <form action="." method="POST">
     <div class="row">
       <div class="col-lg-4 col-lg-offset-4">
@@ -13,6 +28,7 @@
       </div>
     </div>
   </form>
+{% endif %}
 {% if success == 'True' %}
 <div class="container-fluid bg-grey text-center">
   <h2> {{title_h2}} </h2>
