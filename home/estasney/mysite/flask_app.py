@@ -5,7 +5,6 @@ from nltk.tokenize import sent_tokenize
 from nltk.stem.porter import PorterStemmer
 import re
 import pickle
-from nltk.classify.decisiontree import DecisionTreeClassifier
 import math
 # model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
 
