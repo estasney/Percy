@@ -6,6 +6,7 @@ from nltk.stem.porter import PorterStemmer
 import re
 import pickle
 from nltk.classify.decisiontree import DecisionTreeClassifier
+import math
 # model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
 
 # for web
@@ -132,9 +133,15 @@ def my_sims():
         # f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
         tree_model = pickle.load(f)
         f.close()
+        fp = open('home/estasney/mysite/name_dict.pickle', "rb")
+        # fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+        name_dict = pickle.load(fp)
+        fp.close()
         user_query_name = request.form['infer_name']
         inferred_gender = tree_model.classify(gender_features(user_query_name)).title()
-        return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=inferred_gender)
+        gender_lookup = retrieve_name(user_query_name, name_dict)[1]  #Selecting the message
+        return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=inferred_gender,
+                               lookup_message = gender_lookup)
 
 
 def gender_features(name):
@@ -154,7 +161,39 @@ def vowel_test(letter):
     else:
         return "No"
 
-
+def retrieve_name(name, name_dict):
+    name = name.lower()
+    try:
+        male_count = name_dict[name]['M']
+        female_count = name_dict[name]['F']
+        if male_count > female_count:
+            try:
+                likely = round(male_count / female_count, 1)
+                if math.isinf(likely):
+                    message = "The name {} is only known to be male".format(name.title())
+                    winner = ('M', 999)
+                else:
+                    message = "The name {} is {}x more likely to be male".format(name.title(), likely)
+                    winner = ('M', likely)
+            except ZeroDivisionError:
+                message = "The name {} is only known to be male"
+                winner = ('M', 999)
+        elif male_count < female_count:
+            try:
+                likely = round(female_count / male_count, 1)
+                if math.isinf(likely):
+                    message = "The name {} is only known to be female".format(name.title())
+                    winner = ('F', 999)
+                else:
+                    message = "The name {} is {}x more likely to be female".format(name.title(), likely)
+                    winner = ('F', likely)
+            except ZeroDivisionError:
+                message = "The name {} is only known to be female"
+                winner = ('F', 999)
+        return winner, message
+    except KeyError:
+        print("I have not see the name {} before".format(name.title()))
+        return False
 
 
 

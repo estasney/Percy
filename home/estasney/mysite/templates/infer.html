@@ -1,41 +1,63 @@
 {% extends "layout.html" %}
 {% block content %}
 {% if success == 'True' %}
-<form action="." method="POST">
-    <div class="row">
-      <div class="col-lg-4 col-lg-offset-4">
-      <div class="input-group">
-      <input type="infer_name" name="infer_name" class="form-control" size="50" value="{{user_query}}" required>
-      <div class="input-group-btn">
-        <button type="infer_name" name="button" value="infer_name" class="btn btn-danger">Guess Gender</button>
-      </div>
-      </div>
-      </div>
-      </div>
-    </div>
-  </form>
+	<form action="." method="POST">
+		<div class="row">
+			<div class="col-lg-4 col-lg-offset-4">
+				<div class="input-group">
+					<input class="form-control" name="infer_name" required="" size="50" type="infer_name" value="{{user_query}}">
+
+					<div class="input-group-btn">
+						<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
 {% else %}
-<form action="." method="POST">
-    <div class="row">
-      <div class="col-lg-4 col-lg-offset-4">
-      <div class="input-group">
-      <input type="infer_name" name="infer_name" class="form-control" size="50" placeholder="Enter a Name" required>
-      <div class="input-group-btn">
-        <button type="infer_name" name="button" value="infer_name" class="btn btn-danger">Guess Gender</button>
-      </div>
-      </div>
-      </div>
-      </div>
-    </div>
-  </form>
+
+    <form action="." method="POST">
+		<div class="row">
+			<div class="col-lg-4 col-lg-offset-4">
+				<div class="input-group">
+					<input class="form-control" name="infer_name" placeholder="Enter a Name" required="" size="50" type="infer_name">
+
+					<div class="input-group-btn">
+						<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
 {% endif %}
 {% if success == 'True' %}
-<div class="container-fluid bg-grey text-center">
-  <h2>You asked me to guess the gender of {{ user_query }}...</h2>
-    <div class="container-fluid bg-white text-center">
-        <h1>I believe {{ user_query }} is a {{gender_guess}} name</h1>
-    </div>
-</div>
+
+<div class="container fluid bg-grey text-center">
+		<div class="row">
+			<h2>You asked me to guess the gender of {{ user_query }}...</h2>
+		</div>
+
+
+		<div class="row row-eq-height">
+			<div class="col-lg-6">
+                <h1>Machine Learning Approach</h1>
+                <div class="well bg-white">
+				<h2>I believe {{ user_query }} is a {{gender_guess}} name</h2>
+                </div>
+			</div>
+
+
+			<div class="col-lg-6">
+				<h1>SSA Name Database</h1>
+
+                <div class="well bg-white">
+				<h2>{{ lookup_message }}</h2>
+                </div>
+
+				<div>
+				</div>
+			</div>
+
 {% elif success == 'False' %}
 <div class="container-fluid">
     <h2>Oops!</h2>
