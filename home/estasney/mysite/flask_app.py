@@ -4,6 +4,8 @@ from gensim.summarization import keywords as KW
 from nltk.tokenize import sent_tokenize
 from nltk.stem.porter import PorterStemmer
 import re
+import pickle
+from nltk.classify.decisiontree import DecisionTreeClassifier
 # model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
 
 # for web
@@ -37,6 +39,10 @@ def related():
 @app.route('/thisplusthat')
 def thisplusthat():
     return render_template('thisplusthat.html')
+
+@app.route('/infer')
+def infer():
+    return render_template('infer.html')
 
 
 @app.route('/', methods=['POST'])
@@ -121,6 +127,42 @@ def my_sims():
             mod_terms.append(full_term)
         stemmed_bool = ' '.join(mod_terms)
         return render_template('stemmed.html', stemmed_bool=stemmed_bool, success='True', original=search)
+    elif request.form['button'] == 'infer_name':
+        f = open("/home/estasney/corpora/tree_classifier.pickle", "rb")
+        # f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
+        tree_model = pickle.load(f)
+        f.close()
+        user_query_name = request.form['infer_name']
+        inferred_gender = tree_model.classify(gender_features(user_query_name)).title()
+        return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=inferred_gender)
+
+
+def gender_features(name):
+    name = name.lower()
+    features = {}
+    features['first_two'] = name[:2]
+    features['last_letter'] = name[-1]
+    features['last_letter_vowel'] = vowel_test(name[-1])
+    features['last_two'] = name[-2:]
+    return features
+
+
+def vowel_test(letter):
+    vowels = ["a", "e", "i", "o", "u", "y"]
+    if letter in vowels:
+        return "Yes"
+    else:
+        return "No"
+
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
