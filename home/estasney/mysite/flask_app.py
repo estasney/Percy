@@ -133,7 +133,7 @@ def my_sims():
         # f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
         tree_model = pickle.load(f)
         f.close()
-        fp = open('home/estasney/mysite/name_dict.pickle', "rb")
+        fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
         # fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
         name_dict = pickle.load(fp)
         fp.close()
