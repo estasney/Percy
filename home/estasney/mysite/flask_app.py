@@ -1,11 +1,14 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
+from werkzeug.utils import secure_filename
 from gensim.models import Doc2Vec
 from gensim.summarization import keywords as KW
 from nltk.tokenize import sent_tokenize
 from nltk.stem.porter import PorterStemmer
+import pandas as pd
 import re
 import pickle
 import math
+import os
 
 # model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
 
@@ -17,8 +20,34 @@ import math
 
 model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
 
+"""
+
+UPLOAD PARAMETERS HERE
+
+"""
+
+UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
+ALLOWED_EXTENSIONS = ['.csv']
+
+
+
 
 app = Flask(__name__)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+""" 
+
+UPLOAD SPECIFIC FUNCTIONS
+
+"""
+def allowed_file(filename):
+    ext = "." + filename.rsplit('.', 1)[1]
+    if ext in ALLOWED_EXTENSIONS:
+        return ext
+    else:
+        print("ext : " + ext + "not approved")
+
 
 
 @app.route('/')
@@ -149,6 +178,27 @@ def my_sims():
         gender_lookup = retrieve_name(user_query_name, name_dict)[1]  #Selecting the message
         return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=inferred_gender,
                                lookup_message = gender_lookup)
+    elif request.form['button'] == 'Upload':
+        if 'file' not in request.files:
+            return render_template('diversity_score.html')
+        file = request.files['file']
+        if file.filename == '':
+            return render_template('diversity_score.html')
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('uploaded_file',
+                                    filename=filename))
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    upped_file = os.path.join(app.config['UPLOAD_FOLDER'],
+                                     filename)
+    print("Pandas should read : " + upped_file)
+    df = pd.read_csv(upped_file)
+    names = df['name']
+    names_counter = "There are {} names in the file".format(len(names))
+    return names_counter
 
 
 def gender_features(name):
