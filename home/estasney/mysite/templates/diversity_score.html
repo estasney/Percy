@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid text-center">
+<h1>Upload a CSV Below</h1>
+</div>
+
+<form action="." method="POST" enctype=multipart/form-data">
+		<div class="row">
+			<div class="col-lg-4 col-lg-offset-4">
+				<div class="input-group">
+					<input type="file" name="file" class="form-control" required="" size="50">
+
+					<div class="input-group-btn">
+						<button class="btn btn-danger" name="button" value="Upload">Score Diversity</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+<div class="container-fluid text-center">
+<h2>Percy will analyze the file for diversity and return a score</h2>
+</div>
+
+{% endblock %}
+
+
+

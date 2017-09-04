@@ -6,11 +6,16 @@ from nltk.stem.porter import PorterStemmer
 import re
 import pickle
 import math
+
 # model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
 
 # for web
 
-model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
+# model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
+
+# for other pc
+
+model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
 
 
 app = Flask(__name__)
@@ -20,6 +25,9 @@ app = Flask(__name__)
 def hello_world():
     return render_template('home_page.html')
 
+@app.route('/diversity')
+def diversity():
+    return render_template('diversity_score.html')
 
 @app.route('/stemmed')
 def stemmed():
