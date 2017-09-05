@@ -1,31 +1,35 @@
 {% extends "layout.html" %}
 {% block content %}
 {% if success == 'True' %}
-
+<div class="container-fluid text-center">
+<h2>Percy Analyzed Your File</h2>
+	<h3> It got a score of {{ diversity_score }}</h3>
+</div>
+{% endif %}
 {% if success == 'False' %}
+<div class="container-fluid text-center">
+<h2>Something Went Wrong..</h2>
+</div>
+{% endif %}
 
-{% else % }
 <div class="container-fluid text-center">
 <h1>Upload a CSV Below</h1>
 </div>
+ <div class="container-fluid text-center">
+<form class="form-inline" action="." method="POST" enctype="multipart/form-data">
+		<input type="file" name="file" class="form-control" required="" size="50">
+		<input class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Header for First Name" name="header_name">
 
-<form action="." method="POST" enctype=multipart/form-data">
-		<div class="row">
-			<div class="col-lg-4 col-lg-offset-4">
-				<div class="input-group">
-					<input type="file" name="file" class="form-control" required="" size="50">
+		<button class="btn btn-danger" name="button" value="Upload">Score Diversity</button>
 
-					<div class="input-group-btn">
-						<button class="btn btn-danger" name="button" value="Upload">Score Diversity</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</form>
+
+</form>
+ </div>
 <div class="container-fluid text-center">
 <h2>Percy will analyze the file for diversity and return a score</h2>
 </div>
-{ % endif % }
+
+
 {% endblock %}
 
 

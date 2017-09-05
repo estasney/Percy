@@ -56,3 +56,4 @@ ENV/
 /home/estasney/mysite/mymodel.model.syn1neg.npy
 /home/estasney/mysite/mymodel.model.wv.syn0.npy
 .idea
+/home/estasney/mysite/name_dict.pickle

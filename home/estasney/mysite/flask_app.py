@@ -183,23 +183,19 @@ def my_sims():
             return render_template('diversity_score.html')
         file = request.files['file']
         if file.filename == '':
-            return render_template('diversity_score.html')
+            return render_template('diversity_score.html', success='False')
         if file and allowed_file(file.filename):
+            name_header = request.form['header_name']
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploaded_file',
-                                    filename=filename))
+            upped_file = os.path.join(app.config['UPLOAD_FOLDER'],
+                                      filename)
+            df = pd.read_csv(upped_file)
+            names_col = df[name_header]
+            diversity_scored = retrieve_names_bulk(names_col)
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    upped_file = os.path.join(app.config['UPLOAD_FOLDER'],
-                                     filename)
-    print("Pandas should read : " + upped_file)
-    df = pd.read_csv(upped_file)
-    names = df['name']
-    names_counter = "There are {} names in the file".format(len(names))
-    return names_counter
 
+            return render_template('diversity_score.html', success='True', diversity_score=diversity_scored)
 
 def gender_features(name):
     name = name.lower()
@@ -251,6 +247,37 @@ def retrieve_name(name, name_dict):
     except KeyError:
         message = "I have not see the name {} before".format(name.title())
         return False, message
+
+def retrieve_names_bulk(name_list):
+
+    # fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
+    # fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+    fp = open(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\name_dict.pickle", "rb")
+    name_dict = pickle.load(fp)
+    fp.close()
+    male_count = 0
+    female_count = 0
+    unknown_count = 0
+    bulk_count = len(name_list)
+    for name in name_list:
+        # TREE CAN GO HERE IN FUTURE
+        try:
+            gender_lookup = retrieve_name(name, name_dict)[0][0]
+            if gender_lookup == 'M':
+                male_count += 1
+            elif gender_lookup == 'F':
+                female_count += 1
+        except TypeError:
+            unknown_count += 1
+    try:
+        diversity_score = female_count / male_count
+    except ZeroDivisionError:
+        diversity_score = 0
+    return diversity_score
+
+
+
+
 
 
 
