@@ -10,7 +10,7 @@ import pickle
 import math
 import os
 
-# model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
+model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
 
 # for web
 
@@ -18,7 +18,7 @@ import os
 
 # for other pc
 
-model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
+# model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
 
 """
 
@@ -26,11 +26,9 @@ UPLOAD PARAMETERS HERE
 
 """
 
-UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
-ALLOWED_EXTENSIONS = ['.csv']
-
-
-
+# UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
+UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
+ALLOWED_EXTENSIONS = ['.csv', '.xlsx']
 
 app = Flask(__name__)
 
@@ -41,6 +39,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 UPLOAD SPECIFIC FUNCTIONS
 
 """
+
+
 def allowed_file(filename):
     ext = "." + filename.rsplit('.', 1)[1]
     if ext in ALLOWED_EXTENSIONS:
@@ -49,14 +49,15 @@ def allowed_file(filename):
         print("ext : " + ext + "not approved")
 
 
-
 @app.route('/')
 def hello_world():
     return render_template('home_page.html')
 
+
 @app.route('/diversity')
 def diversity():
     return render_template('diversity_score.html')
+
 
 @app.route('/stemmed')
 def stemmed():
@@ -77,6 +78,7 @@ def related():
 def thisplusthat():
     return render_template('thisplusthat.html')
 
+
 @app.route('/infer')
 def infer():
     return render_template('infer.html')
@@ -88,7 +90,8 @@ def my_sims():
         user_query = request.form['query'].lower()
         try:
             result = dict(model.similar_by_word(user_query))
-            return render_template('related.html', result=result, success='True', title_h2='Word Similarity Score', title_th='Similarity Score', original=user_query)
+            return render_template('related.html', result=result, success='True', title_h2='Word Similarity Score',
+                                   title_th='Similarity Score', original=user_query)
         except KeyError as error:
             error_message = str(error)
             offending_term = error_message.split("'")[1]
@@ -105,7 +108,8 @@ def my_sims():
             else:
                 user_equation = word_one.title() + " + " + word_two.title() + " - " + word_three.title() + " = "
                 result = dict(model.most_similar(positive=[word_one, word_two], negative=[word_three]))
-            return render_template('thisplusthat.html', result=result, success='True', user_equation=user_equation, word_one=word_one.strip(), word_two=word_two.strip(), word_three=word_three.strip())
+            return render_template('thisplusthat.html', result=result, success='True', user_equation=user_equation,
+                                   word_one=word_one.strip(), word_two=word_two.strip(), word_three=word_three.strip())
         except KeyError as error:
             error_message = str(error)
             offending_term = error_message.split("'")[1]
@@ -165,19 +169,19 @@ def my_sims():
         stemmed_bool = ' '.join(mod_terms)
         return render_template('stemmed.html', stemmed_bool=stemmed_bool, success='True', original=search)
     elif request.form['button'] == 'infer_name':
-        f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
-        # f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
+        # f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
+        f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
         tree_model = pickle.load(f)
         f.close()
-        fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
-        # fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+        # fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
+        fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
         name_dict = pickle.load(fp)
         fp.close()
         user_query_name = request.form['infer_name']
         inferred_gender = tree_model.classify(gender_features(user_query_name)).title()
-        gender_lookup = retrieve_name(user_query_name, name_dict)[1]  #Selecting the message
+        gender_lookup = retrieve_name(user_query_name, name_dict)[1]  # Selecting the message
         return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=inferred_gender,
-                               lookup_message = gender_lookup)
+                               lookup_message=gender_lookup)
     elif request.form['button'] == 'Upload':
         if 'file' not in request.files:
             return render_template('diversity_score.html')
@@ -190,12 +194,20 @@ def my_sims():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             upped_file = os.path.join(app.config['UPLOAD_FOLDER'],
                                       filename)
-            df = pd.read_csv(upped_file)
+            file_ext = find_file_ext(upped_file)
+            if file_ext == 'csv':
+                df = pd.read_csv(upped_file)
+            elif file_ext == 'xlsx':
+                df = pd.read_excel(upped_file)
             names_col = df[name_header]
             diversity_scored = retrieve_names_bulk(names_col)
+            male_count = str(diversity_scored['male'])
+            female_count = str(diversity_scored['female'])
+            unknown_count = str(diversity_scored['unknown'])
 
+            return render_template('diversity_score.html', success='True', male_count=male_count,
+                                   female_count=female_count, unknown_count=unknown_count)
 
-            return render_template('diversity_score.html', success='True', diversity_score=diversity_scored)
 
 def gender_features(name):
     name = name.lower()
@@ -213,6 +225,7 @@ def vowel_test(letter):
         return "Yes"
     else:
         return "No"
+
 
 def retrieve_name(name, name_dict):
     name = name.lower()
@@ -243,16 +256,19 @@ def retrieve_name(name, name_dict):
             except ZeroDivisionError:
                 message = "The name {} is only known to be female"
                 winner = ('F', 999)
+        else:
+            message = "The name {} is ambiguous".format(name.title())
+            return False, message
         return winner, message
     except KeyError:
         message = "I have not see the name {} before".format(name.title())
         return False, message
 
-def retrieve_names_bulk(name_list):
 
+def retrieve_names_bulk(name_list):
     # fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
-    # fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
-    fp = open(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\name_dict.pickle", "rb")
+    fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+    # fp = open(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\name_dict.pickle", "rb")
     name_dict = pickle.load(fp)
     fp.close()
     male_count = 0
@@ -269,24 +285,12 @@ def retrieve_names_bulk(name_list):
                 female_count += 1
         except TypeError:
             unknown_count += 1
-    try:
-        diversity_score = female_count / male_count
-    except ZeroDivisionError:
-        diversity_score = 0
-    return diversity_score
+    diversity_score_dict = {'male': male_count, 'female': female_count, 'unknown': unknown_count}
+    return diversity_score_dict
 
-
-
-
-
-
-
-
-
-
-
-
-
+def find_file_ext(filename):
+    ext = filename.split(".")[-1]  # return the last split
+    return ext
 
 if __name__ == '__main__':
     app.run()

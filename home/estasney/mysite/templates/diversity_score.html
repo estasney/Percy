@@ -3,7 +3,29 @@
 {% if success == 'True' %}
 <div class="container-fluid text-center">
 <h2>Percy Analyzed Your File</h2>
-	<h3> It got a score of {{ diversity_score }}</h3>
+<table class="table">
+    <thead>
+      <tr>
+        <th class="text-center">Male Names</th>
+	  	<th class="text-center">Female Names</th>
+	    <th class="text-center">Unknown Names</th>
+	  </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td> {{ male_count }} </td>
+        <td> {{ female_count }} </td>
+	    <td> {{ unknown_count }} </td>
+      </tr>
+
+
+    </tbody>
+  </table>
+</div>
+
+
+
 </div>
 {% endif %}
 {% if success == 'False' %}
@@ -13,7 +35,7 @@
 {% endif %}
 
 <div class="container-fluid text-center">
-<h1>Upload a CSV Below</h1>
+<h1>Upload a .csv or .xlsx Spreadsheet Below</h1>
 </div>
  <div class="container-fluid text-center">
 <form class="form-inline" action="." method="POST" enctype="multipart/form-data">
