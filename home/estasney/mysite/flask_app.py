@@ -10,11 +10,11 @@ import pickle
 import math
 import os
 
-model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
+# model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
 
 # for web
 
-# model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
+model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
 
 # for other pc
 
@@ -27,7 +27,8 @@ UPLOAD PARAMETERS HERE
 """
 
 # UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
-UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
+# UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
+UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
 ALLOWED_EXTENSIONS = ['.csv', '.xlsx']
 
 app = Flask(__name__)
@@ -169,12 +170,12 @@ def my_sims():
         stemmed_bool = ' '.join(mod_terms)
         return render_template('stemmed.html', stemmed_bool=stemmed_bool, success='True', original=search)
     elif request.form['button'] == 'infer_name':
-        # f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
-        f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
+        f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
+        # f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
         tree_model = pickle.load(f)
         f.close()
-        # fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
-        fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+        fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
+        # fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
         name_dict = pickle.load(fp)
         fp.close()
         user_query_name = request.form['infer_name']
@@ -266,8 +267,8 @@ def retrieve_name(name, name_dict):
 
 
 def retrieve_names_bulk(name_list):
-    # fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
-    fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+    fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
+    # fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
     # fp = open(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\name_dict.pickle", "rb")
     name_dict = pickle.load(fp)
     fp.close()
