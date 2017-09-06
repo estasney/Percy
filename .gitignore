@@ -56,3 +56,6 @@ ENV/
 /home/estasney/mysite/mymodel.model.syn1neg.npy
 /home/estasney/mysite/mymodel.model.wv.syn0.npy
 .idea
+/home/estasney/mysite/name_dict.pickle
+/home/estasney/mysite/uploads/
+/home/estasney/mysite/uploads/Extraction_escalation.csv
