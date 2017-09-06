@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 from gensim.models import Doc2Vec
 from gensim.summarization import keywords as KW
@@ -275,7 +275,6 @@ def retrieve_names_bulk(name_list):
     male_count = 0
     female_count = 0
     unknown_count = 0
-    bulk_count = len(name_list)
     for name in name_list:
         # TREE CAN GO HERE IN FUTURE
         try:
