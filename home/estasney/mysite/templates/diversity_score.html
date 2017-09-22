@@ -3,12 +3,11 @@
 {% if success == 'True' %}
 <div class="container-fluid text-center">
 <h2>Percy Analyzed Your File</h2>
-<table class="table">
+    <table class="table">
     <thead>
       <tr>
         <th class="text-center">Male Names</th>
 	  	<th class="text-center">Female Names</th>
-	    <th class="text-center">Unknown Names</th>
 	  </tr>
     </thead>
     <tbody>
@@ -16,8 +15,31 @@
       <tr>
         <td> {{ male_count }} </td>
         <td> {{ female_count }} </td>
-	    <td> {{ unknown_count }} </td>
       </tr>
+    </table>
+</div>
+<div class="container-fluid text-center bg-white">
+<h2> {{unknown_count}} names were not present in the SSA Database. Percy utilized Machine Learning for these {{unknown_count}}</h2>
+<table class="table">
+    <thead>
+    <tr>
+        <th class="text-center">Name</th>
+        <th class="text-center">Inferred Gender</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for name, gender in ai_names.items() %}
+    <tr>
+        <td> {{ name }} </td>
+        <td> {{ gender }} </td>
+      </tr>
+        {% endfor %}
+    </tr>
+
+    </tbody>
+
+
+
 
 
     </tbody>

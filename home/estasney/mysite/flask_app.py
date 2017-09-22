@@ -10,25 +10,47 @@ import pickle
 import math
 import os
 
+
+
+
+
+""" GLOBAL VARS HERE"""
+
+# for local dev
+
 # model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
+# model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
+# f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
+# fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+# UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
+# UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
 
 # for web
 
 model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
+f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
+fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
+UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
 
-# for other pc
+# common
 
-# model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
+tree_model = pickle.load(f)
+f.close()
+name_dict = pickle.load(fp)
+fp.close()
 
+
+
+
+
+""" GLOBAL END"""
 """
 
 UPLOAD PARAMETERS HERE
 
 """
 
-# UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
-# UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
-UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
+
 ALLOWED_EXTENSIONS = ['.csv', '.xlsx']
 
 app = Flask(__name__)
@@ -170,14 +192,6 @@ def my_sims():
         stemmed_bool = ' '.join(mod_terms)
         return render_template('stemmed.html', stemmed_bool=stemmed_bool, success='True', original=search)
     elif request.form['button'] == 'infer_name':
-        f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
-        # f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
-        tree_model = pickle.load(f)
-        f.close()
-        fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
-        # fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
-        name_dict = pickle.load(fp)
-        fp.close()
         user_query_name = request.form['infer_name']
         inferred_gender = tree_model.classify(gender_features(user_query_name)).title()
         gender_lookup = retrieve_name(user_query_name, name_dict)[1]  # Selecting the message
@@ -232,9 +246,10 @@ def my_sims():
             male_count = str(diversity_scored['male'])
             female_count = str(diversity_scored['female'])
             unknown_count = str(diversity_scored['unknown'])
+            ai_names = diversity_scored['ai_names']
 
             return render_template('diversity_score.html', success='True', male_count=male_count,
-                                   female_count=female_count, unknown_count=unknown_count)
+                                   female_count=female_count, unknown_count=unknown_count, ai_names=ai_names)
 
 
 def gender_features(name):
@@ -294,16 +309,12 @@ def retrieve_name(name, name_dict):
 
 
 def retrieve_names_bulk(name_list):
-    fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
-    # fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
-    # fp = open(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\name_dict.pickle", "rb")
-    name_dict = pickle.load(fp)
-    fp.close()
+
     male_count = 0
     female_count = 0
     unknown_count = 0
+    unknown_dict = {}
     for name in name_list:
-        # TREE CAN GO HERE IN FUTURE
         try:
             gender_lookup = retrieve_name(name, name_dict)[0][0]
             if gender_lookup == 'M':
@@ -311,13 +322,27 @@ def retrieve_names_bulk(name_list):
             elif gender_lookup == 'F':
                 female_count += 1
         except TypeError:
-            unknown_count += 1
-    diversity_score_dict = {'male': male_count, 'female': female_count, 'unknown': unknown_count}
+            # Use decision tree model
+
+            inferred_gender = guess_name(name).lower()
+            if inferred_gender == 'male':
+                male_count = male_count + 1
+                unknown_count = unknown_count + 1
+                unknown_dict[name.title()] = 'Male'
+            elif inferred_gender == 'female':
+                female_count = female_count + 1
+                unknown_count = unknown_count + 1
+                unknown_dict[name.title()] = 'Female'
+    diversity_score_dict = {'male': male_count, 'female': female_count, 'unknown': unknown_count, 'ai_names':unknown_dict}
     return diversity_score_dict
 
 def find_file_ext(filename):
     ext = filename.split(".")[-1]  # return the last split
     return ext
+
+def guess_name(name):
+    inferred_gender = tree_model.classify(gender_features(name)).title()
+    return inferred_gender
 
 if __name__ == '__main__':
     app.run()
