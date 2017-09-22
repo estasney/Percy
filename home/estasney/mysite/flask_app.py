@@ -197,9 +197,36 @@ def my_sims():
                                       filename)
             file_ext = find_file_ext(upped_file)
             if file_ext == 'csv':
-                df = pd.read_csv(upped_file)
+                try:
+                    df = pd.read_csv(upped_file)
+                except:
+                    try:
+                        df = pd.read_csv(upped_file, encoding='latin1')
+                    except:
+                        try:
+                            df = pd.read_csv(upped_file, encoding='cp1252')
+                        except:
+                            try:
+                                df = pd.read_csv(upped_file, encoding='iso-8859-1')
+                            except:
+                                return render_template('diversity_score.html', success='False',error_message="Your file's encoding was not recognized")
+
             elif file_ext == 'xlsx':
-                df = pd.read_excel(upped_file)
+                try:
+                    df = pd.read_excel(upped_file)
+                except:
+                    try:
+                        df = pd.read_excel(upped_file, encoding='latin1')
+                    except:
+                        try:
+                            df = pd.read_excel(upped_file, encoding='cp1252')
+                        except:
+                            try:
+                                df = pd.read_excel(upped_file, encoding='iso-8859-1')
+                            except:
+                                return render_template('diversity_score.html', success='False',
+                                                       error_message="Your file's encoding was not recognized")
+
             names_col = df[name_header]
             diversity_scored = retrieve_names_bulk(names_col)
             male_count = str(diversity_scored['male'])
