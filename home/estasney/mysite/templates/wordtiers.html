@@ -38,7 +38,9 @@
 		</div>
 		<div class="well bg-white">
 			<h2>Tier {{tier_found}}</h2>
-		</div>{% elif success == 'False' %}
+            <h3>Occurring in {{occurrence_pct}}% of resumes</h3>
+		</div>
+        {% elif success == 'False' %}
 		<div class="container-fluid">
 			<h2>Oops!</h2>
 			<p>It would appear that the word <strong>{{user_query}}</strong> is not in my vocabulary.</p>
