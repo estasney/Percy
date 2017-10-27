@@ -1,51 +1,61 @@
-from flask import Flask, render_template, request
-from werkzeug.utils import secure_filename
-from gensim.models import Doc2Vec
-from gensim.summarization import keywords as KW
-from nltk.tokenize import sent_tokenize
-from nltk.stem.porter import PorterStemmer
-import pickle
 import math
 import os
+import pickle
 import re
+import string
+
+
+import gensim
 import nltk
 import pandas as pd
-import gensim
-import string
+from flask import Flask, render_template, request
+from gensim.models import Doc2Vec, TfidfModel
+from gensim.corpora import Dictionary
+from gensim.summarization import keywords as KW
+from nltk.stem.porter import PorterStemmer
+from nltk.tokenize import sent_tokenize
 from nltk.tokenize.moses import MosesTokenizer
-
+from werkzeug.utils import secure_filename
 
 """ GLOBAL VARS HERE"""
 
 # for local dev
-
-# model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
-model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
-
-# f = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
-f = open(r"C:\Users\erics_qp7a9\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
-
-# fp = open(r"C:\Users\estasney\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
-fp = open(r"C:\Users\erics_qp7a9\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
-
-UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
-# UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
-
-gram_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\trigram_model.p")
-
-name_file_path = os.path.join("C:\\Users\\", os.getlogin(),
-                              r"Google Drive\IPython Books\Perseus Notebooks\Data\name_list.csv")
-
-month_list = ["jan", "january" "feb", "february", "mar", "march", "apr", "april", "may", "jun", "june", "jul", "july",
-              "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec", "december"]
-number_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+#
+# # model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
+# # model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
+#
+# # f = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
+# f = open(r"C:\Users\erics_qp7a9\Google Drive\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
+#
+# # fp = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+# fp = open(r"C:\Users\erics_qp7a9\Google Drive\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+#
+# dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\tfidf_dict.dict")
+# bigram_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf_dict.dict")
+# tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\tfidf.model")
+# bigram_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf.model")
+#
+# UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
+# # UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
+#
+# gram_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\trigram_model.p")
+#
+# name_file_path = os.path.join("C:\\Users\\", os.getlogin(),
+#                               r"Google Drive\IPython Books\Perseus Notebooks\Data\name_list.csv")
 
 # for web
 #
-# model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
-# f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
-# fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
-# UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
+model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
+f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
+fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
+dict_path = '/home/estasney/mysite/tfidf_dict.dict'
+bigram_dict_path = '/home/estasney/mysite/bigram_tfidf_dict.dict'
+tfidf_model_path = '/home/estasney/mysite/tfidf.model'
+bigram_tfidf_model_path = '/home/estasney/mysite/bigram_tfidf.model'
+gram_path = '/home/estasney/mysite/trigram_model.p'
+name_file_path '/home/estasney/mysite/name_list.csv'
+
+UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
 
 # common
 
@@ -65,6 +75,13 @@ name_list = name_list['names'].tolist()
 name_list = set(name_list)
 bigram = gensim.models.Phrases.load(gram_path)
 bigrammer = gensim.models.phrases.Phraser(bigram)
+tfidf_model = TfidfModel.load(tfidf_model_path)
+bigram_tfidf_model = TfidfModel.load(bigram_tfidf_model_path)
+dictionary = Dictionary.load(dict_path)
+bigram_dictionary = Dictionary.load(bigram_dict_path)
+month_list = ["jan", "january" "feb", "february", "mar", "march", "apr", "april", "may", "jun", "june", "jul", "july",
+              "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec", "december"]
+number_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
 """ GLOBAL END"""
 
@@ -131,9 +148,9 @@ def thisplusthat():
 def infer():
     return render_template('infer.html')
 
-@app.route('/tfidf/')
-def render_tfidf():
-    return render_template('tfidf.html')
+@app.route('/tfidf_measures')
+def tfidf():
+    return render_template('tf_idf.html')
 
 @app.route('/', methods=['POST'])
 def my_sims():
@@ -278,8 +295,38 @@ def my_sims():
 
             return render_template('diversity_score.html', success='True', male_count=male_count,
                                    female_count=female_count, unknown_count=unknown_count, ai_names=ai_names)
+
     elif request.form['button'] == 'tfidf':
         user_input = request.form['tfidf_text']
+        if len(user_input) > 10000:
+            return render_template('tf_idf.html', success='False', original="Text Size Limit Exceeded", error_message="Text Size Limit Exceeded")
+        user_form = request.form
+        gram_mode = user_form.get('gram_tokens', False)
+        lem_mode = user_form.get('lem_tokens', False)
+        if gram_mode == 'on':
+            gram_mode = True
+        if lem_mode == 'on':
+            lem_mode = True
+        # clean text returned is string.
+        clean_text = clean_it(user_input, lem_tokens=lem_mode, gram_tokens=gram_mode)
+        # choose model from gram tokens parameter
+        if gram_mode is True:
+            d = bigram_dictionary
+            m = bigram_tfidf_model
+        else:
+            d = dictionary
+            m = tfidf_model
+
+        tfidf_values = dict(m[d.doc2bow(clean_text.split())])
+        tfidf_tokens = {}
+        for id_token, tfidf_value in tfidf_values.items():
+            token = d[id_token]
+            tfidf_tokens[token] = round(tfidf_value, 4)
+        # Sort the values
+        tfidf_scored = sorted(tfidf_tokens.items(), key=lambda x: x[1], reverse=True)
+        # Limit to 25
+        tfidf_scored = tfidf_scored[:25]
+        return render_template('tf_idf.html', success='True', original=user_input, result=tfidf_scored)
 
 
 
