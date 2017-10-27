@@ -53,7 +53,7 @@ bigram_dict_path = '/home/estasney/mysite/bigram_tfidf_dict.dict'
 tfidf_model_path = '/home/estasney/mysite/tfidf.model'
 bigram_tfidf_model_path = '/home/estasney/mysite/bigram_tfidf.model'
 gram_path = '/home/estasney/mysite/trigram_model.p'
-name_file_path '/home/estasney/mysite/name_list.csv'
+name_file_path ='/home/estasney/mysite/name_list.csv'
 
 UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
 
