@@ -4,7 +4,6 @@ import pickle
 import re
 import string
 
-
 import gensim
 import nltk
 import pandas as pd
@@ -20,73 +19,73 @@ from werkzeug.utils import secure_filename
 """ GLOBAL VARS HERE"""
 
 # for local dev
-#
-model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
-# # model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
-#
-f = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
+
+# model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
+# model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
+
+# f = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
 # f = open(r"C:\Users\erics_qp7a9\Google Drive\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
-#
-fp = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+
+# fp = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
 # fp = open(r"C:\Users\erics_qp7a9\Google Drive\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
 
 
 # TFIDF
 
-## Raw
-dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\raw_dictionary.dict")
-tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\tfidf.model")
+# Raw
+# dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\raw_dictionary.dict")
+# tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\tfidf.model")
 
 # Grams Only
-bigram_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf_dict.dict")
-bigram_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf.model")
+# bigram_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf_dict.dict")
+# bigram_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf.model")
 
 # Lems Only
 
-lem_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\l_dictionary.dict")
-lem_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\l_tfidf.model")
+# lem_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\l_dictionary.dict")
+# lem_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\l_tfidf.model")
 
 # Lemmed and Grammed
 
-lg_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\lg_dictionary.dict")
-lg_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\lg_tfidf.model")
+# lg_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\lg_dictionary.dict")
+# lg_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\lg_tfidf.model")
 
 
-UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
-# # UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
-#
-gram_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\trigram_model.p")
-#
-name_file_path = os.path.join("C:\\Users\\", os.getlogin(),
-                              r"Google Drive\IPython Books\Perseus Notebooks\Data\name_list.csv")
+# UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
+# UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
+
+# gram_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\trigram_model.p")
+
+# name_file_path = os.path.join("C:\\Users\\", os.getlogin(),
+#                               r"Google Drive\IPython Books\Perseus Notebooks\Data\name_list.csv")
 
 # for web
-#
-# model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
-# f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
-# fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
-#
-# # TFIDF
-#
-# ## Raw
-# dict_path = '/home/estasney/mysite/tfidf_dict.dict'
-# tfidf_model_path = '/home/estasney/mysite/tfidf.model'
-# ## Grams Only
-# bigram_dict_path = '/home/estasney/mysite/bigram_tfidf_dict.dict'
-# bigram_tfidf_model_path = '/home/estasney/mysite/bigram_tfidf.model'
-# ## Lems Only
-# lem_dict_path = '/home/estasney/mysite/l_dictionary.dict'
-# lem_tfidf_model_path = '/home/estasney/mysite/l_tfidf.model'
-# ## Lemmed and Grammed
-# lg_dict_path = '/home/estasney/mysite/lg_dictionary.dict'
-# lg_tfidf_model_path = '/home/estasney/mysite/lg_tfidf.model'
-#
-#
-#
-# gram_path = '/home/estasney/mysite/trigram_model.p'
-# name_file_path ='/home/estasney/mysite/name_list.csv'
-#
-# UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
+
+model = Doc2Vec.load('/home/estasney/mysite/resources/mymodel.model')
+f = open("/home/estasney/mysite/resources/tree_classifier.pickle", "rb")
+fp = open('/home/estasney/mysite/resources/name_dict.pickle', "rb")
+
+# TFIDF
+
+## Raw
+dict_path = '/home/estasney/mysite/resources/tfidf_dict.dict'
+tfidf_model_path = '/home/estasney/mysite/resources/tfidf.model'
+## Grams Only
+bigram_dict_path = '/home/estasney/mysite/resources/bigram_tfidf_dict.dict'
+bigram_tfidf_model_path = '/home/estasney/mysite/resources/bigram_tfidf.model'
+## Lems Only
+lem_dict_path = '/home/estasney/mysite/resources/l_dictionary.dict'
+lem_tfidf_model_path = '/home/estasney/mysite/resources/l_tfidf.model'
+## Lemmed and Grammed
+lg_dict_path = '/home/estasney/mysite/resources/lg_dictionary.dict'
+lg_tfidf_model_path = '/home/estasney/mysite/resources/lg_tfidf.model'
+
+
+
+gram_path = '/home/estasney/mysite/resources/trigram_model.p'
+name_file_path ='/home/estasney/mysite/resources/name_list.csv'
+
+UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
 
 # common
 
