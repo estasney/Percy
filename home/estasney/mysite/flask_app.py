@@ -21,41 +21,72 @@ from werkzeug.utils import secure_filename
 
 # for local dev
 #
-# # model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
+model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
 # # model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
 #
-# # f = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
+f = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
 # f = open(r"C:\Users\erics_qp7a9\Google Drive\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
 #
-# # fp = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+fp = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
 # fp = open(r"C:\Users\erics_qp7a9\Google Drive\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
-#
-# dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\tfidf_dict.dict")
-# bigram_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf_dict.dict")
-# tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\tfidf.model")
-# bigram_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf.model")
-#
-# UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
+
+
+# TFIDF
+
+## Raw
+dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\raw_dictionary.dict")
+tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\tfidf.model")
+
+# Grams Only
+bigram_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf_dict.dict")
+bigram_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf.model")
+
+# Lems Only
+
+lem_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\l_dictionary.dict")
+lem_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\l_tfidf.model")
+
+# Lemmed and Grammed
+
+lg_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\lg_dictionary.dict")
+lg_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\lg_tfidf.model")
+
+
+UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
 # # UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
 #
-# gram_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\trigram_model.p")
+gram_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\trigram_model.p")
 #
-# name_file_path = os.path.join("C:\\Users\\", os.getlogin(),
-#                               r"Google Drive\IPython Books\Perseus Notebooks\Data\name_list.csv")
+name_file_path = os.path.join("C:\\Users\\", os.getlogin(),
+                              r"Google Drive\IPython Books\Perseus Notebooks\Data\name_list.csv")
 
 # for web
 #
-model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
-f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
-fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
-dict_path = '/home/estasney/mysite/tfidf_dict.dict'
-bigram_dict_path = '/home/estasney/mysite/bigram_tfidf_dict.dict'
-tfidf_model_path = '/home/estasney/mysite/tfidf.model'
-bigram_tfidf_model_path = '/home/estasney/mysite/bigram_tfidf.model'
-gram_path = '/home/estasney/mysite/trigram_model.p'
-name_file_path ='/home/estasney/mysite/name_list.csv'
-
-UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
+# model = Doc2Vec.load('/home/estasney/mysite/mymodel.model')
+# f = open("/home/estasney/mysite/tree_classifier.pickle", "rb")
+# fp = open('/home/estasney/mysite/name_dict.pickle', "rb")
+#
+# # TFIDF
+#
+# ## Raw
+# dict_path = '/home/estasney/mysite/tfidf_dict.dict'
+# tfidf_model_path = '/home/estasney/mysite/tfidf.model'
+# ## Grams Only
+# bigram_dict_path = '/home/estasney/mysite/bigram_tfidf_dict.dict'
+# bigram_tfidf_model_path = '/home/estasney/mysite/bigram_tfidf.model'
+# ## Lems Only
+# lem_dict_path = '/home/estasney/mysite/l_dictionary.dict'
+# lem_tfidf_model_path = '/home/estasney/mysite/l_tfidf.model'
+# ## Lemmed and Grammed
+# lg_dict_path = '/home/estasney/mysite/lg_dictionary.dict'
+# lg_tfidf_model_path = '/home/estasney/mysite/lg_tfidf.model'
+#
+#
+#
+# gram_path = '/home/estasney/mysite/trigram_model.p'
+# name_file_path ='/home/estasney/mysite/name_list.csv'
+#
+# UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
 
 # common
 
@@ -75,10 +106,28 @@ name_list = name_list['names'].tolist()
 name_list = set(name_list)
 bigram = gensim.models.Phrases.load(gram_path)
 bigrammer = gensim.models.phrases.Phraser(bigram)
+### TFIDF Variables
+
+# Raw
 tfidf_model = TfidfModel.load(tfidf_model_path)
-bigram_tfidf_model = TfidfModel.load(bigram_tfidf_model_path)
 dictionary = Dictionary.load(dict_path)
+# Grams Only
+bigram_tfidf_model = TfidfModel.load(bigram_tfidf_model_path)
 bigram_dictionary = Dictionary.load(bigram_dict_path)
+# Lems Only
+lems_tfidf_model = TfidfModel.load(lem_tfidf_model_path)
+lems_dictionary = Dictionary.load(lem_dict_path)
+# Grams and Lems
+lg_tfidf_model = TfidfModel.load(lg_tfidf_model_path)
+lg_dictionary = Dictionary.load(lg_dict_path)
+
+
+
+
+
+
+
+
 month_list = ["jan", "january" "feb", "february", "mar", "march", "apr", "april", "may", "jun", "june", "jul", "july",
               "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec", "december"]
 number_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
@@ -310,9 +359,18 @@ def my_sims():
         # clean text returned is string.
         clean_text = clean_it(user_input, lem_tokens=lem_mode, gram_tokens=gram_mode)
         # choose model from gram tokens parameter
-        if gram_mode is True:
+        if gram_mode is False and lem_mode is False:
+            d = dictionary
+            m = tfidf_model
+        elif gram_mode is True and lem_mode is False:
             d = bigram_dictionary
             m = bigram_tfidf_model
+        elif gram_mode is True and lem_mode is True:
+            d = lg_dictionary
+            m = lg_tfidf_model
+        elif gram_mode is False and lem_mode is True:
+            d = lems_dictionary
+            m = lems_tfidf_model
         else:
             d = dictionary
             m = tfidf_model
