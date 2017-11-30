@@ -8,7 +8,7 @@ import string
 import gensim
 import nltk
 import pandas as pd
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from gensim.models import Doc2Vec, TfidfModel
 from gensim.corpora import Dictionary
 from gensim.summarization import keywords as KW
@@ -33,7 +33,7 @@ fp = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\nam
 
 # TFIDF
 
-## Raw
+## Raws
 dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\raw_dictionary.dict")
 tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\tfidf.model")
 
@@ -162,6 +162,18 @@ def allowed_file(filename):
     else:
         print("ext : " + ext + "not approved")
 
+"""
+
+Hack to include an API for other projects
+
+"""
+
+dupcheck_version = '0.1'
+
+
+@app.route('/api/dupchecker/version', methods=['GET'])
+def get_version():
+    return jsonify({'version': dupcheck_version})
 
 @app.route('/')
 def hello_world():
