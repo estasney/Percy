@@ -3,11 +3,10 @@ import os
 import pickle
 import re
 import string
-
 import gensim
 import nltk
 import pandas as pd
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from gensim.models import Doc2Vec, TfidfModel
 from gensim.corpora import Dictionary
 from gensim.summarization import keywords as KW
@@ -16,116 +15,81 @@ from nltk.tokenize import sent_tokenize
 from nltk.tokenize.moses import MosesTokenizer
 from werkzeug.utils import secure_filename
 
+""" LOAD CONFIG """
+
+try:
+    from config import local_config as config
+except ImportError:
+    from config import web_config as config
+
 """ GLOBAL VARS HERE"""
 
 # for local dev
+#
+model = Doc2Vec.load(config.model)
 
-# model = Doc2Vec.load(r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\mymodel.model")
-# model = Doc2Vec.load(r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\mymodel.model")
+f = open(config.tree, "rb")
 
-# f = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
-# f = open(r"C:\Users\erics_qp7a9\Google Drive\IPython Books\Diversity Notebooks\names\Models\tree_classifier.pickle", "rb")
+fp = open(config.name_dict, "rb")
 
-# fp = open(r"C:\Users\estasney\Google Drive\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
-# fp = open(r"C:\Users\erics_qp7a9\Google Drive\IPython Books\Diversity Notebooks\names\Models\name_dict.pickle", "rb")
+UPLOAD_FOLDER = config.UPLOAD_FOLDER
 
-
-# TFIDF
-
-# Raw
-# dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\raw_dictionary.dict")
-# tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\tfidf.model")
-
-# Grams Only
-# bigram_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf_dict.dict")
-# bigram_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\bigram_tfidf.model")
-
-# Lems Only
-
-# lem_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\l_dictionary.dict")
-# lem_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\l_tfidf.model")
-
-# Lemmed and Grammed
-
-# lg_dict_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\lg_dictionary.dict")
-# lg_tfidf_model_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\Perseus Notebooks\Models\lg_tfidf.model")
-
-
-# UPLOAD_FOLDER = r"C:\Users\erics_qp7a9\PycharmProjects\percy1\Percy\home\estasney\mysite\uploads"
-# UPLOAD_FOLDER = r"C:\Users\estasney\PycharmProjects\webwork\home\estasney\mysite\uploads"
-
-# gram_path = os.path.join("C:\\Users\\", os.getlogin(), r"Google Drive\IPython Books\trigram_model.p")
-
-# name_file_path = os.path.join("C:\\Users\\", os.getlogin(),
-#                               r"Google Drive\IPython Books\Perseus Notebooks\Data\name_list.csv")
-
-# for web
-
-model = Doc2Vec.load('/home/estasney/mysite/resources/mymodel.model')
-f = open("/home/estasney/mysite/resources/tree_classifier.pickle", "rb")
-fp = open('/home/estasney/mysite/resources/name_dict.pickle', "rb")
-
-# TFIDF
-
-## Raw
-dict_path = '/home/estasney/mysite/resources/tfidf_dict.dict'
-tfidf_model_path = '/home/estasney/mysite/resources/tfidf.model'
-## Grams Only
-bigram_dict_path = '/home/estasney/mysite/resources/bigram_tfidf_dict.dict'
-bigram_tfidf_model_path = '/home/estasney/mysite/resources/bigram_tfidf.model'
-## Lems Only
-lem_dict_path = '/home/estasney/mysite/resources/l_dictionary.dict'
-lem_tfidf_model_path = '/home/estasney/mysite/resources/l_tfidf.model'
-## Lemmed and Grammed
-lg_dict_path = '/home/estasney/mysite/resources/lg_dictionary.dict'
-lg_tfidf_model_path = '/home/estasney/mysite/resources/lg_tfidf.model'
-
-
-
-gram_path = '/home/estasney/mysite/resources/trigram_model.p'
-name_file_path ='/home/estasney/mysite/resources/name_list.csv'
-
-UPLOAD_FOLDER = ('/home/estasney/mysite/uploads')
-
-# common
+# Load Tree Classifier
 
 tree_model = pickle.load(f)
 f.close()
+
+# Load Name Dictionary
 name_dict = pickle.load(fp)
 fp.close()
+
+# Load Stopwords
 stopw = gensim.parsing.preprocessing.STOPWORDS
+
+# Punctuation
 punc = string.punctuation
 punc = punc + "●" + "•" + "-" + "ø"
+
+# Tokenizer
 tokenizer = nltk.tokenize.moses.MosesTokenizer()
+
+# Stemmer
 stemmer = nltk.stem.snowball.SnowballStemmer("english")
+
+# Stoplist
 stoplist = nltk.corpus.stopwords.words('english')
+
+# Whitespace
 wht_space = set('\t\r\x0b\x0c')
-name_list = pd.read_csv(name_file_path)
+
+# Namelist
+name_list = pd.read_csv(config.name_file_path)
 name_list = name_list['names'].tolist()
 name_list = set(name_list)
-bigram = gensim.models.Phrases.load(gram_path)
+
+# Phraser
+bigram = gensim.models.Phrases.load(config.gram_path)
 bigrammer = gensim.models.phrases.Phraser(bigram)
-### TFIDF Variables
+
+"""
+
+TFIDF Variables
+
+"""
+
 
 # Raw
-tfidf_model = TfidfModel.load(tfidf_model_path)
-dictionary = Dictionary.load(dict_path)
+tfidf_model = TfidfModel.load(config.tfidf_model)
+dictionary = Dictionary.load(config.raw_dict)
 # Grams Only
-bigram_tfidf_model = TfidfModel.load(bigram_tfidf_model_path)
-bigram_dictionary = Dictionary.load(bigram_dict_path)
+bigram_tfidf_model = TfidfModel.load(config.bigram_tfidf_model_path)
+bigram_dictionary = Dictionary.load(config.bigram_dict_path)
 # Lems Only
-lems_tfidf_model = TfidfModel.load(lem_tfidf_model_path)
-lems_dictionary = Dictionary.load(lem_dict_path)
+lems_tfidf_model = TfidfModel.load(config.lem_tfidf_model_path)
+lems_dictionary = Dictionary.load(config.lem_dict_path)
 # Grams and Lems
-lg_tfidf_model = TfidfModel.load(lg_tfidf_model_path)
-lg_dictionary = Dictionary.load(lg_dict_path)
-
-
-
-
-
-
-
+lg_tfidf_model = TfidfModel.load(config.lg_tfidf_model_path)
+lg_dictionary = Dictionary.load(config.lg_dict_path)
 
 month_list = ["jan", "january" "feb", "february", "mar", "march", "apr", "april", "may", "jun", "june", "jul", "july",
               "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec", "december"]
@@ -161,6 +125,18 @@ def allowed_file(filename):
     else:
         print("ext : " + ext + "not approved")
 
+"""
+
+Hack to include an API for other projects
+
+"""
+
+dupcheck_version = '0.1'
+
+
+@app.route('/api/dupchecker/version', methods=['GET'])
+def get_version():
+    return jsonify({'version': dupcheck_version})
 
 @app.route('/')
 def hello_world():
@@ -631,6 +607,7 @@ def clean_it(text, lem_tokens=True, gram_tokens=True, sent_mode=False):
                     continue_gram = False
         clean_tokens = ' '.join(clean_tokens)
         return clean_tokens
+
 
 if __name__ == '__main__':
     app.run()
