@@ -131,7 +131,7 @@ Hack to include an API for other projects
 
 """
 
-dupcheck_version = '0.1'
+dupcheck_version = config.dupcheck_version
 
 
 @app.route('/api/dupchecker/version', methods=['GET'])
