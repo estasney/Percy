@@ -271,9 +271,11 @@ def my_sims():
             return render_template('diversity_score.html')
         file = request.files['file']
         if file.filename == '':
-            return render_template('diversity_score.html', success='False')
+            return render_template('diversity_score.html', success='False', error_message='No File Selected')
         if file and allowed_file(file.filename):
             name_header = request.form['header_name']
+            if name_header == '':
+                return render_template('diversity_score.html', success='False', error_message='You forgot to include the header that contains the first names')
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             upped_file = os.path.join(app.config['UPLOAD_FOLDER'],
@@ -292,7 +294,7 @@ def my_sims():
                             try:
                                 df = pd.read_csv(upped_file, encoding='iso-8859-1')
                             except:
-                                return render_template('diversity_score.html', success='False',error_message="Your file's encoding was not recognized")
+                                return render_template('diversity_score.html', success='False', error_message="Your file's encoding was not recognized")
 
             elif file_ext == 'xlsx':
                 try:
@@ -309,8 +311,26 @@ def my_sims():
                             except:
                                 return render_template('diversity_score.html', success='False',
                                                        error_message="Your file's encoding was not recognized")
-
-            names_col = df[name_header]
+            else:
+                try:
+                    df = pd.read_excel(upped_file)
+                except:
+                    try:
+                        df = pd.read_excel(upped_file, encoding='latin1')
+                    except:
+                        try:
+                            df = pd.read_excel(upped_file, encoding='cp1252')
+                        except:
+                            try:
+                                df = pd.read_excel(upped_file, encoding='iso-8859-1')
+                            except:
+                                return render_template('diversity_score.html', success='False',
+                                                       error_message="Your file's encoding was not recognized")
+            try:
+                names_col = df[name_header]
+            except KeyError:
+                return render_template('diversity_score.html', success='False',
+                                       error_message="Header \"{}\" was not found in spreadsheet".format(name_header))
             diversity_scored = retrieve_names_bulk(names_col)
             male_count = str(diversity_scored['male'])
             female_count = str(diversity_scored['female'])
