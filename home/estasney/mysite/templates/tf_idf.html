@@ -4,7 +4,11 @@
 <div class="form-group text-center">
     <form action="." method="post">
         <label for="tfidf">Paste in a Resume to Calculate TF-IDF</label>
-        <textarea class="form-control" id="tfidf_success" name="tfidf_text" rows="5">{{ original }}</textarea> <label class="form-check-label"><input class="form-check-input" name="gram_tokens" type="checkbox"> Phrase Detection?</label> <label class="form-check-label"><input class="form-check-input" name="lem_tokens" type="checkbox"> Lemmatize Words?</label>
+        <textarea class="form-control" id="tfidf_success" name="tfidf_text" rows="5">{{ original }}</textarea>
+        <label class="form-check-label">
+            <input class="form-check-input" name="gram_tokens" type="checkbox">Phrase Detection?</label>
+        <label class="form-check-label">
+            <input class="form-check-input" name="lem_tokens" type="checkbox">Lemmatize Words?</label>
         <div class="input-group-btn">
             <button class="btn btn-danger" name="button" type="tfidf" value="tfidf">Get TF-IDF</button>
         </div>

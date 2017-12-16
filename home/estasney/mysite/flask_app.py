@@ -105,25 +105,7 @@ UPLOAD PARAMETERS HERE
 """
 
 
-ALLOWED_EXTENSIONS = ['.csv', '.xlsx']
 
-app = Flask(__name__)
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-""" 
-
-UPLOAD SPECIFIC FUNCTIONS
-
-"""
-
-
-def allowed_file(filename):
-    ext = "." + filename.rsplit('.', 1)[1]
-    if ext in ALLOWED_EXTENSIONS:
-        return ext
-    else:
-        print("ext : " + ext + "not approved")
 
 """
 
@@ -261,84 +243,11 @@ def my_sims():
         stemmed_bool = ' '.join(mod_terms)
         return render_template('stemmed.html', stemmed_bool=stemmed_bool, success='True', original=search)
     elif request.form['button'] == 'infer_name':
-        user_query_name = request.form['infer_name']
-        inferred_gender = tree_model.classify(gender_features(user_query_name)).title()
-        gender_lookup = retrieve_name(user_query_name, name_dict)[1]  # Selecting the message
-        return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=inferred_gender,
-                               lookup_message=gender_lookup)
+        # Todo import
     elif request.form['button'] == 'Upload':
-        if 'file' not in request.files:
-            return render_template('diversity_score.html')
-        file = request.files['file']
-        if file.filename == '':
-            return render_template('diversity_score.html', success='False', error_message='No File Selected')
-        if file and allowed_file(file.filename):
-            name_header = request.form['header_name']
-            if name_header == '':
-                return render_template('diversity_score.html', success='False', error_message='You forgot to include the header that contains the first names')
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            upped_file = os.path.join(app.config['UPLOAD_FOLDER'],
-                                      filename)
-            file_ext = find_file_ext(upped_file)
-            if file_ext == 'csv':
-                try:
-                    df = pd.read_csv(upped_file)
-                except:
-                    try:
-                        df = pd.read_csv(upped_file, encoding='latin1')
-                    except:
-                        try:
-                            df = pd.read_csv(upped_file, encoding='cp1252')
-                        except:
-                            try:
-                                df = pd.read_csv(upped_file, encoding='iso-8859-1')
-                            except:
-                                return render_template('diversity_score.html', success='False', error_message="Your file's encoding was not recognized")
-
-            elif file_ext == 'xlsx':
-                try:
-                    df = pd.read_excel(upped_file)
-                except:
-                    try:
-                        df = pd.read_excel(upped_file, encoding='latin1')
-                    except:
-                        try:
-                            df = pd.read_excel(upped_file, encoding='cp1252')
-                        except:
-                            try:
-                                df = pd.read_excel(upped_file, encoding='iso-8859-1')
-                            except:
-                                return render_template('diversity_score.html', success='False',
-                                                       error_message="Your file's encoding was not recognized")
-            else:
-                try:
-                    df = pd.read_excel(upped_file)
-                except:
-                    try:
-                        df = pd.read_excel(upped_file, encoding='latin1')
-                    except:
-                        try:
-                            df = pd.read_excel(upped_file, encoding='cp1252')
-                        except:
-                            try:
-                                df = pd.read_excel(upped_file, encoding='iso-8859-1')
-                            except:
-                                return render_template('diversity_score.html', success='False',
-                                                       error_message="Your file's encoding was not recognized")
-            try:
-                names_col = df[name_header]
-            except KeyError:
-                return render_template('diversity_score.html', success='False',
-                                       error_message="Header \"{}\" was not found in spreadsheet".format(name_header))
-            diversity_scored = retrieve_names_bulk(names_col)
-            male_count = str(diversity_scored['male'])
-            female_count = str(diversity_scored['female'])
-            unknown_count = str(diversity_scored['unknown'])
-            ai_names = diversity_scored['ai_names']
-
-            return render_template('diversity_score.html', success='True', male_count=male_count,
-                                   female_count=female_count, unknown_count=unknown_count, ai_names=ai_names)
+        # TODO Add Check for Use Global Dict
+        # TODO import
+        # Validate Header
 
     elif request.form['button'] == 'tfidf':
         user_input = request.form['tfidf_text']
@@ -380,100 +289,6 @@ def my_sims():
         # Limit to 25
         tfidf_scored = tfidf_scored[:25]
         return render_template('tf_idf.html', success='True', original=user_input, result=tfidf_scored)
-
-
-
-def gender_features(name):
-    name = name.lower()
-    features = {}
-    features['first_two'] = name[:2]
-    features['last_letter'] = name[-1]
-    features['last_letter_vowel'] = vowel_test(name[-1])
-    features['last_two'] = name[-2:]
-    return features
-
-
-def vowel_test(letter):
-    vowels = ["a", "e", "i", "o", "u", "y"]
-    if letter in vowels:
-        return "Yes"
-    else:
-        return "No"
-
-
-def retrieve_name(name, name_dict):
-    name = name.lower()
-    try:
-        male_count = name_dict[name]['M']
-        female_count = name_dict[name]['F']
-        if male_count > female_count:
-            try:
-                likely = round(male_count / female_count, 1)
-                if math.isinf(likely):
-                    message = "The name {} is only known to be male".format(name.title())
-                    winner = ('M', 999)
-                else:
-                    message = "The name {} is {}x more likely to be male".format(name.title(), likely)
-                    winner = ('M', likely)
-            except ZeroDivisionError:
-                message = "The name {} is only known to be male"
-                winner = ('M', 999)
-        elif male_count < female_count:
-            try:
-                likely = round(female_count / male_count, 1)
-                if math.isinf(likely):
-                    message = "The name {} is only known to be female".format(name.title())
-                    winner = ('F', 999)
-                else:
-                    message = "The name {} is {}x more likely to be female".format(name.title(), likely)
-                    winner = ('F', likely)
-            except ZeroDivisionError:
-                message = "The name {} is only known to be female"
-                winner = ('F', 999)
-        else:
-            message = "The name {} is ambiguous".format(name.title())
-            return False, message
-        return winner, message
-    except KeyError:
-        message = "I have not see the name {} before".format(name.title())
-        return False, message
-
-
-def retrieve_names_bulk(name_list):
-
-    male_count = 0
-    female_count = 0
-    unknown_count = 0
-    unknown_dict = {}
-    for name in name_list:
-        try:
-            gender_lookup = retrieve_name(name, name_dict)[0][0]
-            if gender_lookup == 'M':
-                male_count += 1
-            elif gender_lookup == 'F':
-                female_count += 1
-        except TypeError:
-            # Use decision tree model
-
-            inferred_gender = guess_name(name).lower()
-            if inferred_gender == 'male':
-                male_count = male_count + 1
-                unknown_count = unknown_count + 1
-                unknown_dict[name.title()] = 'Male'
-            elif inferred_gender == 'female':
-                female_count = female_count + 1
-                unknown_count = unknown_count + 1
-                unknown_dict[name.title()] = 'Female'
-    diversity_score_dict = {'male': male_count, 'female': female_count, 'unknown': unknown_count, 'ai_names':unknown_dict}
-    return diversity_score_dict
-
-def find_file_ext(filename):
-    ext = filename.split(".")[-1]  # return the last split
-    return ext
-
-def guess_name(name):
-    inferred_gender = tree_model.classify(gender_features(name)).title()
-    return inferred_gender
 
 def remove_noise(text, sent=False):
     # CV/Resume Specific Cleaning
