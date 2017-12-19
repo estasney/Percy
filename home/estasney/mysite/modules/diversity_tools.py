@@ -1,4 +1,5 @@
 from operator import itemgetter
+import queue
 
 
 # user_form = self.request_object
@@ -16,16 +17,89 @@ from operator import itemgetter
 #
 # # Will be passed query data
 
-def single_name(name, name_dict, global_dict=None):
-    # Database lookup
+# Start with list of names
+# User chooses
+    # A. Include Global Dict?
+    # B. Exclude Machine Learning
+# Returns
+    # Database Lookups
+        # SSA Lookup
+            # M to F
+        # Global Dict
+            # M, F, Ambiguous
+    # If exclude ML
+        # Do stats
 
-    ssa_lookup = retrieve_name(name, name_dict=name_dict)
-    if global_dict:
-        if ssa_lookup is False:
-            global_lookup = retrieve_name(name, name_dict=global_dict)
+class DataFetcher(object):
 
-    # ML Method
-    gender_guess = guess_name(name)
+    def __init__(self, query, *data_file):
+        self.query = self.format_query_(query)
+        self.data_file = [d for d in data_file]
+        self.query_results = {'male': 0, 'female': 0, 'ambiguous': 0, 'unknown': []}
+
+    def format_query_(self, query):
+        if isinstance(query, str):
+            query = [query]
+        elif isinstance(query, list) is False:
+            raise ValueError
+        fl = [q.lower() for q in query]
+        query_q = queue.Queue()
+        for qq in fl:
+            query_q.put_nowait(qq)
+        return query_q
+
+
+    def query_name_(self, name, data_file_index=0):
+        if name not in self.data_file[data_file_index]:
+            return False
+        else:
+            return self.data_file[data_file_index][name]
+
+    def parse_value_(self, value):
+        if isinstance(value, dict): # SSA Database
+            sorted_data = sorted(value, key=itemgetter(1), reverse=True)
+            top_gender = sorted_data[0][0]
+            return top_gender
+        if isinstance(value, str): # Global Name Database
+            return value
+
+    def run_query(self):
+        for q in self.query:
+            self.query_name_(q)
+
+def worker():
+    while True:
+        item = q.get()
+        if item is None:
+            break
+        do_work(item)
+        q.task_done()
+
+q = queue.Queue()
+threads = []
+for i in range(num_worker_threads):
+    t = threading.Thread(target=worker)
+    t.start()
+    threads.append(t)
+
+for item in source():
+    q.put(item)
+
+# block until all tasks are done
+q.join()
+
+# stop workers
+for i in range(num_worker_threads):
+    q.put(None)
+for t in threads:
+    t.join()
+
+
+
+
+
+
+
 
 
 
@@ -45,20 +119,6 @@ def vowel_test(letter):
         return "Yes"
     else:
         return "No"
-
-
-def retrieve_name(name, name_dict):
-    name = name.lower()
-    if name not in name_dict:
-        return False
-    name_lookup = name_dict[name]
-    return name_lookup
-
-def parse_ssa_lookup(data):
-    sorted_data = sorted(data, key=itemgetter(1), reverse=True)
-    top_gender = sorted_data[0][0]
-    return top_gender
-
 
 def retrieve_names_bulk(name_list, name_dict, global_dict=None, infer_gender=True):
     male_count = 0
