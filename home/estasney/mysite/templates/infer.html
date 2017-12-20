@@ -1,36 +1,25 @@
 {% extends "layout.html" %}
 {% block content %}
 {% if success == 'True' or success == 'Partial' %}
-	<form action="/infer" method="POST">
-		<div class="container-fluid text-center">
-
-				<form class="form-inline">
-					<input class="form-control mb-2 mr-sm-2 mb-sm-0" name="infer_name" required="" size="50" type="infer_name" value="{{user_query}}">
-					<label class="form-check-label">
-            			<input class="form-check-input" name="global_names" type="checkbox">Use Global Name Data?</label>
-
-						<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
-					</div>
-				</form>
-			</div>
-		</div>
+<div class="container-fluid text-center">
+	<form class="form-inline" action="/infer" method="POST">
+		<input class="form-control mb-2 mr-sm-2 mb-sm-0" name="infer_name" required="" size="50" type="infer_name" value="{{user_query}}">
+		<label class="form-check-label">
+			<input class="form-check-input" name="global_names" type="checkbox">Use Global Name Data?</label>
+		<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
 	</form>
+</div>
+
 {% else %}
+<div class="container-fluid text-center">
+	<form class="form-inline" action="/infer" method="POST">
+		<input class="form-control mb-2 mr-sm-2 mb-sm-0" name="infer_name" required="" size="50" type="infer_name" value="">
+		<label class="form-check-label">
+			<input class="form-check-input" name="global_names" type="checkbox">Use Global Name Data?</label>
+		<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
+		</form>
+</div>
 
-    <form action="/infer" method="POST">
-		<div class="container-fluid text-center">
-
-				<form class="form-inline">
-					<input class="form-control mb-2 mr-sm-2 mb-sm-0" name="infer_name" required="" size="50" type="infer_name" value="">
-					<label class="form-check-label">
-            			<input class="form-check-input" name="global_names" type="checkbox">Use Global Name Data?</label>
-
-						<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</form>
 {% endif %}
 {% if success == 'True' %}
 
