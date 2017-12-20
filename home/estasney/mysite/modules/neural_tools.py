@@ -40,7 +40,7 @@ def word_math(request):
             user_equation = word_one.title() + " + " + word_two.title() + " - " + word_three.title() + " = "
             result = dict(model.most_similar(positive=[word_one, word_two], negative=[word_three]))
 
-        return {'result':result, 'success': True, 'user_equation':user_equation, 'word_one':word_one.strip(), 'word_two':word_two.strip(),
+        return {'result':prettify_dict(result), 'success': True, 'user_equation':user_equation, 'word_one':word_one.strip(), 'word_two':word_two.strip(),
                 'word_three': word_three.strip()}
     except KeyError as error:
         error_message = str(error)

@@ -34,7 +34,7 @@ APP ROUTING
 
 """
 
-
+app.jinja_env.globals.update(allowed_ext=upload_tools.inject_allowed_ext())
 @app.route('/')
 def open_page():
     return render_template('home_page.html')
@@ -85,7 +85,7 @@ def thisplusthat():
     if request.method == 'GET':
         return render_template('thisplusthat.html')
     elif request.method == 'POST':
-        solution = neural_tools.word_sims(request)
+        solution = neural_tools.word_math(request)
         if solution['success'] == True:
             return render_template('thisplusthat.html', result=solution['result'], success='True',
                                    user_equation=solution['user_equation'],
@@ -96,10 +96,12 @@ def thisplusthat():
 
 
 @app.route('/infer', methods=['GET', 'POST'])
-def infer():
+def infer_name():
     if request.method == 'GET':
         return render_template('infer.html')
     elif request.method == 'POST':
+        user_query_name = request.form['infer_name']
+        print(request)
         inferred, data_sources = diversity_tools.infer_one(request)
         user_query_name = request.form['infer-name']
     else:
@@ -141,7 +143,7 @@ def diversity():
 
     # Check whether to use global name dict
     user_form = request.form
-    use_global = user_form.get('global_names', False)
+    use_global = user_form.get('use_global_names', False)
     if use_global == 'on':
         use_global = True
 

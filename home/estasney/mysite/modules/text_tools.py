@@ -7,6 +7,7 @@ from gensim.models import Doc2Vec, TfidfModel
 from gensim.corpora import Dictionary
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
+from nltk.tokenize import sent_tokenize
 from gensim.summarization import keywords as KW
 
 try:
@@ -249,7 +250,7 @@ def wild_stem(text):
 def get_keywords(text):
     raw_text = str(text)
     raw_text = ' '.join([word for word in raw_text.split()])
-    sentences = tokenizer.sent_tokenize(raw_text)
+    sentences = nltk.sent_tokenize(raw_text)
     sentence_keywords = []
     try:
         for sentence in sentences:

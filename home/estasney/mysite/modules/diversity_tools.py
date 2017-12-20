@@ -100,8 +100,12 @@ def infer_many(names_list, use_global):
     genderizer = Genderize(**resources)
 
     name_results = {}
+    names_list = [str(n).strip() for n in names_list]
     for i, first_name in enumerate(names_list):
-        results, _ = genderizer.run_query(first_name)
+        try:
+            results, _ = genderizer.run_query(first_name)
+        except AttributeError:
+            continue
         name_results[i] = results
 
     cumul_count = infer_stats(name_results, type='Cumul')

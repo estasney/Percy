@@ -2,6 +2,8 @@ import os
 import pandas as pd
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
+from flask import Flask, render_template, request
+
 
 try:
     from config import local_config as config
@@ -15,21 +17,11 @@ GLOBAL PARAMETERS
 """
 ALLOWED_EXTENSIONS = ['.csv', '.xls', '.xlsx']
 
-
-
-
-
-
-
 TRY_ENCODINGS = ['', 'latin1', 'cp1252', 'iso-8859-1']
-
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
-
 app = Flask(__name__)
-
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.context_processor
 def inject_allowed_ext():
     return dict(allowed_ext=ALLOWED_EXTENSIONS)
 
@@ -43,16 +35,16 @@ class UploadManager(object):
     allowed_extensions = ALLOWED_EXTENSIONS
     try_encodings = TRY_ENCODINGS
 
-    def __init__(self, request_object):
-        self.request_object = request_object
+    def __init__(self, request):
+        self.request = request
+        self.request_file = request.files['file']
         self.uploaded_filename = self.receive_upload_()
         self.uploaded_file = None
         self.status = None
         if self.uploaded_filename:
             self.uploaded_file = self.open_file_()
         self.valid_header = None
-        if self.uploaded_file:
-            self.valid_header = self.validate_header_()
+        self.valid_header = self.validate_header_()
         self.data = None
         if self.valid_header:
             self.data = self.parse_sheet_()
@@ -80,10 +72,9 @@ class UploadManager(object):
         """
 
         # No file included
-        if 'file' not in self.request_object.files:
-            return render_template('diversity_score.html')
 
-        file = self.request_object['file']
+
+        file = self.request_file
 
         # Blank file included
         if file.filename == '':
@@ -92,7 +83,7 @@ class UploadManager(object):
 
         # File included
         if file and self.allowed_file_(file.filename):
-            name_header = request.form['header_name']
+            name_header = self.request.form['header_name']
             # If user doesn't add a name header
             if name_header == '':
                 self.status = 'You forgot to include the header that contains the first names'
@@ -120,10 +111,10 @@ class UploadManager(object):
 
         :return: pd.DataFrame() or False if fail to open
         """
-
+        print(self.uploaded_filename)
         file_ext = self.find_file_ext(self.uploaded_filename)
         try_encodings = self.try_encodings
-        if file_ext == 'csv':
+        if file_ext == '.csv':
             open_method = pd.read_csv
         elif file_ext == '.xls' or file_ext == '.xlsx':
             open_method = pd.read_excel
@@ -150,8 +141,11 @@ class UploadManager(object):
         Function that tries different casing of user entered name header
         :return: name_header or cased_name_header
         """
-        user_header = self.request_object['header_name']
-        df_headers = set(self.uploaded_file.columns.tolist())
+        user_header = self.request.form['header_name']
+        try:
+            df_headers = set(self.uploaded_file.columns.tolist())
+        except AttributeError:
+            return False
         if user_header in df_headers:
             return user_header
 
