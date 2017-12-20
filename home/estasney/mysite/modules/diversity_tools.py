@@ -44,25 +44,71 @@ def infer_one(request):
     results = genderizer.run_query(request.form['infer-name'])
     return results
 
+def infer_stats(results, type=None):
+    if type:
+        if type == 'Cumul': # Get overall M, F, U counts
+            # Prefer data over model result
+            cumul = {'M': 0, 'F': 0, 'U': 0}
+            for v in results.values():
+                data = [dv for dv in v if 'data' in dv.source]
+                if data:
+                    if len(data) > 1:
+                        data = [dv for dv in v if 'SSA' in dv.source]
+                    result = data[0].result
+                    old_score = cumul[result]
+                    cumul[result] = old_score + 1
+                    continue
+                model = [dv for dv in v if 'model' in dv.source]
+                result = model[0].result
+                old_score = cumul[result]
+                cumul[result] = old_score + 1
+            return cumul
+        elif type == 'Data':  # Get overall, M,F,U, Unk counts
+            # Excluding models
+            # Prefer data over model result
+            cumul = {'M': 0, 'F': 0, 'U': 0, 'Unk': 0}
+            for v in results.values():
+                data = [dv for dv in v if 'data' in dv.source]
+                if data:
+                    if len(data) > 1:
+                        data = [dv for dv in v if 'SSA' in dv.source]
+                    result = data[0].result
+                    old_score = cumul[result]
+                    cumul[result] = old_score + 1
+                    continue
+                else:
+                    old_score = cumul['Unk']
+                    cumul['Unk'] = old_score + 1
+            return cumul
+        elif type == 'DSources':
+            dsources = {}
+            for v in results.values():
+                data = [dv for dv in v if 'data' in dv.source]
+                for dv in data:
+                    current_score = dsources.get(dv.source, 0)
+                    dsources[dv.source] = current_score + 1
+            return dsources
+
+
+# TODO Exclude ML Option
 def infer_many(names_list, use_global):
     if use_global:
         resources = {'data-SSA': name_dict, 'data-Global': global_name_dict, 'model': tree_model}
     else:
         resources = {'data-SSA': name_dict, 'model': tree_model}
 
-    # Create seperate Genderize object with single resources
+    genderizer = Genderize(**resources)
 
-    genderizers = []
+    name_results = {}
+    for i, first_name in enumerate(names_list):
+        results, _ = genderizer.run_query(first_name)
+        name_results[i] = results
 
-    for resource_key, resource_value in resources.items():
-        genderizers.append(Genderize(**{resource_key: resource_value}))
+    cumul_count = infer_stats(name_results, type='Cumul')
+    data_only = infer_stats(name_results, type='Data')
+    data_sources = infer_stats(name_results, type='DSources')
 
-
-    summary_counts = {'male': 0, 'female': 0, 'ambiguous': 0, 'unknown': 0}
-
-
-    # Return summary of data sources
-
+    return {'Cumulative': cumul_count, 'Data_Only': data_only, 'Data_Sources': data_sources}
 
 class Genderize(object):
 
@@ -149,7 +195,7 @@ class Genderize(object):
 
     def list_datas_(self, prettify=True):
         data_list = []
-        for k, v in self.datas:
+        for k, v in self.datas.items():
             if prettify:
                 if k == 'data-SSA':
                     new_k = "Social Security Database"
@@ -176,7 +222,6 @@ class Genderize(object):
         results.append(model_results)
         data_sources = self.list_datas_()
         return results, data_sources
-
 
 
 

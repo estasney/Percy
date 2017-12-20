@@ -1,11 +1,4 @@
-import pickle
-import re
 from flask import Flask, render_template, request, jsonify
-from gensim.models import Doc2Vec, TfidfModel
-from gensim.corpora import Dictionary
-
-from nltk.tokenize import sent_tokenize
-from werkzeug.utils import secure_filename
 from home.estasney.mysite.modules import text_tools
 from home.estasney.mysite.modules import diversity_tools
 from home.estasney.mysite.modules import upload_tools
@@ -19,8 +12,6 @@ try:
 except ImportError:
     from home.estasney.mysite.config import web_config as config
 
-
-
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -30,6 +21,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 Hack to include an API for other projects
 
 """
+
 
 @app.route('/api/dupchecker/version', methods=['GET'])
 def get_version():
@@ -42,9 +34,11 @@ APP ROUTING
 
 """
 
+
 @app.route('/')
 def open_page():
     return render_template('home_page.html')
+
 
 @app.route('/related', methods=['GET', 'POST'])
 def related():
@@ -61,6 +55,7 @@ def related():
             offending_term = error_message.split("'")[1]
             result = offending_term.title()
             return render_template('related.html', result=result[1], success='False')
+
 
 @app.route('/stemmed', methods=['GET', 'POST'])
 def stemmed():
@@ -79,7 +74,8 @@ def keywords():
     elif request.method == 'POST':
         keywords = text_tools.get_keywords(request.form['raw_text'])
         if keywords:
-            return render_template('keywords.html', keywords=keywords, success='True', original=raw_text)
+            return render_template('keywords.html', keywords=keywords, success='True',
+                                   original=request.form['raw_text'])
         else:
             return render_template('keywords.html', success='False')
 
@@ -129,6 +125,7 @@ def infer():
     else:
         return render_template('infer.html', success='False')
 
+
 @app.route('/diversity', methods=['GET', 'POST'])
 def diversity():
     if request.method == 'GET':
@@ -148,63 +145,24 @@ def diversity():
     if use_global == 'on':
         use_global = True
 
-
     # Logic of checking names list
     names_list = upload_file.file_data()
 
-    # Init a Genderize object
+    # Run the query
+    name_results = diversity_tools.infer_many(names_list, use_global)
+    cumul_count = name_results['Cumulative']
+    total_count = len(names_list)
+    male_count, female_count, amb_count = cumul_count['M'], cumul_count['F'], cumul_count['U']
 
-#
-# @app.route('/tfidf_measures')
-# def tfidf():
-#     return render_template('tf_idf.html')
-#
-# # TODO Get this into a module
-# @app.route('/tfidf_measures', methods=['POST'])
-# def post_tfidf():
-#     user_input = request.form['tfidf_text']
-#     if len(user_input) > 10000:
-#         return render_template('tf_idf.html', success='False', original="Text Size Limit Exceeded",
-#                                error_message="Text Size Limit Exceeded")
-#     user_form = request.form
-#     gram_mode = user_form.get('gram_tokens', False)
-#     lem_mode = user_form.get('lem_tokens', False)
-#     if gram_mode == 'on':
-#         gram_mode = True
-#     if lem_mode == 'on':
-#         lem_mode = True
-#     # clean text returned is string.
-#     clean_text = clean_it(user_input, lem_tokens=lem_mode, gram_tokens=gram_mode)
-#     # choose model from gram tokens parameter
-#     if gram_mode is False and lem_mode is False:
-#         d = dictionary
-#         m = tfidf_model
-#     elif gram_mode is True and lem_mode is False:
-#         d = bigram_dictionary
-#         m = bigram_tfidf_model
-#     elif gram_mode is True and lem_mode is True:
-#         d = lg_dictionary
-#         m = lg_tfidf_model
-#     elif gram_mode is False and lem_mode is True:
-#         d = lems_dictionary
-#         m = lems_tfidf_model
-#     else:
-#         d = dictionary
-#         m = tfidf_model
-#
-#     tfidf_values = dict(m[d.doc2bow(clean_text.split())])
-#     tfidf_tokens = {}
-#     for id_token, tfidf_value in tfidf_values.items():
-#         token = d[id_token]
-#         tfidf_tokens[token] = round(tfidf_value, 4)
-#     # Sort the values
-#     tfidf_scored = sorted(tfidf_tokens.items(), key=lambda x: x[1], reverse=True)
-#     # Limit to 25
-#     tfidf_scored = tfidf_scored[:25]
-#     return render_template('tf_idf.html', success='True', original=user_input, result=tfidf_scored)
-#
-#
+    # Data only
 
+    data_count = name_results['Data_Only']
+    d_male_count, d_female_count, d_amb_count, d_unk_count = data_count['M'], data_count['F'], data_count['U'],\
+                                                             data_count['Unk']
+
+    return render_template('diversity_score.html', success='True', total_count=total_count, male_count=male_count,
+                           female_count=female_count, amb_count=amb_count, d_male_count=d_male_count,
+                           d_female_count=d_female_count, d_amb_count=d_amb_count, d_unk_count=d_unk_count)
 
 
 if __name__ == '__main__':

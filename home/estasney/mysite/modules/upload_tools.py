@@ -15,9 +15,7 @@ GLOBAL PARAMETERS
 """
 ALLOWED_EXTENSIONS = ['.csv', '.xls', '.xlsx']
 
-@app.context_processor
-def inject_allowed_ext():
-    return dict(allowed_ext=ALLOWED_EXTENSIONS)
+
 
 
 
@@ -30,6 +28,10 @@ UPLOAD_FOLDER = config.UPLOAD_FOLDER
 app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+@app.context_processor
+def inject_allowed_ext():
+    return dict(allowed_ext=ALLOWED_EXTENSIONS)
 
 
 class UploadManager(object):
