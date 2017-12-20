@@ -9,6 +9,7 @@ from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
 from nltk.tokenize import sent_tokenize
 from gensim.summarization import keywords as KW
+from home.estasney.mysite.modules.Utils import prettify_dict
 
 try:
     from home.estasney.mysite.config import local_config as config
@@ -269,3 +270,36 @@ def get_keywords(text):
     except:
         return False
     return user_keywords
+
+def score_tfidf(user_input, gram_mode, lem_mode):
+    # clean text returned is string.
+    clean_text = clean_it(user_input, lem_tokens=lem_mode, gram_tokens=gram_mode)
+    # choose model from gram tokens parameter
+    if gram_mode is False and lem_mode is False:
+        d = dictionary
+        m = tfidf_model
+    elif gram_mode is True and lem_mode is False:
+        d = bigram_dictionary
+        m = bigram_tfidf_model
+    elif gram_mode is True and lem_mode is True:
+        d = lg_dictionary
+        m = lg_tfidf_model
+    elif gram_mode is False and lem_mode is True:
+        d = lems_dictionary
+        m = lems_tfidf_model
+    else:
+        d = dictionary
+        m = tfidf_model
+
+    tfidf_values = dict(m[d.doc2bow(clean_text.split())])
+    tfidf_tokens = {}
+    for id_token, tfidf_value in tfidf_values.items():
+        token = d[id_token]
+        tfidf_tokens[token] = tfidf_value
+    # prettify
+    tfidf_tokens = prettify_dict(tfidf_tokens)
+    # Sort the values
+    tfidf_scored = sorted(tfidf_tokens.items(), key=lambda x: x[1], reverse=True)
+    # Limit to 25
+    tfidf_scored = tfidf_scored[:25]
+    return tfidf_scored

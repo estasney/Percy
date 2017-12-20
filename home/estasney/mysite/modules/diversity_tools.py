@@ -25,15 +25,7 @@ global_name_dict = pickle.load(f)
 f.close()
 
 
-
-
-
-def infer_one(request):
-    user_form = request.form
-    use_global = user_form.get('global_names', False)
-    if use_global == 'on':
-        use_global = True
-
+def infer_one(name_query, use_global):
     # resources available to genderize
     if use_global:
         resources = {'data-SSA': name_dict, 'data-Global': global_name_dict, 'model': tree_model}
@@ -41,12 +33,12 @@ def infer_one(request):
         resources = {'data-SSA': name_dict, 'model': tree_model}
 
     genderizer = Genderize(**resources)
-    results = genderizer.run_query(request.form['infer-name'])
-    return results
+    results, data_sources = genderizer.run_query(name_query)
+    return results, data_sources
 
 def infer_stats(results, type=None):
     if type:
-        if type == 'Cumul': # Get overall M, F, U counts
+        if type == 'Cumul':  # Get overall M, F, U counts
             # Prefer data over model result
             cumul = {'M': 0, 'F': 0, 'U': 0}
             for v in results.values():

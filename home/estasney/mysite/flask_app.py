@@ -3,6 +3,7 @@ from home.estasney.mysite.modules import text_tools
 from home.estasney.mysite.modules import diversity_tools
 from home.estasney.mysite.modules import upload_tools
 from home.estasney.mysite.modules import neural_tools
+from home.estasney.mysite.modules import Utils
 
 
 """ LOAD CONFIG """
@@ -15,6 +16,7 @@ except ImportError:
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+Flask.debug = True
 
 """
 
@@ -34,7 +36,7 @@ APP ROUTING
 
 """
 
-app.jinja_env.globals.update(allowed_ext=upload_tools.inject_allowed_ext())
+
 @app.route('/')
 def open_page():
     return render_template('home_page.html')
@@ -101,23 +103,19 @@ def infer_name():
         return render_template('infer.html')
     elif request.method == 'POST':
         user_query_name = request.form['infer_name']
-        print(request)
-        inferred, data_sources = diversity_tools.infer_one(request)
-        user_query_name = request.form['infer-name']
+        global_names = request.form.get('use_global_names', False)
+        inferred, data_sources = diversity_tools.infer_one(user_query_name, global_names)
     else:
         return render_template('infer.html')
 
-    model_results = [result for result in inferred if 'model' in result.source][0]
-    if model_results == 'M':
-        model_results = 'Male'
-    elif model_results == 'F':
-        model_results = 'Female'
-    elif model_results == 'U':
-        model_results = 'Ambiguous'
-    data_results = [result for result in inferred if 'data' in result.source][0]
+    model_results = [result.result for result in inferred if 'model' in result.source][0]
+    model_results = Utils.readable_gender(model_results)
+
+    data_results = [result for result in inferred if 'data' in result.source]
     if len(data_results) != 0:
         database_name = data_results[0].source.split("-")[1]
-
+        data_results = data_results[0].result
+        data_results = Utils.readable_gender(data_results)
         return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=model_results,
                                database_name=database_name, database_result=data_results)
     elif len(data_results) == 0:
@@ -165,6 +163,30 @@ def diversity():
     return render_template('diversity_score.html', success='True', total_count=total_count, male_count=male_count,
                            female_count=female_count, amb_count=amb_count, d_male_count=d_male_count,
                            d_female_count=d_female_count, d_amb_count=d_amb_count, d_unk_count=d_unk_count)
+
+
+@app.route('/tf_idf', methods=['GET', 'POST'])
+def tfidf():
+    if request.method == 'GET':
+        return render_template('tf_idf.html')
+    elif request.method == 'POST':
+        user_input = request.form['tfidf_text']
+        if isinstance(user_input, str) is False:
+            return render_template('tf_idf.html', success='False', original="",
+                                   error_message="This Form Only Accepts Text...")
+        if len(user_input.split()) > 10000:
+            return render_template('tf_idf.html', success='False', original=user_input,
+                                   error_message="Word Limit Exceeded")
+        user_form = request.form
+        gram_mode = user_form.get('gram_tokens', False)
+        lem_mode = user_form.get('lem_tokens', False)
+        if gram_mode == 'on':
+            gram_mode = True
+        if lem_mode == 'on':
+            lem_mode = True
+
+        scored_tfidf = text_tools.score_tfidf(user_input, gram_mode, lem_mode)
+        return render_template('tf_idf.html', success='True', original=user_input, result=scored_tfidf)
 
 
 if __name__ == '__main__':

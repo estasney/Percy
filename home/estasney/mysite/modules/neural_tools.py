@@ -1,4 +1,5 @@
 from gensim.models import Doc2Vec
+from home.estasney.mysite.modules.Utils import prettify_dict
 
 try:
     from home.estasney.mysite.config import local_config as config
@@ -16,17 +17,6 @@ def word_sims(user_query, prettify=True):
         result = prettify_dict(result)
     return True, result
 
-def prettify_dict(d):
-    p_dict = {}
-    for k, v in d.items():
-        pk = k.replace("_", " ")
-        pk = pk.title()
-        pv = v*100
-        pv = round(pv, 1)
-        pv = str(pv) + "%"
-        p_dict[pk] = pv
-    return p_dict
-
 
 def word_math(request):
     word_one = request.form['word1'].lower()
@@ -40,7 +30,7 @@ def word_math(request):
             user_equation = word_one.title() + " + " + word_two.title() + " - " + word_three.title() + " = "
             result = dict(model.most_similar(positive=[word_one, word_two], negative=[word_three]))
 
-        return {'result':prettify_dict(result), 'success': True, 'user_equation':user_equation, 'word_one':word_one.strip(), 'word_two':word_two.strip(),
+        return {'result': prettify_dict(result), 'success': True, 'user_equation':user_equation, 'word_one':word_one.strip(), 'word_two':word_two.strip(),
                 'word_three': word_three.strip()}
     except KeyError as error:
         error_message = str(error)

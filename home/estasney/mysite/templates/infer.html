@@ -5,7 +5,7 @@
 	<form class="form-inline" action="/infer" method="POST">
 		<input class="form-control mb-2 mr-sm-2 mb-sm-0" name="infer_name" required="" size="50" type="infer_name" value="{{user_query}}">
 		<label class="form-check-label">
-			<input class="form-check-input" name="global_names" type="checkbox">Use Global Name Data?</label>
+			<input class="form-check-input" name="use_global_names" type="checkbox">Use Global Name Data?</label>
 		<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
 	</form>
 </div>
@@ -13,10 +13,10 @@
 {% else %}
 <div class="container-fluid text-center">
 	<form class="form-inline" action="/infer" method="POST">
-		<input class="form-control mb-2 mr-sm-2 mb-sm-0" name="infer_name" required="" size="50" type="infer_name" value="">
+		<input class="form-control mb-2 mr-sm-2 mb-sm-0" name="infer_name" required="" size="50" value="">
 		<label class="form-check-label">
-			<input class="form-check-input" name="global_names" type="checkbox">Use Global Name Data?</label>
-		<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
+			<input class="form-check-input" name="use_global_names" type="checkbox">Use Global Name Data?</label>
+		<button class="btn btn-danger" name="button" value="infer_name">Guess Gender</button>
 		</form>
 </div>
 
