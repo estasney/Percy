@@ -3,7 +3,7 @@
  <div class="container-fluid text-center">
      <h3>Let's Try Some Word Equations</h3>
  {% if success == 'True' %}
- <form class="form-inline" action="." method="POST">
+ <form class="form-inline" action="/thisplusthat" method="POST">
   <label class="sr-only" for="word1input">Word 1</label>
      <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word1" id="word1input" value="{{word_one}}">
   <operator>+</operator>
@@ -18,7 +18,7 @@
     <button type="query" name="button" value="math" class="btn btn-danger">Ask Percy</button>
 </form>
  {% else %}
-     <form class="form-inline" action="." method="POST">
+     <form class="form-inline" action="/thisplusthat" method="POST">
   <label class="sr-only" for="word1input">Word 1</label>
   <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word1" id="word1input">
   <operator>+</operator>

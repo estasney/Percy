@@ -1,35 +1,46 @@
 from operator import itemgetter
 from collections import namedtuple
+import pickle
+
+try:
+    from home.estasney.mysite.config import local_config as config
+except ImportError:
+    from home.estasney.mysite.config import web_config as config
+
+# Load Tree Classifier
+
+f = open(config.tree, "rb")
+
+tree_model = pickle.load(f)
+f.close()
+
+# Load Name Dictionary
+f = open(config.name_dict, "rb")
+name_dict = pickle.load(f)
+f.close()
+
+# Load Global Name Dictionary
+f = open(config.global_name_dict, "rb")
+global_name_dict = pickle.load(f)
+f.close()
 
 
+def infer_one(request):
+    user_form = request.form
+    use_global = user_form.get('global_names', False)
+    if use_global == 'on':
+        use_global = True
 
-# user_form = self.request_object
-# # TODO Ad
-# global_name_mode = user_form.get('use_global_names', False)
-#
-# diversity_scored = retrieve_names_bulk(names_col, global_name_mode)
-# male_count = str(diversity_scored['male'])
-# female_count = str(diversity_scored['female'])
-# unknown_count = str(diversity_scored['unknown'])
-# ai_names = diversity_scored['ai_names']
-#
-# return render_template('diversity_score.html', success='True', male_count=male_count,
-#                        female_count=female_count, unknown_count=unknown_count, ai_names=ai_names)
-#
-# # Will be passed query data
+    # resources available to genderize
+    if use_global:
+        resources = {'data-SSA': name_dict, 'data-Global': global_name_dict, 'model': tree_model}
+    else:
+        resources = {'data-SSA': name_dict, 'model': tree_model}
 
-# Start with list of names
-# User chooses
-    # A. Include Global Dict?
-    # B. Exclude Machine Learning
-# Returns
-    # Database Lookups
-        # SSA Lookup
-            # M to F
-        # Global Dict
-            # M, F, Ambiguous
-    # If exclude ML
-        # Do stats
+    genderizer = Genderize(**resources)
+    results = genderizer.run_query(request.form['infer-name'])
+    return results
+
 
 class Genderize(object):
 
@@ -107,6 +118,26 @@ class Genderize(object):
         else:
             return False
 
+    def list_datas_(self, prettify=True):
+        data_list = []
+        for k, v in self.datas:
+            if prettify:
+                if k == 'data-SSA':
+                    new_k = "Social Security Database"
+                elif k == 'data-Global':
+                    new_k = "Global Names Database"
+                else:
+                    new_k = k
+                data_list.append(new_k)
+            else:
+                data_list.append(k)
+        if prettify:
+            if len(data_list) == 1:
+                return data_list[0]
+            else:
+                return ' and '.join(data_list)
+        return data_list
+
     def run_query(self, query):
         results = []
         data_results = self.data_lookup_(query)
@@ -114,7 +145,8 @@ class Genderize(object):
             results.append(data_results)
         model_results = self.ask_model_(query)
         results.append(model_results)
-        return results
+        data_sources = self.list_datas_()
+        return results, data_sources
 
 
 
@@ -135,67 +167,3 @@ class Genderize(object):
 
 
 
-# def retrieve_names_bulk(name_list, name_dict, global_dict=None, infer_gender=True):
-#     male_count = 0
-#     female_count = 0
-#     unknown_count = 0
-#     amb_count = 0 # Ambiguous count
-#     ai_count = 0
-#     unknown_holder = []
-#     ai_dict = {}
-#
-#     for name in name_list:
-#         if name not in name_dict:
-#             unknown_holder.append(name)
-#             continue
-#         gender_lookup = retrieve_name(name, name_dict)
-#         top_gender = parse_ssa_lookup(gender_lookup)
-#         if top_gender == 'M':
-#             male_count += 1
-#         elif top_gender == 'F':
-#             female_count += 1
-#
-#     if global_dict and unknown_holder:
-#         for name in unknown_holder:
-#             if name not in global_dict:
-#                 continue
-#             gender_lookup = retrieve_name(name, global_dict)
-#             top_gender = gender_lookup
-#             if top_gender == 'M':
-#                 male_count += 1
-#             elif gender_lookup == 'F':
-#                 female_count += 1
-#             else:
-#                 amb_count += 1
-#             unknown_holder.pop(unknown_holder.index(name))
-#
-#     if infer_gender is False:
-#         diversity_score_dict = {'male': male_count, 'female': female_count, 'unknown': len(unknown_holder),
-#                                 'amb_count': amb_count, 'ai_names': False, 'ai_count': 0}
-#         return diversity_score_dict
-#
-#     for name in unknown_holder:
-#         inferred_gender = guess_name(name).lower()
-#         if inferred_gender == 'male':
-#             male_count += 1
-#             ai_dict[name.title()] = 'Male'
-#         elif inferred_gender == 'female':
-#             female_count = female_count + 1
-#             ai_dict[name.title()] = 'Female'
-#         ai_count += 1
-#
-#     diversity_score_dict = {'male': male_count, 'female': female_count, 'unknown': 0, 'amb_count': 0,
-#                             'ai_names':ai_dict, 'ai_count': ai_count}
-#     return diversity_score_dict
-#
-#
-#
-# def guess_name(name):
-#     inferred_gender = tree_model.classify(gender_features(name)).title()
-#     return inferred_gender
-#
-# user_query_name = request.form['infer_name']
-#         inferred_gender = tree_model.classify(gender_features(user_query_name)).title()
-#         gender_lookup = retrieve_name(user_query_name, name_dict)[1]  # Selecting the message
-#         return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=inferred_gender,
-#                                lookup_message=gender_lookup)

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 {% if success == 'True' %}
-<form action="." method="POST">
+<form action="/stemmed" method="POST">
 <div class="form-group text-center">
     <p> Easily capture all possible forms with a word using wildcards</p>
   <label for="raw_stem">Enter Words To Convert them to Their Stemmed Forms</label>
@@ -12,7 +12,7 @@
 </div>
 </form>
 {% else %}
-<form action="." method="POST">
+<form action="/stemmed" method="POST">
 <div class="form-group text-center">
     <p> Easily capture all possible forms with a word using wildcards</p>
   <label for="raw_stem">Enter Words To Convert them to Their Stemmed Forms</label>
