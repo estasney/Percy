@@ -106,7 +106,8 @@ def infer():
     elif request.method == 'POST':
         inferred, data_sources = diversity_tools.infer_one(request)
         user_query_name = request.form['infer-name']
-
+    else:
+        return render_template('infer.html')
 
     model_results = [result for result in inferred if 'model' in result.source][0]
     if model_results == 'M':
@@ -119,8 +120,8 @@ def infer():
     if len(data_results) != 0:
         database_name = data_results[0].source.split("-")[1]
 
-        return render_template('infer.html', user_query=user_query_name, success='True',
-                           gender_guess=model_results, database_name=database_name, database_result=data_results)
+        return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=model_results,
+                               database_name=database_name, database_result=data_results)
     elif len(data_results) == 0:
         database_name = data_sources
         return render_template('infer.html', user_query=user_query_name, success='Partial',
@@ -128,12 +129,31 @@ def infer():
     else:
         return render_template('infer.html', success='False')
 
+@app.route('/diversity', methods=['GET', 'POST'])
+def diversity():
+    if request.method == 'GET':
+        return render_template('diversity_score.html')
+    elif request.method == 'POST':
+        upload_file = upload_tools.UploadManager(request)
+    else:
+        return render_template('diversity_score.html')
+
+    # Check if anything went wrong with upload
+    if upload_file.status != True:
+        return render_template('diversity_score.html', success='False', error_message=upload_file.status)
+
+    # Check whether to use global name dict
+    user_form = request.form
+    use_global = user_form.get('global_names', False)
+    if use_global == 'on':
+        use_global = True
 
 
-#
-# @app.route('/diversity')
-# def diversity():
-#     return render_template('diversity_score.html')
+    # Logic of checking names list
+    names_list = upload_file.file_data()
+
+    # Init a Genderize object
+
 #
 # @app.route('/tfidf_measures')
 # def tfidf():

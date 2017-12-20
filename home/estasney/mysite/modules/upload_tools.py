@@ -13,7 +13,16 @@ except ImportError:
 GLOBAL PARAMETERS
 
 """
-ALLOWED_EXTENSIONS = ['.csv', '.xlsx']
+ALLOWED_EXTENSIONS = ['.csv', '.xls', '.xlsx']
+
+@app.context_processor
+def inject_allowed_ext():
+    return dict(allowed_ext=ALLOWED_EXTENSIONS)
+
+
+
+
+
 TRY_ENCODINGS = ['', 'latin1', 'cp1252', 'iso-8859-1']
 
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
@@ -36,6 +45,7 @@ class UploadManager(object):
         self.request_object = request_object
         self.uploaded_filename = self.receive_upload_()
         self.uploaded_file = None
+        self.status = None
         if self.uploaded_filename:
             self.uploaded_file = self.open_file_()
         self.valid_header = None
@@ -55,6 +65,7 @@ class UploadManager(object):
         if ext in self.allowed_extensions:
             return True
         else:
+            self.status = "Extension {} not permitted".format(ext)
             return False
 
     def receive_upload_(self):
@@ -74,15 +85,16 @@ class UploadManager(object):
 
         # Blank file included
         if file.filename == '':
-            return render_template('diversity_score.html', success='False', error_message='No File Selected')
+            self.status = "Your file name is blank"
+            return False
 
         # File included
         if file and self.allowed_file_(file.filename):
             name_header = request.form['header_name']
             # If user doesn't add a name header
             if name_header == '':
-                return render_template('diversity_score.html', success='False',
-                                       error_message='You forgot to include the header that contains the first names')
+                self.status = 'You forgot to include the header that contains the first names'
+                return False
 
         filename = secure_filename(file.filename)
 
@@ -115,6 +127,7 @@ class UploadManager(object):
             open_method = pd.read_excel
         else:
             # No file extension found
+            self.status = 'No file extension was found'
             return False
 
         for encoding in try_encodings:
@@ -124,6 +137,7 @@ class UploadManager(object):
             except:
                 if encoding == try_encodings[-1]:
                     # Tried all encodings, all failed
+                    self.status = "Unable to determine file encoding"
                     return False
                 else:
                     continue
@@ -147,6 +161,7 @@ class UploadManager(object):
             if cased_name_header in df_headers:
                 return cased_name_header
 
+        self.status = "Unable to find header named: {} , in file".format(user_header)
         return False
 
     def parse_sheet_(self):
@@ -156,8 +171,16 @@ class UploadManager(object):
         if self.valid_header:
             try:
                 names_col = self.uploaded_file[self.valid_header].values.tolist()
+                self.status = True
                 return names_col
             except KeyError:
+                self.status = 'Unable to find header named: {}, in file'.format(self.valid_header)
                 return False
+
+    def file_data(self):
+        if self.data:
+            return self.data
+        else:
+            return False
 
 

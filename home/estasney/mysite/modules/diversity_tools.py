@@ -25,6 +25,9 @@ global_name_dict = pickle.load(f)
 f.close()
 
 
+
+
+
 def infer_one(request):
     user_form = request.form
     use_global = user_form.get('global_names', False)
@@ -41,10 +44,30 @@ def infer_one(request):
     results = genderizer.run_query(request.form['infer-name'])
     return results
 
+def infer_many(names_list, use_global):
+    if use_global:
+        resources = {'data-SSA': name_dict, 'data-Global': global_name_dict, 'model': tree_model}
+    else:
+        resources = {'data-SSA': name_dict, 'model': tree_model}
+
+    # Create seperate Genderize object with single resources
+
+    genderizers = []
+
+    for resource_key, resource_value in resources.items():
+        genderizers.append(Genderize(**{resource_key: resource_value}))
+
+
+    summary_counts = {'male': 0, 'female': 0, 'ambiguous': 0, 'unknown': 0}
+
+
+    # Return summary of data sources
+
 
 class Genderize(object):
 
     GenderResults = namedtuple('GenderResults', 'query source result')
+    default_resources = {'data-SSA': name_dict, 'data-Global': global_name_dict, 'model': tree_model}
 
     def __init__(self, **resources):
         """
@@ -56,6 +79,12 @@ class Genderize(object):
         self.models = {}
         if resources:
             for k, v in resources.items():
+                if "data" in k:
+                    self.datas[k] = v
+                elif "model" in k:
+                    self.models[k] = v
+        else:
+            for k, v in self.default_resources.items():
                 if "data" in k:
                     self.datas[k] = v
                 elif "model" in k:
