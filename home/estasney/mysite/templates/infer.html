@@ -1,34 +1,25 @@
 {% extends "layout.html" %}
 {% block content %}
-{% if success == 'True' %}
-	<form action="." method="POST">
-		<div class="row">
-			<div class="col-lg-4 col-lg-offset-4">
-				<div class="input-group">
-					<input class="form-control" name="infer_name" required="" size="50" type="infer_name" value="{{user_query}}">
-
-					<div class="input-group-btn">
-						<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
-					</div>
-				</div>
-			</div>
-		</div>
+{% if success == 'True' or success == 'Partial' %}
+<div class="container-fluid text-center">
+	<form class="form-inline" action="/infer" method="POST">
+		<input class="form-control mb-2 mr-sm-2 mb-sm-0" name="infer_name" required="" size="50" type="infer_name" value="{{user_query}}">
+		<label class="form-check-label">
+			<input class="form-check-input" name="use_global_names" type="checkbox">Use Global Name Data?</label>
+		<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
 	</form>
+</div>
+
 {% else %}
+<div class="container-fluid text-center">
+	<form class="form-inline" action="/infer" method="POST">
+		<input class="form-control mb-2 mr-sm-2 mb-sm-0" name="infer_name" required="" size="50" value="">
+		<label class="form-check-label">
+			<input class="form-check-input" name="use_global_names" type="checkbox">Use Global Name Data?</label>
+		<button class="btn btn-danger" name="button" value="infer_name">Guess Gender</button>
+		</form>
+</div>
 
-    <form action="." method="POST">
-		<div class="row">
-			<div class="col-lg-4 col-lg-offset-4">
-				<div class="input-group">
-					<input class="form-control" name="infer_name" placeholder="Enter a Name" required="" size="50" type="infer_name">
-
-					<div class="input-group-btn">
-						<button class="btn btn-danger" name="button" type="infer_name" value="infer_name">Guess Gender</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</form>
 {% endif %}
 {% if success == 'True' %}
 
@@ -48,10 +39,38 @@
 
 
 			<div class="col-lg-6">
-				<h1>SSA Name Database</h1>
+				<h1>{{ database_name }}</h1>
 
                 <div class="well bg-white">
-				<h2>{{ lookup_message }}</h2>
+				<h2>{{ database_result }}</h2>
+                </div>
+
+				<div>
+				</div>
+			</div>
+
+{% elif success == 'Partial' %}
+
+<div class="container fluid bg-grey text-center">
+		<div class="row">
+			<h2>You asked me to guess the gender of {{ user_query }}...</h2>
+		</div>
+
+
+		<div class="row row-eq-height">
+			<div class="col-lg-6">
+                <h1>Machine Learning Approach</h1>
+                <div class="well bg-white">
+				<h2>I believe {{ user_query }} is a {{gender_guess}} name</h2>
+                </div>
+			</div>
+
+
+			<div class="col-lg-6">
+				<h1>I looked in {{ database_name }}</h1>
+
+                <div class="well bg-white">
+				<h2>No results were found</h2>
                 </div>
 
 				<div>

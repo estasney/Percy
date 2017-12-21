@@ -6,44 +6,49 @@
     <table class="table">
     <thead>
       <tr>
+          <th class="text-center">Total Names</th>
         <th class="text-center">Male Names</th>
 	  	<th class="text-center">Female Names</th>
+          <th class="text-center">Ambiguous Names</th>
+
 	  </tr>
     </thead>
     <tbody>
 
       <tr>
+          <td> {{ total_count }} </td>
         <td> {{ male_count }} </td>
         <td> {{ female_count }} </td>
+          <td> {{ amb_count }} </td>
+
       </tr>
     </table>
 </div>
 <div class="container-fluid text-center bg-white">
-    <h2> {{unknown_count}} names were not present in the SSA Database.</h2>
-    <h3> Percy utilized Machine Learning for these {{unknown_count}}</h3>
-<table class="table">
+    <h2> Without Using Machine Learning, Your File Appears to Contain</h2>
+    <table class="table">
     <thead>
-    <tr>
-        <th class="text-center">Name</th>
-        <th class="text-center">Inferred Gender</th>
-    </tr>
+      <tr>
+          <th class="text-center">Total Names</th>
+        <th class="text-center">Male Names</th>
+	  	<th class="text-center">Female Names</th>
+          <th class="text-center">Ambiguous Names</th>
+          <th class="text-center">Unknown Names</th>
+
+	  </tr>
     </thead>
     <tbody>
-        {% for name, gender in ai_names.items() %}
-    <tr>
-        <td> {{ name }} </td>
-        <td> {{ gender }} </td>
+
+      <tr>
+          <td> {{ total_count }} </td>
+        <td> {{ d_male_count }} </td>
+        <td> {{ d_female_count }} </td>
+          <td> {{ d_amb_count }} </td>
+          <td> {{ d_unk_count }} </td>
       </tr>
-        {% endfor %}
-    </tr>
-    </tbody>
-    </tbody>
-  </table>
+    </table>
 </div>
 
-
-
-</div>
 {% endif %}
 {% if success == 'False' %}
 <div class="container-fluid text-center">
@@ -53,13 +58,14 @@
 {% endif %}
 
 <div class="container-fluid text-center">
-<h1>Upload a .csv or .xlsx Spreadsheet Below</h1>
+<h1>Upload a Spreadsheet Below</h1>
 </div>
  <div class="container-fluid text-center">
-<form class="form-inline" action="." method="POST" enctype="multipart/form-data">
+<form class="form-inline" action="/diversity" method="POST" enctype="multipart/form-data">
 		<input type="file" name="file" class="form-control" required="" size="50">
 		<input class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Header for First Name" name="header_name">
-
+        <label class="form-check-label">
+            <input class="form-check-input" name="use_global_names" type="checkbox">Use Global Name Database?</label>
 		<button class="btn btn-danger" name="button" value="Upload">Score Diversity</button>
 
 

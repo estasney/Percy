@@ -1,129 +1,22 @@
-import math
-import os
-import pickle
-import re
-import string
-import gensim
-import nltk
-import pandas as pd
 from flask import Flask, render_template, request, jsonify
-from gensim.models import Doc2Vec, TfidfModel
-from gensim.corpora import Dictionary
-from gensim.summarization import keywords as KW
-from nltk.stem.porter import PorterStemmer
-from nltk.tokenize import sent_tokenize
-from nltk.tokenize.moses import MosesTokenizer
-from werkzeug.utils import secure_filename
+from home.estasney.mysite.modules import text_tools
+from home.estasney.mysite.modules import diversity_tools
+from home.estasney.mysite.modules import upload_tools
+from home.estasney.mysite.modules import neural_tools
+from home.estasney.mysite.modules import Utils
+
 
 """ LOAD CONFIG """
 
 try:
-    from config import local_config as config
+    from home.estasney.mysite.config import local_config as config
 except ImportError:
-    from config import web_config as config
-
-""" GLOBAL VARS HERE"""
-
-# for local dev
-#
-model = Doc2Vec.load(config.model)
-
-f = open(config.tree, "rb")
-
-fp = open(config.name_dict, "rb")
+    from home.estasney.mysite.config import web_config as config
 
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
-
-# Load Tree Classifier
-
-tree_model = pickle.load(f)
-f.close()
-
-# Load Name Dictionary
-name_dict = pickle.load(fp)
-fp.close()
-
-# Load Stopwords
-stopw = gensim.parsing.preprocessing.STOPWORDS
-
-# Punctuation
-punc = string.punctuation
-punc = punc + "●" + "•" + "-" + "ø"
-
-# Tokenizer
-tokenizer = nltk.tokenize.moses.MosesTokenizer()
-
-# Stemmer
-stemmer = nltk.stem.snowball.SnowballStemmer("english")
-
-# Stoplist
-stoplist = nltk.corpus.stopwords.words('english')
-
-# Whitespace
-wht_space = set('\t\r\x0b\x0c')
-
-# Namelist
-name_list = pd.read_csv(config.name_file_path)
-name_list = name_list['names'].tolist()
-name_list = set(name_list)
-
-# Phraser
-bigram = gensim.models.Phrases.load(config.gram_path)
-bigrammer = gensim.models.phrases.Phraser(bigram)
-
-"""
-
-TFIDF Variables
-
-"""
-
-
-# Raw
-tfidf_model = TfidfModel.load(config.tfidf_model)
-dictionary = Dictionary.load(config.raw_dict)
-# Grams Only
-bigram_tfidf_model = TfidfModel.load(config.bigram_tfidf_model_path)
-bigram_dictionary = Dictionary.load(config.bigram_dict_path)
-# Lems Only
-lems_tfidf_model = TfidfModel.load(config.lem_tfidf_model_path)
-lems_dictionary = Dictionary.load(config.lem_dict_path)
-# Grams and Lems
-lg_tfidf_model = TfidfModel.load(config.lg_tfidf_model_path)
-lg_dictionary = Dictionary.load(config.lg_dict_path)
-
-month_list = ["jan", "january" "feb", "february", "mar", "march", "apr", "april", "may", "jun", "june", "jul", "july",
-              "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec", "december"]
-number_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-
-""" GLOBAL END"""
-
-
-"""
-
-UPLOAD PARAMETERS HERE
-
-"""
-
-
-ALLOWED_EXTENSIONS = ['.csv', '.xlsx']
-
 app = Flask(__name__)
-
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-""" 
-
-UPLOAD SPECIFIC FUNCTIONS
-
-"""
-
-
-def allowed_file(filename):
-    ext = "." + filename.rsplit('.', 1)[1]
-    if ext in ALLOWED_EXTENSIONS:
-        return ext
-    else:
-        print("ext : " + ext + "not approved")
 
 """
 
@@ -131,219 +24,159 @@ Hack to include an API for other projects
 
 """
 
-dupcheck_version = config.dupcheck_version
-
 
 @app.route('/api/dupchecker/version', methods=['GET'])
 def get_version():
+    dupcheck_version = config.dupcheck_version
     return jsonify({'version': dupcheck_version})
 
+"""
+
+APP ROUTING
+
+"""
+
+
 @app.route('/')
-def hello_world():
+def open_page():
     return render_template('home_page.html')
 
 
-@app.route('/diversity')
-def diversity():
-    return render_template('diversity_score.html')
-
-
-@app.route('/stemmed')
-def stemmed():
-    return render_template('stemmed.html')
-
-
-@app.route('/keywords')
-def keywords():
-    return render_template('keywords.html')
-
-
-@app.route('/related')
+@app.route('/related', methods=['GET', 'POST'])
 def related():
-    return render_template('related.html')
-
-
-@app.route('/thisplusthat')
-def thisplusthat():
-    return render_template('thisplusthat.html')
-
-
-@app.route('/infer')
-def infer():
-    return render_template('infer.html')
-
-@app.route('/tfidf_measures')
-def tfidf():
-    return render_template('tf_idf.html')
-
-@app.route('/', methods=['POST'])
-def my_sims():
-    if request.form['button'] == 'query':  # similar words search
+    if request.method == 'GET':
+        return render_template('related.html')
+    elif request.method == 'POST':
         user_query = request.form['query'].lower()
-        try:
-            result = dict(model.similar_by_word(user_query))
-            return render_template('related.html', result=result, success='True', title_h2='Word Similarity Score',
+        result = neural_tools.word_sims(user_query)
+        if result[0] is True:
+            return render_template('related.html', result=result[1], success='True', title_h2='Word Similarity Score',
                                    title_th='Similarity Score', original=user_query)
-        except KeyError as error:
-            error_message = str(error)
+        if result[0] is False:
+            error_message = str(result[1])
             offending_term = error_message.split("'")[1]
             result = offending_term.title()
-            return render_template('related.html', result=result, success='False')
-    elif request.form['button'] == 'math':
-        word_one = request.form['word1'].lower()
-        word_two = request.form['word2'].lower()
-        word_three = request.form['word3'].lower()
-        try:
-            if word_three == '':
-                user_equation = word_one.title() + " + " + word_two.title() + " = "
-                result = dict(model.most_similar(positive=[word_one, word_two]))
-            else:
-                user_equation = word_one.title() + " + " + word_two.title() + " - " + word_three.title() + " = "
-                result = dict(model.most_similar(positive=[word_one, word_two], negative=[word_three]))
-            return render_template('thisplusthat.html', result=result, success='True', user_equation=user_equation,
-                                   word_one=word_one.strip(), word_two=word_two.strip(), word_three=word_three.strip())
-        except KeyError as error:
-            error_message = str(error)
-            offending_term = error_message.split("'")[1]
-            result = offending_term.title()
-            return render_template('thisplusthat.html', result=result, success='False')
-    elif request.form['button'] == 'keywords':
-        try:
-            raw_text = str(request.form['raw_text'])
-            raw_text = ' '.join([word for word in raw_text.split()])
-            sentences = sent_tokenize(raw_text)
-            sentence_keywords = []
-            for sentence in sentences:
-                try:
-                    sent_keyw = KW(sentence)
-                    if len(sent_keyw) > 0:
-                        sent_keyw = sent_keyw.splitlines()
-                        if len(sent_keyw) > 1:
-                            sent_keyw = ', '.join([word for word in sent_keyw if len(sent_keyw) > 1])
-                        else:
-                            sent_keyw = ' '.join([word for word in sent_keyw])
-                        sentence_keywords.append(sent_keyw)
-                except:
-                    pass
-            user_keywords = sentence_keywords
-            return render_template('keywords.html', keywords=user_keywords, success='True', original=raw_text)
-        except:
-            return render_template('keywords.html', success='False')
-    elif request.form['button'] == 'raw_stem':
-        stemmer = PorterStemmer()
-        bool_logic = ["OR", "AND", "NOT"]
-        re_words = re.compile(r"(\w+)")
+            return render_template('related.html', result=result[1], success='False')
+
+
+@app.route('/stemmed', methods=['GET', 'POST'])
+def stemmed():
+    if request.method == 'GET':
+        return render_template('stemmed.html')
+    elif request.method == 'POST':
         search = request.form['raw_stem']
-        terms = search.split()
-        mod_terms = []
-        for term in terms:
-            if term in bool_logic:
-                mod_terms.append(term)
-                continue
-            word_matches = re_words.findall(term)
-            word = ' '.join(word_matches)  # List to string
-            other_char = term.replace(word, "")
-            stem_word = stemmer.stem(word)
-            if stem_word == word:
-                pass
-            else:
-                stem_word = stem_word + "*"
+        stemmed_search = text_tools.wild_stem(search)
+        return render_template('stemmed.html', stemmed_bool=stemmed_search, success='True', original=search)
 
-            if len(other_char) == 0:  # Is a operator present?
-                mod_terms.append(stem_word)
-                continue
-            char_position = term.find(other_char)
-            if char_position == 0:
-                full_term = other_char + stem_word
-            else:
-                full_term = stem_word + other_char
-            mod_terms.append(full_term)
-        stemmed_bool = ' '.join(mod_terms)
-        return render_template('stemmed.html', stemmed_bool=stemmed_bool, success='True', original=search)
-    elif request.form['button'] == 'infer_name':
+
+@app.route('/keywords', methods=['GET', 'POST'])
+def keywords():
+    if request.method == 'GET':
+        return render_template('keywords.html')
+    elif request.method == 'POST':
+        keywords = text_tools.get_keywords(request.form['raw_text'])
+        if keywords:
+            return render_template('keywords.html', keywords=keywords, success='True',
+                                   original=request.form['raw_text'])
+        else:
+            return render_template('keywords.html', success='False')
+
+
+@app.route('/thisplusthat', methods=['GET', 'POST'])
+def thisplusthat():
+    if request.method == 'GET':
+        return render_template('thisplusthat.html')
+    elif request.method == 'POST':
+        solution = neural_tools.word_math(request)
+        if solution['success'] == True:
+            return render_template('thisplusthat.html', result=solution['result'], success='True',
+                                   user_equation=solution['user_equation'],
+                                   word_one=solution['word_one'].strip(), word_two=solution['word_two'].strip(),
+                                   word_three=solution['word_three'].strip())
+        elif solution['success'] == False:
+            return render_template('thisplusthat.html', result=solution['result'], success='False')
+
+
+@app.route('/infer', methods=['GET', 'POST'])
+def infer_name():
+    if request.method == 'GET':
+        return render_template('infer.html')
+    elif request.method == 'POST':
         user_query_name = request.form['infer_name']
-        inferred_gender = tree_model.classify(gender_features(user_query_name)).title()
-        gender_lookup = retrieve_name(user_query_name, name_dict)[1]  # Selecting the message
-        return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=inferred_gender,
-                               lookup_message=gender_lookup)
-    elif request.form['button'] == 'Upload':
-        if 'file' not in request.files:
-            return render_template('diversity_score.html')
-        file = request.files['file']
-        if file.filename == '':
-            return render_template('diversity_score.html', success='False', error_message='No File Selected')
-        if file and allowed_file(file.filename):
-            name_header = request.form['header_name']
-            if name_header == '':
-                return render_template('diversity_score.html', success='False', error_message='You forgot to include the header that contains the first names')
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            upped_file = os.path.join(app.config['UPLOAD_FOLDER'],
-                                      filename)
-            file_ext = find_file_ext(upped_file)
-            if file_ext == 'csv':
-                try:
-                    df = pd.read_csv(upped_file)
-                except:
-                    try:
-                        df = pd.read_csv(upped_file, encoding='latin1')
-                    except:
-                        try:
-                            df = pd.read_csv(upped_file, encoding='cp1252')
-                        except:
-                            try:
-                                df = pd.read_csv(upped_file, encoding='iso-8859-1')
-                            except:
-                                return render_template('diversity_score.html', success='False', error_message="Your file's encoding was not recognized")
+        global_names = request.form.get('use_global_names', False)
+        inferred, data_sources = diversity_tools.infer_one(user_query_name, global_names)
+    else:
+        return render_template('infer.html')
 
-            elif file_ext == 'xlsx':
-                try:
-                    df = pd.read_excel(upped_file)
-                except:
-                    try:
-                        df = pd.read_excel(upped_file, encoding='latin1')
-                    except:
-                        try:
-                            df = pd.read_excel(upped_file, encoding='cp1252')
-                        except:
-                            try:
-                                df = pd.read_excel(upped_file, encoding='iso-8859-1')
-                            except:
-                                return render_template('diversity_score.html', success='False',
-                                                       error_message="Your file's encoding was not recognized")
-            else:
-                try:
-                    df = pd.read_excel(upped_file)
-                except:
-                    try:
-                        df = pd.read_excel(upped_file, encoding='latin1')
-                    except:
-                        try:
-                            df = pd.read_excel(upped_file, encoding='cp1252')
-                        except:
-                            try:
-                                df = pd.read_excel(upped_file, encoding='iso-8859-1')
-                            except:
-                                return render_template('diversity_score.html', success='False',
-                                                       error_message="Your file's encoding was not recognized")
-            try:
-                names_col = df[name_header]
-            except KeyError:
-                return render_template('diversity_score.html', success='False',
-                                       error_message="Header \"{}\" was not found in spreadsheet".format(name_header))
-            diversity_scored = retrieve_names_bulk(names_col)
-            male_count = str(diversity_scored['male'])
-            female_count = str(diversity_scored['female'])
-            unknown_count = str(diversity_scored['unknown'])
-            ai_names = diversity_scored['ai_names']
+    model_results = [result.result for result in inferred if 'model' in result.source][0]
+    model_results = Utils.readable_gender(model_results)
 
-            return render_template('diversity_score.html', success='True', male_count=male_count,
-                                   female_count=female_count, unknown_count=unknown_count, ai_names=ai_names)
+    data_results = [result for result in inferred if 'data' in result.source]
+    if len(data_results) != 0:
+        database_name = data_results[0].source.split("-")[1]
+        data_results = data_results[0].result
+        data_results = Utils.readable_gender(data_results)
+        return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=model_results,
+                               database_name=database_name, database_result=data_results)
+    elif len(data_results) == 0:
+        database_name = data_sources
+        return render_template('infer.html', user_query=user_query_name, success='Partial',
+                               gender_guess=model_results, database_name=database_name)
+    else:
+        return render_template('infer.html', success='False')
 
-    elif request.form['button'] == 'tfidf':
+
+@app.route('/diversity', methods=['GET', 'POST'])
+def diversity():
+    if request.method == 'GET':
+        return render_template('diversity_score.html')
+    elif request.method == 'POST':
+        upload_file = upload_tools.UploadManager(request)
+    else:
+        return render_template('diversity_score.html')
+
+    # Check if anything went wrong with upload
+    if upload_file.status != True:
+        return render_template('diversity_score.html', success='False', error_message=upload_file.status)
+
+    # Check whether to use global name dict
+    user_form = request.form
+    use_global = user_form.get('use_global_names', False)
+    if use_global == 'on':
+        use_global = True
+
+    # Logic of checking names list
+    names_list = upload_file.file_data()
+
+    # Run the query
+    name_results = diversity_tools.infer_many(names_list, use_global)
+    cumul_count = name_results['Cumulative']
+    total_count = len(names_list)
+    male_count, female_count, amb_count = cumul_count['M'], cumul_count['F'], cumul_count['U']
+
+    # Data only
+
+    data_count = name_results['Data_Only']
+    d_male_count, d_female_count, d_amb_count, d_unk_count = data_count['M'], data_count['F'], data_count['U'],\
+                                                             data_count['Unk']
+
+    return render_template('diversity_score.html', success='True', total_count=total_count, male_count=male_count,
+                           female_count=female_count, amb_count=amb_count, d_male_count=d_male_count,
+                           d_female_count=d_female_count, d_amb_count=d_amb_count, d_unk_count=d_unk_count)
+
+
+@app.route('/tf_idf', methods=['GET', 'POST'])
+def tfidf():
+    if request.method == 'GET':
+        return render_template('tf_idf.html')
+    elif request.method == 'POST':
         user_input = request.form['tfidf_text']
-        if len(user_input) > 10000:
-            return render_template('tf_idf.html', success='False', original="Text Size Limit Exceeded", error_message="Text Size Limit Exceeded")
+        if isinstance(user_input, str) is False:
+            return render_template('tf_idf.html', success='False', original="",
+                                   error_message="This Form Only Accepts Text...")
+        if len(user_input.split()) > 10000:
+            return render_template('tf_idf.html', success='False', original=user_input,
+                                   error_message="Word Limit Exceeded")
         user_form = request.form
         gram_mode = user_form.get('gram_tokens', False)
         lem_mode = user_form.get('lem_tokens', False)
@@ -351,282 +184,9 @@ def my_sims():
             gram_mode = True
         if lem_mode == 'on':
             lem_mode = True
-        # clean text returned is string.
-        clean_text = clean_it(user_input, lem_tokens=lem_mode, gram_tokens=gram_mode)
-        # choose model from gram tokens parameter
-        if gram_mode is False and lem_mode is False:
-            d = dictionary
-            m = tfidf_model
-        elif gram_mode is True and lem_mode is False:
-            d = bigram_dictionary
-            m = bigram_tfidf_model
-        elif gram_mode is True and lem_mode is True:
-            d = lg_dictionary
-            m = lg_tfidf_model
-        elif gram_mode is False and lem_mode is True:
-            d = lems_dictionary
-            m = lems_tfidf_model
-        else:
-            d = dictionary
-            m = tfidf_model
 
-        tfidf_values = dict(m[d.doc2bow(clean_text.split())])
-        tfidf_tokens = {}
-        for id_token, tfidf_value in tfidf_values.items():
-            token = d[id_token]
-            tfidf_tokens[token] = round(tfidf_value, 4)
-        # Sort the values
-        tfidf_scored = sorted(tfidf_tokens.items(), key=lambda x: x[1], reverse=True)
-        # Limit to 25
-        tfidf_scored = tfidf_scored[:25]
-        return render_template('tf_idf.html', success='True', original=user_input, result=tfidf_scored)
-
-
-
-def gender_features(name):
-    name = name.lower()
-    features = {}
-    features['first_two'] = name[:2]
-    features['last_letter'] = name[-1]
-    features['last_letter_vowel'] = vowel_test(name[-1])
-    features['last_two'] = name[-2:]
-    return features
-
-
-def vowel_test(letter):
-    vowels = ["a", "e", "i", "o", "u", "y"]
-    if letter in vowels:
-        return "Yes"
-    else:
-        return "No"
-
-
-def retrieve_name(name, name_dict):
-    name = name.lower()
-    try:
-        male_count = name_dict[name]['M']
-        female_count = name_dict[name]['F']
-        if male_count > female_count:
-            try:
-                likely = round(male_count / female_count, 1)
-                if math.isinf(likely):
-                    message = "The name {} is only known to be male".format(name.title())
-                    winner = ('M', 999)
-                else:
-                    message = "The name {} is {}x more likely to be male".format(name.title(), likely)
-                    winner = ('M', likely)
-            except ZeroDivisionError:
-                message = "The name {} is only known to be male"
-                winner = ('M', 999)
-        elif male_count < female_count:
-            try:
-                likely = round(female_count / male_count, 1)
-                if math.isinf(likely):
-                    message = "The name {} is only known to be female".format(name.title())
-                    winner = ('F', 999)
-                else:
-                    message = "The name {} is {}x more likely to be female".format(name.title(), likely)
-                    winner = ('F', likely)
-            except ZeroDivisionError:
-                message = "The name {} is only known to be female"
-                winner = ('F', 999)
-        else:
-            message = "The name {} is ambiguous".format(name.title())
-            return False, message
-        return winner, message
-    except KeyError:
-        message = "I have not see the name {} before".format(name.title())
-        return False, message
-
-
-def retrieve_names_bulk(name_list):
-
-    male_count = 0
-    female_count = 0
-    unknown_count = 0
-    unknown_dict = {}
-    for name in name_list:
-        try:
-            gender_lookup = retrieve_name(name, name_dict)[0][0]
-            if gender_lookup == 'M':
-                male_count += 1
-            elif gender_lookup == 'F':
-                female_count += 1
-        except TypeError:
-            # Use decision tree model
-
-            inferred_gender = guess_name(name).lower()
-            if inferred_gender == 'male':
-                male_count = male_count + 1
-                unknown_count = unknown_count + 1
-                unknown_dict[name.title()] = 'Male'
-            elif inferred_gender == 'female':
-                female_count = female_count + 1
-                unknown_count = unknown_count + 1
-                unknown_dict[name.title()] = 'Female'
-    diversity_score_dict = {'male': male_count, 'female': female_count, 'unknown': unknown_count, 'ai_names':unknown_dict}
-    return diversity_score_dict
-
-def find_file_ext(filename):
-    ext = filename.split(".")[-1]  # return the last split
-    return ext
-
-def guess_name(name):
-    inferred_gender = tree_model.classify(gender_features(name)).title()
-    return inferred_gender
-
-def remove_noise(text, sent=False):
-    # CV/Resume Specific Cleaning
-    regex_email = re.compile(r"((\w|\d|\.)+)(@)(\w+)(\.)(\w{3})")
-    regex_dates = re.compile(r"([A-z]+\.? ?\d{2,4}| +- (P|p)resent)|(\d{2}\/\d{2}\/\d{2,4})")
-    regex_phone_numbers = re.compile(r"(\d{3}(-|.)){2}(\d{4})")
-    regex_three_or_more = re.compile(r"\w*(.)(\1){2,}\w*")  # If a word contains a series of 3 or more identical letters
-    regex_bullets = re.compile(r"(•|✓|#|\*|●  *)|(\d[.|:])|( ?- )")
-    regex_hyperlinks = re.compile(r"(http)([a-z]|[A-Z]|[\d]|\.|\/|\?|\=|&|:|-)+")
-    regex_numbers_only = re.compile(r"\d+[^A-z]")
-    regex_punctuation = re.compile(
-        r"(!|\"|#|\$|%|&|\||\)|\(|\*|\+|,|-|\.|\/|:|;|<|=|>|\?|@|\[|\\|\]|\^|_|`|\{|\||\}|~|')")
-    if sent:
-        for space in wht_space:
-            text.replace(space, "\n")
-        sent_holder = nltk.tokenize.sent_tokenize(text)
-        quiet_sents_clean = []
-        for sent in sent_holder:
-            sent = regex_phone_numbers.sub(" ", sent)
-            sent = regex_email.sub(" ", sent)
-            sent = regex_hyperlinks.sub(" ", sent)
-            sent = regex_three_or_more.sub(" ", sent)
-            sent = regex_numbers_only.sub(" ", sent)
-            sent = regex_punctuation.sub(" ", sent)
-            sent = sent.lower()
-            for space in set(string.whitespace):
-                sent.replace(space, " ")
-            sent = tokenizer.tokenize(sent)
-            sent = ' '.join([word for word in sent if word not in stopw and word not in stoplist
-                             and word not in name_list and word not in punc and word not in month_list and
-                             word_number_test(word) is True])
-            quiet_sents_clean.append(sent)
-        return quiet_sents_clean
-
-    else:
-        quiet_text = text
-        quiet_text = regex_phone_numbers.sub(" ", quiet_text)
-        quiet_text = regex_email.sub(" ", quiet_text)
-        quiet_text = regex_hyperlinks.sub(" ", quiet_text)
-        quiet_text = regex_dates.sub(" ", quiet_text)
-        quiet_text = regex_three_or_more.sub(" ", quiet_text)
-        quiet_text = regex_bullets.sub(" ", quiet_text)
-        quiet_text = regex_numbers_only.sub(" ", quiet_text)
-        quiet_text = regex_punctuation.sub(" ", quiet_text)
-        clean_text = quiet_text.lower()
-        for space in set(string.whitespace):
-            clean_text.replace(space, " ")
-            clean_text = tokenizer.tokenize(clean_text)
-            clean_text = ' '.join([word for word in clean_text if word not in stopw and word not in stoplist
-                                   and word not in name_list and word not in punc and word not in month_list and word_number_test(
-                word) is True])
-    return clean_text
-
-
-def word_number_test(word):
-    if any(num in word for num in number_list):
-        word_length = len(word)
-        number_count = 0
-        for letter in word:
-            if letter in number_list:
-                number_count += 1
-        ratio = number_count / word_length
-        if ratio >= 0.1:
-            return False
-        else:
-            return True
-    else:
-        return True
-
-
-def document_to_tokens(clean_text, lem_tokens):
-    tokens = tokenizer.tokenize(clean_text)
-    if lem_tokens:
-        pos_tokens = nltk.pos_tag(tokens)
-        stemmed_tokens = token_stemmer(pos_tokens)
-        return stemmed_tokens
-    else:
-        tokens = ' '.join(tokens)
-        return tokens
-
-
-def token_stemmer(pos_tagged_tokens):
-    lemmatizer = nltk.WordNetLemmatizer()
-    stemmed_tokens = []
-    for tagged_tuple in pos_tagged_tokens:
-        token = tagged_tuple[0]
-        pos_tag = get_wordnet_pos(tagged_tuple[1])
-        if pos_tag is False:
-            lemmed_token = lemmatizer.lemmatize(token)
-        else:
-            lemmed_token = lemmatizer.lemmatize(token, pos_tag)
-        stemmed_tokens.append(lemmed_token)
-    stem_join_tokens = ' '.join(token for token in stemmed_tokens)
-    return stem_join_tokens
-
-
-# https://stackoverflow.com/questions/15586721/wordnet-lemmatization-and-pos-tagging-in-python
-def get_wordnet_pos(treebank_tag):
-    wordnet = nltk.corpus.wordnet
-    if treebank_tag.startswith('J'):
-        return wordnet.ADJ
-    elif treebank_tag.startswith('V'):
-        return wordnet.VERB
-    elif treebank_tag.startswith('N'):
-        return wordnet.NOUN
-    elif treebank_tag.startswith('R'):
-        return wordnet.ADV
-    else:
-        return False
-
-
-def clean_it(text, lem_tokens=True, gram_tokens=True, sent_mode=False):
-    quiet_text = remove_noise(text, sent=sent_mode)  # sent_mode will return a list of sentences
-    if sent_mode:
-        sent_holder = []
-        for sent in quiet_text:  # String form
-            if lem_tokens:
-                sent = document_to_tokens(sent, lem_tokens=True)  # returns String form
-            if gram_tokens:  # Must be list form
-                sent = sent.split()  # List form
-                clean_tokens = bigrammer[sent]
-                continue_gram = True
-                while continue_gram is True:
-                    new_tokens = bigrammer[clean_tokens]  # Detect new phrases, must be tokens
-                    if clean_tokens != new_tokens:
-                        clean_tokens = new_tokens
-                    else:
-                        sent = new_tokens  # List form
-                        sent = ' '.join(new_tokens)  # String rom
-                        continue_gram = False
-            sent_holder.append(sent)  # sent clean complete, append
-            # Sent Holder Ready
-        return sent_holder
-    elif sent_mode is False:
-        if lem_tokens:
-            text_tokens = document_to_tokens(quiet_text, lem_tokens=True)
-        else:
-            text_tokens = document_to_tokens(quiet_text, lem_tokens=False)
-        text_tokens = text_tokens.split()
-        clean_tokens = ' '.join(
-            [token for token in text_tokens if len(token) > 2 and token not in stopw and token not in punc])
-        clean_tokens = clean_tokens.split()
-        if gram_tokens:
-            clean_tokens = bigrammer[clean_tokens]
-            continue_gram = True
-            while continue_gram is True:
-                new_tokens = bigrammer[clean_tokens]  # Detect new phrases, must be tokens
-                if clean_tokens != new_tokens:
-                    clean_tokens = new_tokens
-                else:
-                    continue_gram = False
-        clean_tokens = ' '.join(clean_tokens)
-        return clean_tokens
+        scored_tfidf = text_tools.score_tfidf(user_input, gram_mode, lem_mode)
+        return render_template('tf_idf.html', success='True', original=user_input, result=scored_tfidf)
 
 
 if __name__ == '__main__':
