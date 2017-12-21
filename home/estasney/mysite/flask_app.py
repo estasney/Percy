@@ -160,10 +160,20 @@ def diversity():
     data_count = name_results['Data_Only']
     d_male_count, d_female_count, d_amb_count, d_unk_count = data_count['M'], data_count['F'], data_count['U'],\
                                                              data_count['Unk']
+    d_known = d_male_count + d_female_count
+
+    # Population distrubition
+    pop_values = diversity_tools.population_distro(male_count=d_male_count, female_count=d_female_count,
+                                                      total_count=total_count)
+    d_female_percent = "{:.2%}".format(pop_values['ratio_female'])
+
+    confidence_interval = "{:.2%}".format(pop_values['confidence_interval'])
+
 
     return render_template('diversity_score.html', success='True', total_count=total_count, male_count=male_count,
                            female_count=female_count, amb_count=amb_count, d_male_count=d_male_count,
-                           d_female_count=d_female_count, d_amb_count=d_amb_count, d_unk_count=d_unk_count)
+                           d_female_count=d_female_count, d_amb_count=d_amb_count, d_unk_count=d_unk_count,
+                           d_known=d_known, d_female_percent=d_female_percent, confidence_interval=confidence_interval)
 
 
 @app.route('/tf_idf', methods=['GET', 'POST'])

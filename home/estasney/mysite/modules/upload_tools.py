@@ -88,6 +88,7 @@ class UploadManager(object):
                 self.status = 'You forgot to include the header that contains the first names'
                 return False
 
+
         filename = secure_filename(file.filename)
 
         if self.allowed_file_(filename) is False:
