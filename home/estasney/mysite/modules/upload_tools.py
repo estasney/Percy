@@ -1,9 +1,7 @@
 import os
 import pandas as pd
-from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
-from flask import Flask, render_template, request
-
+from flask import Flask
 
 try:
     from config import local_config as config
@@ -21,6 +19,7 @@ TRY_ENCODINGS = ['', 'latin1', 'cp1252', 'iso-8859-1']
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 def inject_allowed_ext():
     return dict(allowed_ext=ALLOWED_EXTENSIONS)
@@ -178,5 +177,3 @@ class UploadManager(object):
             return self.data
         else:
             return False
-
-
