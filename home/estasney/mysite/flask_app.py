@@ -16,7 +16,7 @@ except ImportError:
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-Flask.debug = True
+
 
 """
 

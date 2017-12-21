@@ -297,9 +297,9 @@ def score_tfidf(user_input, gram_mode, lem_mode):
         token = d[id_token]
         tfidf_tokens[token] = tfidf_value
     # prettify
-    tfidf_tokens = prettify_dict(tfidf_tokens)
     # Sort the values
     tfidf_scored = sorted(tfidf_tokens.items(), key=lambda x: x[1], reverse=True)
     # Limit to 25
     tfidf_scored = tfidf_scored[:25]
+    tfidf_scored = [(token, "{:.2%}".format(score)) for token, score in tfidf_scored]
     return tfidf_scored

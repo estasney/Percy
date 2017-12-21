@@ -3,9 +3,7 @@ def prettify_dict(d):
     for k, v in d.items():
         pk = k.replace("_", " ")
         pk = pk.title()
-        pv = v*100
-        pv = round(pv, 1)
-        pv = str(pv) + "%"
+        pv = "{:.2%}".format(v)
         p_dict[pk] = pv
     return p_dict
 
