@@ -1,6 +1,6 @@
 from gensim.models import Doc2Vec
 
-from home.estasney.mysite.modules.Utils import prettify_dict
+from Utils import prettify_dict
 
 try:
     from config import local_config as config
