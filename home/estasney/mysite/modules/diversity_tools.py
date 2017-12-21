@@ -108,7 +108,7 @@ def population_distro(male_count, female_count, total_count):
 
     plus_or_minus = t_value * a * b
 
-    pop_values = {'range': plus_or_minus, 'ratio_female': sample_mean, 'confidence_interval': plus_or_minus}
+    pop_values = {'ratio_female': sample_mean, 'confidence_interval': plus_or_minus}
     return pop_values
 
 
