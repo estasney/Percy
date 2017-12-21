@@ -1,17 +1,18 @@
 from flask import Flask, render_template, request, jsonify
-from home.estasney.mysite.modules import text_tools
-from home.estasney.mysite.modules import diversity_tools
-from home.estasney.mysite.modules import upload_tools
-from home.estasney.mysite.modules import neural_tools
-from home.estasney.mysite.modules import Utils
+from modules import text_tools
+from modules import diversity_tools
+from modules import upload_tools
+from modules import neural_tools
+from modules import Utils
+
 
 
 """ LOAD CONFIG """
 
 try:
-    from home.estasney.mysite.config import local_config as config
+    from config import local_config as config
 except ImportError:
-    from home.estasney.mysite.config import web_config as config
+    from config import web_config as config
 
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
 app = Flask(__name__)

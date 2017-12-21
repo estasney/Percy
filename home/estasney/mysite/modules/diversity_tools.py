@@ -1,11 +1,11 @@
-from operator import itemgetter
-from collections import namedtuple
 import pickle
+from collections import namedtuple
+from operator import itemgetter
 
 try:
-    from home.estasney.mysite.config import local_config as config
+    from config import local_config as config
 except ImportError:
-    from home.estasney.mysite.config import web_config as config
+    from config import web_config as config
 
 # Load Tree Classifier
 

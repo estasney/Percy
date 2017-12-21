@@ -1,20 +1,19 @@
 import re
+import string
+
 import gensim
 import nltk
-import string
 import pandas as pd
-from gensim.models import Doc2Vec, TfidfModel
 from gensim.corpora import Dictionary
+from gensim.models import TfidfModel
+from gensim.summarization import keywords as KW
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
-from nltk.tokenize import sent_tokenize
-from gensim.summarization import keywords as KW
-from home.estasney.mysite.modules.Utils import prettify_dict
 
 try:
-    from home.estasney.mysite.config import local_config as config
+    from config import local_config as config
 except ImportError:
-    from home.estasney.mysite.config import web_config as config
+    from config import web_config as config
 
 # Raw
 tfidf_model = TfidfModel.load(config.tfidf_model)

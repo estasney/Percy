@@ -1,10 +1,11 @@
 from gensim.models import Doc2Vec
+
 from home.estasney.mysite.modules.Utils import prettify_dict
 
 try:
-    from home.estasney.mysite.config import local_config as config
+    from config import local_config as config
 except ImportError:
-    from home.estasney.mysite.config import web_config as config
+    from config import web_config as config
 
 model = Doc2Vec.load(config.model)
 
