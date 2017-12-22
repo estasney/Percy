@@ -1,9 +1,12 @@
 from gensim.models import Doc2Vec
 import sys
-sys.path.append("home/estasney/mysite/my_config")
+sys.path.append('/home/estasney/mysite/my_config')
+try:
+    from home.estasney.mysite.my_config import Config as config
+except ImportError:
+    import web_config
+    config = web_config.Config()
 
-
-from home.estasney.mysite.my_config import Config as config
 
 def prettify_dict(d):
     p_dict = {}

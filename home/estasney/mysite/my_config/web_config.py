@@ -24,4 +24,3 @@ class Config(object):
     lg_tfidf_model_path = '/home/estasney/mysite/resources/lg_tfidf.model'
     UPLOAD_FOLDER = '/home/estasney/mysite/uploads'
     dupcheck_version = '0.1.1'
-
