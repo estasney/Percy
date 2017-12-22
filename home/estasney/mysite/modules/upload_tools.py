@@ -2,10 +2,15 @@ import os
 import pandas as pd
 from werkzeug.utils import secure_filename
 from flask import Flask
+import sys
+sys.path.append('/home/estasney/mysite/my_config')
+try:
+    from home.estasney.mysite.my_config import Config as config
+except ImportError:
+    import web_config
+    config = web_config.Config()
 
-from home.estasney.mysite.my_config import Config as config
-
-""" 
+"""
 
 GLOBAL PARAMETERS
 

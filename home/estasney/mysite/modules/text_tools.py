@@ -1,6 +1,6 @@
 import re
 import string
-
+import sys
 import gensim
 import nltk
 import pandas as pd
@@ -9,8 +9,12 @@ from gensim.models import TfidfModel
 from gensim.summarization import keywords as KW
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
-
-from home.estasney.mysite.my_config import Config as config
+sys.path.append('/home/estasney/mysite/my_config')
+try:
+    from home.estasney.mysite.my_config import Config as config
+except ImportError:
+    import web_config
+    config = web_config.Config()
 
 # Raw
 tfidf_model = TfidfModel.load(config.tfidf_model)

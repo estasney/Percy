@@ -3,7 +3,13 @@ from collections import namedtuple
 from operator import itemgetter
 import numpy as np
 import scipy
-from home.estasney.mysite.my_config import Config as config
+import sys
+sys.path.append('/home/estasney/mysite/my_config')
+try:
+    from home.estasney.mysite.my_config import Config as config
+except ImportError:
+    import web_config
+    config = web_config.Config()
 
 # Load Tree Classifier
 
