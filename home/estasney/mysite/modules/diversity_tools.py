@@ -3,11 +3,7 @@ from collections import namedtuple
 from operator import itemgetter
 import numpy as np
 import scipy
-
-try:
-    from config import local_config as config
-except ImportError:
-    from config import web_config as config
+from home.estasney.mysite.my_config import Config as config
 
 # Load Tree Classifier
 

@@ -1,18 +1,14 @@
 from flask import Flask, render_template, request, jsonify
+from my_config import Config as config
 from modules import text_tools
 from modules import diversity_tools
 from modules import upload_tools
 from modules import neural_tools
 from modules import Utils
 
-
-
 """ LOAD CONFIG """
 
-try:
-    from config import local_config as config
-except ImportError:
-    from config import web_config as config
+
 
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
 app = Flask(__name__)

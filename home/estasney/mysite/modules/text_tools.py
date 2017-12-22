@@ -10,10 +10,7 @@ from gensim.summarization import keywords as KW
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
 
-try:
-    from config import local_config as config
-except ImportError:
-    from config import web_config as config
+from home.estasney.mysite.my_config import Config as config
 
 # Raw
 tfidf_model = TfidfModel.load(config.tfidf_model)
