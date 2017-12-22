@@ -3,10 +3,7 @@ import pandas as pd
 from werkzeug.utils import secure_filename
 from flask import Flask
 
-try:
-    from config import local_config as config
-except ImportError:
-    from config import web_config as config
+from home.estasney.mysite.my_config import Config as config
 
 """ 
 
@@ -87,6 +84,7 @@ class UploadManager(object):
             if name_header == '':
                 self.status = 'You forgot to include the header that contains the first names'
                 return False
+
 
         filename = secure_filename(file.filename)
 

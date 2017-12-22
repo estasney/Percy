@@ -1,11 +1,19 @@
 from gensim.models import Doc2Vec
+import sys
+sys.path.append("home/estasney/mysite/my_config")
 
-from Utils import prettify_dict
 
-try:
-    from config import local_config as config
-except ImportError:
-    from config import web_config as config
+from home.estasney.mysite.my_config import Config as config
+
+def prettify_dict(d):
+    p_dict = {}
+    for k, v in d.items():
+        pk = k.replace("_", " ")
+        pk = pk.title()
+        pv = "{:.2%}".format(v)
+        p_dict[pk] = pv
+    return p_dict
+
 
 model = Doc2Vec.load(config.model)
 

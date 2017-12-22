@@ -1,11 +1,9 @@
 import pickle
 from collections import namedtuple
 from operator import itemgetter
-
-try:
-    from config import local_config as config
-except ImportError:
-    from config import web_config as config
+import numpy as np
+import scipy
+from home.estasney.mysite.my_config import Config as config
 
 # Load Tree Classifier
 
@@ -80,6 +78,36 @@ def infer_stats(results, type=None):
                     current_score = dsources.get(dv.source, 0)
                     dsources[dv.source] = current_score + 1
             return dsources
+
+
+def population_distro(male_count, female_count, total_count):
+
+    # Names to integers
+    int_known = [0 for _ in range(male_count)] + [1 for _ in range(female_count)]
+    # Std_dev of group
+    standard_deviation = np.std(int_known)
+
+    # Degree of freedom known - 1
+    degrees_of_freedom = total_count - male_count - female_count - 1
+    # Sample mean
+    sample_mean = float(np.mean(int_known))
+
+    # magic coefficient for 95% confidence
+    t_value = scipy.stats.t.ppf(1-0.025, degrees_of_freedom)
+
+    # Calculate plus and minus
+    # Standard deviation divided by sqrt of sample siz
+    a = standard_deviation/ np.sqrt((male_count + female_count))
+
+    # Sqrt of (Population - Sample Size) / (Population - 1)
+    b = np.sqrt((total_count - (male_count + female_count)) / (total_count - 1))
+
+    plus_or_minus = t_value * a * b
+
+    pop_values = {'ratio_female': sample_mean, 'confidence_interval': plus_or_minus}
+    return pop_values
+
+
 
 
 # TODO Exclude ML Option
