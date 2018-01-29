@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block content %}
+{% if success == 'True' %}
+<div class="container-fluid text-center">
+<h2>Machine Learning, Database Hybridized Model</h2>
+    <h3>For names not present in a database, machine learning was used to infer a gender.</h3>
+    <table class="table">
+    <thead>
+      <tr>
+          <th class="text-center">Total Names</th>
+        <th class="text-center">Male Names</th>
+	  	<th class="text-center">Female Names</th>
+          <th class="text-center">Ambiguous Names</th>
+
+	  </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+          <td> {{ total_count }} </td>
+        <td> {{ male_count }} </td>
+        <td> {{ female_count }} </td>
+          <td> {{ amb_count }} </td>
+
+      </tr>
+    </table>
+</div>
+<div class="container-fluid text-center bg-white">
+    <h2>Database Results</h2>
+    <h3>Machine Learning results not included</h3>
+    <table class="table">
+    <thead>
+      <tr>
+          <th class="text-center">Total Names</th>
+        <th class="text-center">Male Names</th>
+	  	<th class="text-center">Female Names</th>
+          <th class="text-center">Ambiguous Names</th>
+          <th class="text-center">Unknown Names</th>
+
+	  </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+          <td> {{ total_count }} </td>
+        <td> {{ d_male_count }} </td>
+        <td> {{ d_female_count }} </td>
+          <td> {{ d_amb_count }} </td>
+          <td> {{ d_unk_count }} </td>
+      </tr>
+    </table>
+    <h2>Statistically, since {{ d_known }} of {{ total_count }} names are known...</h2>
+    <br>
+    <h3>And of this group, {{ d_female_percent }} are Female...</h3>
+    <br>
+    <h2>The likelihood of the remaining, {{ d_unk_count }}, names having the same M:F ratio is 95% +/- {{confidence_interval}} </h2>
+</div>
+
+
+{% endif %}
+{% if success == 'False' %}
+<div class="container-fluid text-center">
+<h2>Something Went Wrong..</h2>
+<h2>{{error_message}}</h2>
+</div>
+{% endif %}
+
+<div class="container-fluid text-center">
+<h1>Upload a Spreadsheet Below</h1>
+</div>
+ <div class="container-fluid text-center">
+<form class="form-inline" action="/diversity" method="POST" enctype="multipart/form-data">
+		<input type="file" name="file" class="form-control" required="" size="50">
+		<input class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Header for First Name" name="header_name">
+        <label class="form-check-label">
+            <input class="form-check-input" name="use_global_names" type="checkbox" checked>Use Global Name Database?</label>
+		<button class="btn btn-danger" name="button" value="Upload">Score Diversity</button>
+
+
+</form>
+ </div>
+<div class="container-fluid text-center">
+<h2>Percy will analyze the file for gender diversity and return a score</h2>
+</div>
+
+
+{% endblock %}
+
+
+

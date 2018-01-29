@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+{% block content %}
+ <div class="container-fluid text-center">
+     <h3>Let's Try Some Word Equations</h3>
+ {% if success == 'True' %}
+ <form class="form-inline" action="/thisplusthat" method="POST">
+  <label class="sr-only" for="word1input">Word 1</label>
+     <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word1" id="word1input" value="{{word_one}}">
+  <operator>+</operator>
+  <label class="sr-only" for="word2input">Word 2</label>
+     <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word2" id="word2input" value="{{word_two}}">
+  <operator>-</operator>
+    <label class="sr-only" for="word3input">{{ word_three }}</label>
+    <input type="text" class="subtraction-word form-control mb-2 mr-sm-2 mb-sm-0" name="word3" id="word3input" value="{{word_three}}">
+    <operator>=</operator>
+    <br>
+    <br>
+    <button type="query" name="button" value="math" class="btn btn-danger">Ask Percy</button>
+</form>
+ {% else %}
+     <form class="form-inline" action="/thisplusthat" method="POST">
+  <label class="sr-only" for="word1input">Word 1</label>
+  <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word1" id="word1input">
+  <operator>+</operator>
+  <label class="sr-only" for="word2input">Word 2</label>
+  <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word2" id="word2input">
+  <operator>-</operator>
+    <label class="sr-only" for="word3input">Word 3</label>
+    <input type="text" class="subtraction-word form-control mb-2 mr-sm-2 mb-sm-0" name="word3" id="word3input">
+    <operator>=</operator>
+    <br>
+    <br>
+    <button type="query" name="button" value="math" class="btn btn-danger">Ask Percy</button>
+</form>
+ {% endif %}
+  <h5>Hints:</h5>
+  <p>You can leave the third box (word subtraction) blank.</p>
+     <p>Percy recognizes terms. For "Quality Assurance", type quality_assurance</p>
+  <p>Try Hardware + Software</p>
+</div>
+{% if success == 'True' %}
+<div class="container-fluid bg-grey text-center">
+  <h2>According to my calculations...</h2>
+  <h3>{{user_equation}}</h3>
+<table class="table">
+    <thead>
+      <tr>
+        <th class="text-center">Closest Match</th>
+          <th class="text-center">Similarity Score</th>
+
+      </tr>
+    </thead>
+    <tbody>
+        {% for key, value in result.items() %}
+      <tr>
+        <td> {{ key }} </td>
+        <td> {{ value }} </td>
+      </tr>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% elif success == 'False' %}
+<div class="container-fluid">
+    <h2>Oops!</h2>
+    <p>It would appear that the word <strong>{{ result }}</strong> is not in my vocabulary.</p>
+</div>
+{% else %}
+{% endif %}
+{% endblock %}
