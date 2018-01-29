@@ -1,14 +1,12 @@
 import os
 import pandas as pd
-from werkzeug.utils import secure_filename
 from flask import Flask
-import sys
-sys.path.append('/home/estasney/mysite/my_config')
+from werkzeug.utils import secure_filename
+
 try:
-    from home.estasney.mysite.my_config import Config as config
+    from app_folder.local_config import Config
 except ImportError:
-    import web_config
-    config = web_config.Config()
+    from app_folder.web_config import Config
 
 """
 
@@ -18,7 +16,7 @@ GLOBAL PARAMETERS
 ALLOWED_EXTENSIONS = ['.csv', '.xls', '.xlsx']
 
 TRY_ENCODINGS = ['', 'latin1', 'cp1252', 'iso-8859-1']
-UPLOAD_FOLDER = config.UPLOAD_FOLDER
+UPLOAD_FOLDER = Config.UPLOAD_FOLDER
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
