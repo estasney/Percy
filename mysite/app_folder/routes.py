@@ -1,45 +1,20 @@
-from flask import Flask, render_template, request, jsonify
-from my_config import Config as config
-from modules import text_tools
-from modules import diversity_tools
-from modules import upload_tools
-from modules import neural_tools
-from modules import Utils
+from app_folder import app_run
 
-""" LOAD CONFIG """
+from flask import render_template, request
+try:
+    from app_folder.local_config import Config
+except ImportError:
+    from app_folder.web_config import Config
 
-
-
-UPLOAD_FOLDER = config.UPLOAD_FOLDER
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+from app_folder import text_tools, Utils, diversity_tools, neural_tools, upload_tools
 
 
-"""
-
-Hack to include an API for other projects
-
-"""
-
-
-@app.route('/api/dupchecker/version', methods=['GET'])
-def get_version():
-    dupcheck_version = config.dupcheck_version
-    return jsonify({'version': dupcheck_version})
-
-"""
-
-APP ROUTING
-
-"""
-
-
-@app.route('/')
+@app_run.route('/')
 def open_page():
     return render_template('home_page.html')
 
 
-@app.route('/related', methods=['GET', 'POST'])
+@app_run.route('/related', methods=['GET', 'POST'])
 def related():
     if request.method == 'GET':
         return render_template('related.html')
@@ -56,7 +31,7 @@ def related():
             return render_template('related.html', result=result[1], success='False')
 
 
-@app.route('/stemmed', methods=['GET', 'POST'])
+@app_run.route('/stemmed', methods=['GET', 'POST'])
 def stemmed():
     if request.method == 'GET':
         return render_template('stemmed.html')
@@ -66,7 +41,7 @@ def stemmed():
         return render_template('stemmed.html', stemmed_bool=stemmed_search, success='True', original=search)
 
 
-@app.route('/keywords', methods=['GET', 'POST'])
+@app_run.route('/keywords', methods=['GET', 'POST'])
 def keywords():
     if request.method == 'GET':
         return render_template('keywords.html')
@@ -79,7 +54,7 @@ def keywords():
             return render_template('keywords.html', success='False')
 
 
-@app.route('/thisplusthat', methods=['GET', 'POST'])
+@app_run.route('/thisplusthat', methods=['GET', 'POST'])
 def thisplusthat():
     if request.method == 'GET':
         return render_template('thisplusthat.html')
@@ -94,7 +69,7 @@ def thisplusthat():
             return render_template('thisplusthat.html', result=solution['result'], success='False')
 
 
-@app.route('/infer', methods=['GET', 'POST'])
+@app_run.route('/infer', methods=['GET', 'POST'])
 def infer_name():
     if request.method == 'GET':
         return render_template('infer.html')
@@ -123,7 +98,7 @@ def infer_name():
         return render_template('infer.html', success='False')
 
 
-@app.route('/diversity', methods=['GET', 'POST'])
+@app_run.route('/diversity', methods=['GET', 'POST'])
 def diversity():
     if request.method == 'GET':
         return render_template('diversity_score.html')
@@ -160,7 +135,7 @@ def diversity():
 
     # Population distrubition
     pop_values = diversity_tools.population_distro(male_count=d_male_count, female_count=d_female_count,
-                                                      total_count=total_count)
+                                                   total_count=total_count)
     d_female_percent = "{:.2%}".format(pop_values['ratio_female'])
 
     confidence_interval = "{:.2%}".format(pop_values['confidence_interval'])
@@ -172,7 +147,7 @@ def diversity():
                            d_known=d_known, d_female_percent=d_female_percent, confidence_interval=confidence_interval)
 
 
-@app.route('/tf_idf', methods=['GET', 'POST'])
+@app_run.route('/tf_idf', methods=['GET', 'POST'])
 def tfidf():
     if request.method == 'GET':
         return render_template('tf_idf.html')
@@ -194,7 +169,3 @@ def tfidf():
 
         scored_tfidf = text_tools.score_tfidf(user_input, gram_mode, lem_mode)
         return render_template('tf_idf.html', success='True', original=user_input, result=scored_tfidf)
-
-
-if __name__ == '__main__':
-    app.run()

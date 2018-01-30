@@ -1,30 +1,30 @@
 import pickle
 from collections import namedtuple
 from operator import itemgetter
+
 import numpy as np
 import scipy
-import sys
-sys.path.append('/home/estasney/mysite/my_config')
+
+
 try:
-    from home.estasney.mysite.my_config import Config as config
+    from app_folder.local_config import Config
 except ImportError:
-    import web_config
-    config = web_config.Config()
+    from app_folder.web_config import Config
 
 # Load Tree Classifier
 
-f = open(config.tree, "rb")
+f = open(Config.tree, "rb")
 
 tree_model = pickle.load(f)
 f.close()
 
 # Load Name Dictionary
-f = open(config.name_dict, "rb")
+f = open(Config.name_dict, "rb")
 name_dict = pickle.load(f)
 f.close()
 
 # Load Global Name Dictionary
-f = open(config.global_name_dict, "rb")
+f = open(Config.global_name_dict, "rb")
 global_name_dict = pickle.load(f)
 f.close()
 

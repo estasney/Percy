@@ -1,6 +1,5 @@
 import re
 import string
-import sys
 import gensim
 import nltk
 import pandas as pd
@@ -9,25 +8,24 @@ from gensim.models import TfidfModel
 from gensim.summarization import keywords as KW
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
-sys.path.append('/home/estasney/mysite/my_config')
+
 try:
-    from home.estasney.mysite.my_config import Config as config
+    from app_folder.local_config import Config
 except ImportError:
-    import web_config
-    config = web_config.Config()
+    from app_folder.web_config import Config
 
 # Raw
-tfidf_model = TfidfModel.load(config.tfidf_model)
-dictionary = Dictionary.load(config.raw_dict)
+tfidf_model = TfidfModel.load(Config.tfidf_model)
+dictionary = Dictionary.load(Config.raw_dict)
 # Grams Only
-bigram_tfidf_model = TfidfModel.load(config.bigram_tfidf_model_path)
-bigram_dictionary = Dictionary.load(config.bigram_dict_path)
+bigram_tfidf_model = TfidfModel.load(Config.bigram_tfidf_model_path)
+bigram_dictionary = Dictionary.load(Config.bigram_dict_path)
 # Lems Only
-lems_tfidf_model = TfidfModel.load(config.lem_tfidf_model_path)
-lems_dictionary = Dictionary.load(config.lem_dict_path)
+lems_tfidf_model = TfidfModel.load(Config.lem_tfidf_model_path)
+lems_dictionary = Dictionary.load(Config.lem_dict_path)
 # Grams and Lems
-lg_tfidf_model = TfidfModel.load(config.lg_tfidf_model_path)
-lg_dictionary = Dictionary.load(config.lg_dict_path)
+lg_tfidf_model = TfidfModel.load(Config.lg_tfidf_model_path)
+lg_dictionary = Dictionary.load(Config.lg_dict_path)
 
 month_list = ["jan", "january" "feb", "february", "mar", "march", "apr", "april", "may", "jun", "june", "jul", "july",
               "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec", "december"]
@@ -55,12 +53,12 @@ stoplist = nltk.corpus.stopwords.words('english')
 wht_space = set('\t\r\x0b\x0c')
 
 # Namelist
-name_list = pd.read_csv(config.name_file_path)
+name_list = pd.read_csv(Config.name_file_path)
 name_list = name_list['names'].tolist()
 name_list = set(name_list)
 
 # Phraser
-bigram = gensim.models.Phrases.load(config.gram_path)
+bigram = gensim.models.Phrases.load(Config.gram_path)
 bigrammer = gensim.models.phrases.Phraser(bigram)
 
 

@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 {% if success == 'True' %}
+{% include 'partials/explains/explains_diversity.html' %}
 <div class="container-fluid text-center">
 <h2>Machine Learning, Database Hybridized Model</h2>
     <h3>For names not present in a database, machine learning was used to infer a gender.</h3>
@@ -59,6 +60,7 @@
 
 {% endif %}
 {% if success == 'False' %}
+{% include 'partials/helps/helps_diversity.html' %}
 <div class="container-fluid text-center">
 <h2>Something Went Wrong..</h2>
 <h2>{{error_message}}</h2>

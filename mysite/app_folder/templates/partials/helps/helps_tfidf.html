@@ -1,0 +1,29 @@
+<div class="container-fluid text-center bg-grey">
+    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#help">What is this?</button>
+  <div id="help" class="collapse text-black">
+      <br>
+      <p>This tool is incredibly useful for situations when you've found a great résumé and want to find more like it.</p>
+      <br>
+      <p>If you build out a search string from an ideal résumé it is easy to be too specific and you risk missing your next ideal résumé.</p>
+      <br>
+      <p>"Resume Fingerprinting" uses a simple but highly effective NLP technique known as Term - Frequency, Inverse Document Frequency</p>
+      <br>
+      <p>When you enter an example résumé, Percy runs a tally of the number of times a word appears in your document.
+          Each of these tallies is then divided by the total number of words. (To accommodate documents of any length). <i>Then</i>
+      Percy makes use of its résumé training data to calculate "Inverse Document Frequency"</p>
+      <br>
+      <div class="panel-group">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#collapse1">And that means...?</a>
+                </h4>
+            </div>
+        </div>
+      <div id="collapse1" class="panel-collapse collapse">
+            <ul class="list-group">
+                <li class="list-group-item">The more frequent a word is used in a résumé, the higher its score.</li>
+                <li class="list-group-item">The more frequent a word is used in all résumés, the lower its score.</li>
+            </ul>
+        </div>
+  </div>
+</div>
