@@ -1,28 +1,28 @@
 import os
-import sys
-# Add the modules path to sys.path
 
 cwd = os.getcwd()
-modules_rel = '/home/estasney/mysite/modules'
 
-sys.path.append(os.path.join(cwd, modules_rel))
+resource_path = r'mysite/app_folder/resources'
+
+rp = os.path.join(cwd, resource_path)
+
 
 class Config(object):
-    model = '/home/estasney/mysite/resources/mymodel.model'
-    gram_path = '/home/estasney/mysite/resources/trigram_model.p'
-    tree = "/home/estasney/mysite/resources/tree_classifier.pickle"
-    name_dict = '/home/estasney/mysite/resources/name_dict.pickle'
-    global_name_dict = '/home/estasney/mysite/resources/global_name_dict.pickle'
-    name_file_path = '/home/estasney/mysite/resources/name_list.csv'
-    raw_dict = '/home/estasney/mysite/resources/tfidf_dict.dict'
-    tfidf_model = '/home/estasney/mysite/resources/tfidf.model'
-    bigram_dict_path = '/home/estasney/mysite/resources/bigram_tfidf_dict.dict'
-    bigram_tfidf_model_path = '/home/estasney/mysite/resources/bigram_tfidf.model'
-    lem_dict_path = '/home/estasney/mysite/resources/l_dictionary.dict'
-    lem_tfidf_model_path = '/home/estasney/mysite/resources/l_tfidf.model'
-    lg_dict_path = '/home/estasney/mysite/resources/lg_dictionary.dict'
-    lg_tfidf_model_path = '/home/estasney/mysite/resources/lg_tfidf.model'
-    UPLOAD_FOLDER = '/home/estasney/mysite/uploads'
-    dupcheck_version = '0.1.1'
+    model = os.path.join(rp, 'mymodel.model')
+    gram_path = os.path.join(rp, 'trigram_model.p')
+    tree = os.path.join(rp, 'tree_classifier.pickle')
+    name_dict = os.path.join(rp, 'name_dict.pickle')
+    global_name_dict = os.path.join(rp, 'global_name_dict.pickle')
+    name_file_path = os.path.join(rp, 'name_list.csv')
+    raw_dict = os.path.join(rp, 'tfidf_dict.dict')
+    tfidf_model = os.path.join(rp, 'tfidf.model')
+    bigram_dict_path = os.path.join(rp, 'bigram_tfidf_dict.dict')
+    bigram_tfidf_model_path = os.path.join(rp, 'bigram_tfidf.model')
+    lem_dict_path = os.path.join(rp, 'l_dictionary.dict')
+    lem_tfidf_model_path = os.path.join(rp, 'l_tfidf.model')
+    lg_dict_path = os.path.join(rp, 'lg_dictionary.dict')
+    lg_tfidf_model_path = os.path.join(rp, 'lg_tfidf.model')
+    UPLOAD_FOLDER = os.path.join(cwd, r'mysite\uploads')
     debug = False
+    secret_key = 'its-a-secret'
     profiler = False
