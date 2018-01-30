@@ -24,6 +24,9 @@ class Config(object):
     lg_tfidf_model_path = os.path.join(rp, 'lg_tfidf.model')
     UPLOAD_FOLDER = os.path.join(cwd, r'mysite\uploads')
     dupcheck_version = '0.1.1'
+    debug = True
+    secret_key = 'its-a-secret'
+    profiler = True
 
 
 

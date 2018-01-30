@@ -8,6 +8,7 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mainpage.css') }}">
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
@@ -26,14 +27,36 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav navbar-left">
-
-        <li><a href="/related">RELATED WORDS</a></li>
-        <li><a href="/thisplusthat">THIS PLUS THAT</a></li>
-        <li><a href="/keywords">KEYWORD FINDER</a></li>
-        <li><a href="/tf_idf">TFIDF</a></li>
-        <li><a href="/stemmed">WILD BOOLEANS</a> </li>
-        <li><a href="/infer">INFER NAME</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">
+            SEARCH TOOLS<span class="caret"></span></a>
+          <ul class="dropdown-menu bg-blue">
+            <li><a href="/related">RELATED WORDS</a></li>
+            <li><a href="/keywords">KEYWORD FINDER</a></li>
+            <li><a href="/tf_idf">RESUME FINGERPRINTING</a></li>
+            <li><a href="/stemmed">WILD BOOLEANS</a> </li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">
+            DIVERSITY TOOLS<span class="caret"></span></a>
+          <ul class="dropdown-menu bg-blue">
+            <li><a href="/infer">INFER NAME</a></li>
         <li><a href="/diversity">DIVERSITY SCORE</a></li>
+          </ul>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">
+            JUST FOR FUN<span class="caret"></span></a>
+          <ul class="dropdown-menu bg-blue">
+        <li><a href="/thisplusthat">THIS PLUS THAT</a></li>
+          </ul>
+        </li>
+
+
+
+
+
+
 
       </ul>
     </div>
