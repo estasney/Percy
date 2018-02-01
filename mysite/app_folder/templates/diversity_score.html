@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+{% include 'partials/helps/helps_diversity.html' %}
 {% if success == 'True' %}
 {% include 'partials/explains/explains_diversity.html' %}
 <div class="container-fluid text-center">
@@ -60,7 +61,6 @@
 
 {% endif %}
 {% if success == 'False' %}
-{% include 'partials/helps/helps_diversity.html' %}
 <div class="container-fluid text-center">
 <h2>Something Went Wrong..</h2>
 <h2>{{error_message}}</h2>
