@@ -22,7 +22,7 @@ class Config(object):
     lem_tfidf_model_path = os.path.join(rp, 'l_tfidf.model')
     lg_dict_path = os.path.join(rp, 'lg_dictionary.dict')
     lg_tfidf_model_path = os.path.join(rp, 'lg_tfidf.model')
-    UPLOAD_FOLDER = os.path.join(cwd, r'mysite\uploads')
+    UPLOAD_FOLDER = os.path.join(cwd, r'mysite/uploads')
     debug = False
     secret_key = 'its-a-secret'
     profiler = False
