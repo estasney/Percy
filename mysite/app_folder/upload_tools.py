@@ -17,8 +17,6 @@ ALLOWED_EXTENSIONS = ['.csv', '.xls', '.xlsx']
 
 TRY_ENCODINGS = ['', 'latin1', 'cp1252', 'iso-8859-1']
 UPLOAD_FOLDER = Config.UPLOAD_FOLDER
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 def inject_allowed_ext():
@@ -95,10 +93,10 @@ class UploadManager(object):
             return None
 
         # Save file to open later for analysis
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        file.save(os.path.join(Config.UPLOAD_FOLDER, filename))
 
         # Save location
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file_path = os.path.join(Config.UPLOAD_FOLDER, filename)
 
         return file_path
 
