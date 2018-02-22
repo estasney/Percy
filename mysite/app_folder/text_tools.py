@@ -8,6 +8,7 @@ from gensim.models import TfidfModel
 from gensim.summarization import keywords as KW
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
+from operator import itemgetter
 
 try:
     from app_folder.local_config import Config
@@ -248,26 +249,15 @@ def wild_stem(text):
 
 def get_keywords(text):
     raw_text = str(text)
-    raw_text = ' '.join([word for word in raw_text.split()])
-    sentences = nltk.sent_tokenize(raw_text)
-    sentence_keywords = []
-    try:
-        for sentence in sentences:
-            try:
-                sent_keyw = KW(sentence)
-                if len(sent_keyw) > 0:
-                    sent_keyw = sent_keyw.splitlines()
-                    if len(sent_keyw) > 1:
-                        sent_keyw = ', '.join([word for word in sent_keyw if len(sent_keyw) > 1])
-                    else:
-                        sent_keyw = ' '.join([word for word in sent_keyw])
-                    sentence_keywords.append(sent_keyw)
-            except:
-                pass
-        user_keywords = sentence_keywords
-    except:
-        return False
-    return user_keywords
+    keywords = KW(raw_text, split=True, scores=True)
+    scored_words = [(word, float(score)) for word, score in keywords]
+    words_ = [word for word, score in scored_words]
+    ranked_words = []
+    for i, word in enumerate(words_):
+        ranked_words.append((word, i+1))
+    ranked_words = sorted(ranked_words, key=itemgetter(1))
+
+    return ranked_words
 
 def score_tfidf(user_input, gram_mode, lem_mode):
     # clean text returned is string.

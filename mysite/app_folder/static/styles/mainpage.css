@@ -18,7 +18,7 @@ body {
   }
 
   .jumbotron {
-      background-color: #f4511e;
+      background-color: #555bde;
       color: #fff;
       padding: 100px 25px;
       font-family: Montserrat, sans-serif;
@@ -44,7 +44,7 @@ body {
       background-color: #b2f7ef;
   }
   .bg-lgrey {
-      background-color: rgba(220, 212, 210, 0.19);
+      background-color: #eaeaea;
   }
   .bg-grey {
       background-color: #f6f6f6;
@@ -133,7 +133,7 @@ body {
   }
   .navbar {
       margin-bottom: 0;
-      background-color: #f4511e;
+      background-color: #555bde;
       z-index: 9999;
       border: 0;
       font-size: 12px !important;

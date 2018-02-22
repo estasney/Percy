@@ -25,14 +25,26 @@
 {% endif %}
 {% if success == 'True' %}
 <div class="container-fluid bg-grey text-center">
-  <h2> {{title_h2}} </h2>
-  <p>These are the keywords I found, separated by sentence...</p>
-    <div class="container-fluid bg-grey text-center">
-        <ul class="list-group">
-                {% for keyword in keywords %}
-                <li class="list-group-item">{{keyword}}</li>
-                {% endfor %}
-        </ul>
+  <h2> Keywords </h2>
+  <p>These are the keywords I found</p>
+    <div class="container">
+        <table class="table">
+    <thead>
+      <tr>
+        <th class="text-center">Word</th>
+        <th class="text-center">Rank</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for word, score in keywords %}
+      <tr>
+        <td> {{ word }} </td>
+        <td> {{ score }} </td>
+      </tr>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
     </div>
 </div>
 {% elif success == 'False' %}
