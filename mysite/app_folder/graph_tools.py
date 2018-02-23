@@ -11,7 +11,7 @@ from gensim.summarization.graph import Graph
 from gensim.utils import chunkize_serial
 
 WINDOW_SIZE = 3
-WORD_LEN = 3
+
 
 INCLUDING_FILTER = ['NN', 'JJ']
 EXCLUDING_FILTER = []
@@ -87,7 +87,7 @@ def add_nodes(lem_text, graph):
             graph.add_node(token)
 
 
-def process_first_window(graph, lem_text):
+def process_first_window(graph, lem_text, window_size=WINDOW_SIZE):
     first_window = get_first_window(lem_text)
     for word_a, word_b in combinations(first_window, 2):
         set_graph_edge(graph, lem_text, word_a, word_b)

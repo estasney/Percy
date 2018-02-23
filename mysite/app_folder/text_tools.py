@@ -34,6 +34,7 @@ month_list = ["jan", "january" "feb", "february", "mar", "march", "apr", "april"
               "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec", "december"]
 number_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
+WORD_LEN = 3
 
 # Load Stopwords
 # TODO Update to my collection
@@ -294,9 +295,23 @@ def score_tfidf(user_input, gram_mode, lem_mode):
     tfidf_scored = [(token, "{:.2%}".format(score)) for token, score in tfidf_scored]
     return tfidf_scored
 
-def process_graph_text(text):
+def process_graph_text(text, word_len=WORD_LEN):
     wnl = nltk.WordNetLemmatizer()
     split_text = list(_tokenize_by_word(text))
-    lem_text = [wnl.lemmatize(word, get_wordnet_pos(pos)) for word, pos in nltk.pos_tag(split_text)]
-    lem_text = [word for word in lem_text if len(word) >= WORD_LEN and word not in stopwords]
+    lem_text = [wnl.lemmatize(word, get_wordnet_pos_graph(pos)) for word, pos in nltk.pos_tag(split_text)]
+    lem_text = [word for word in lem_text if len(word) >= word_len and word not in stopw]
     return lem_text
+
+def get_wordnet_pos_graph(treebank_tag):
+
+    wordnet = nltk.corpus.wordnet
+    if treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('N'):
+        return wordnet.NOUN
+    elif treebank_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return wordnet.NOUN
