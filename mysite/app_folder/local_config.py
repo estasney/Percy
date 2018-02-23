@@ -2,7 +2,7 @@ import os
 
 cwd = os.getcwd()
 
-resource_path = r'mysite\app_folder\resources'
+resource_path = r'mysite/app_folder/resources'
 
 rp = os.path.join(cwd, resource_path)
 

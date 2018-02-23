@@ -1,14 +1,16 @@
 import re
 import string
+from operator import itemgetter
+
 import gensim
 import nltk
 import pandas as pd
 from gensim.corpora import Dictionary
 from gensim.models import TfidfModel
 from gensim.summarization import keywords as KW
+from gensim.summarization.textcleaner import tokenize_by_word as _tokenize_by_word
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
-from operator import itemgetter
 
 try:
     from app_folder.local_config import Config
@@ -291,3 +293,10 @@ def score_tfidf(user_input, gram_mode, lem_mode):
     tfidf_scored = tfidf_scored[:25]
     tfidf_scored = [(token, "{:.2%}".format(score)) for token, score in tfidf_scored]
     return tfidf_scored
+
+def process_graph_text(text):
+    wnl = nltk.WordNetLemmatizer()
+    split_text = list(_tokenize_by_word(text))
+    lem_text = [wnl.lemmatize(word, get_wordnet_pos(pos)) for word, pos in nltk.pos_tag(split_text)]
+    lem_text = [word for word in lem_text if len(word) >= WORD_LEN and word not in stopwords]
+    return lem_text
