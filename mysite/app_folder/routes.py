@@ -191,6 +191,3 @@ def kw_data():
         data.append(td)
 
     return jsonify({'data': data})
-
-
-
