@@ -12,8 +12,8 @@
         <button class="btn btn-secondary disabled" type="button" id="reset">Reset!</button>
       </span>
 
-        <span style="vertical-align:middle;" class="input-group" id="window_size"><select class="form-control">
-     Window Size
+        <span style="vertical-align:middle;" class="input-group" ><select id="window_size" class="form-control">
+
   <option>2</option>
   <option>3</option>
   <option>4</option>
@@ -35,7 +35,7 @@ $('#reset').on('click', enableGo);
 $('#reset').on('click', clearGraph);
 
 function windowSize() {
-    var ws = document.getElementById('#window_size');
+    var ws = document.getElementById('window_size');
     return ws.options[ws.selectedIndex].value;
 }
 function disableGo() {
