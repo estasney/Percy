@@ -111,12 +111,12 @@ function getData(term, limit, is_update) {
 function newLinks(search_data) {
     function updateNodes(d) {
         d.source = graph.nodes[d.source] || (graph.nodes[d.source] = {
-            node_text: d.source,
+            node_text: d.source.toString(),
             node_color: d.source_color,
             node_score: d.source_score
         });
         d.target = graph.nodes[d.target] || (graph.nodes[d.target] = {
-            node_text: d.target,
+            node_text: d.target.toString(),
             node_color: d.target_color,
             node_score: d.target_score
         });
