@@ -50,16 +50,16 @@ $('#search').removeClass('disabled');
 
 function clearGraph(){
   graph = {
-    "nodes": [],
-    "links": []
+    "nodes": {},
+    "links": {}
 };
 }
 
 var width = window.outerWidth;
 var height = window.outerHeight;
 var graph = {
-    "nodes": [],
-    "links": []
+    "nodes": {},
+    "links": {}
 };
 
 
@@ -111,12 +111,12 @@ function getData(term, limit, is_update) {
 function newLinks(search_data) {
     function updateNodes(d) {
         d.source = graph.nodes[d.source] || (graph.nodes[d.source] = {
-            node_text: d.source.toString(),
+            node_text: d.source.valueOf(),
             node_color: d.source_color,
             node_score: d.source_score
         });
-        d.target = graph.nodes[d.target] || (graph.nodes[d.target] = {
-            node_text: d.target.toString(),
+        d.target = graph.nodes[d.target] || (graph.nodes[d.target.valueOf()] = {
+            node_text: d.target.valueOf(),
             node_color: d.target_color,
             node_score: d.target_score
         });
