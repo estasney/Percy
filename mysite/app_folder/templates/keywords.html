@@ -1,32 +1,44 @@
 {% extends "layout.html" %}
 {% block content %}
 
-   <div id="main-menu" class="container">
+<div id="main-menu" class="container">
 
     <div class="input-group">
-        <textarea id="search_term" type="text" rows="4" class="form-control" placeholder="Search for..."></textarea>
-      <span class="input-group-btn">
+        <textarea id="search_term" type="text" rows="4" class="form-control" placeholder="Paste in Text..."></textarea>
+        <span class="input-group-btn">
         <button class="btn btn-secondary" type="button" id="search">Go!</button>
       </span>
-      <span class="input-group-btn">
+        <span class="input-group-btn">
         <button class="btn btn-secondary disabled" type="button" id="reset">Reset!</button>
       </span>
-    </div>
-  </div>
 
-<div class="container-fluid text-center">
-    <svg id="plot">
-    </svg>
+        <span style="vertical-align:middle;" class="input-group" id="window_size"><select class="form-control">
+     Window Size
+  <option>1</option>
+  <option>2</option>
+  <option>3</option>
+  <option>4</option>
+  <option>5</option>
+</select>
+</span>
+        <span style="vertical-align:middle;" class="input-group"><label>Window Size
+</label>
+</span></div>
 </div>
+
 <script>
 var data_url = "http://127.0.0.1:5000/kw_data";
 
-var r_base = 3;
+var r_base = 4;
 $('#search').on('click', startSearch);
 $('#reset').on('click', restart);
 $('#reset').on('click', enableGo);
 $('#reset').on('click', clearGraph);
 
+function windowSize() {
+    var ws = document.getElementById('#window_size');
+    return ws.options[ws.selectedIndex].value;
+}
 function disableGo() {
   $('#search').addClass('disabled');
   $('#reset').removeClass('disabled');
@@ -52,7 +64,7 @@ var graph = {
 };
 
 
-var force = d3.layout.force().size([width, height]).linkDistance(15).charge(-500);
+var force = d3.layout.force().size([width, height]).linkDistance(15).charge(-1000);
 
 var svg = d3.select('body').append('svg')
     .attr('width', width)
@@ -60,8 +72,8 @@ var svg = d3.select('body').append('svg')
 
 function startSearch() {
     var search_term = $("#search_term").prop('value');
-    var limit_to = $('#limit_to').prop('value');
-    getData(search_term, limit_to, false);
+    var window_size = windowSize();
+    getData(search_term, window_size, false);
     disableGo();
 }
 
@@ -253,6 +265,7 @@ function startForce() {
             .style("font", "14px serif");
     }
 }
+
 
 </script>
 {% endblock %}

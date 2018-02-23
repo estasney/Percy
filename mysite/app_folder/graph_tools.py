@@ -55,28 +55,28 @@ def bright_color():
     return (r, g, b)
 
 
-def remaining_windows(lem_text):
-    return lem_text[WINDOW_SIZE:]
+def remaining_windows(lem_text, window_size):
+    return lem_text[window_size:]
 
 
-def get_first_window(lem_text):
-    return lem_text[:WINDOW_SIZE]
+def get_first_window(lem_text, window_size):
+    return lem_text[:window_size]
 
 
-def generate_chunks(remaining_window):
-    return chunkize_serial(remaining_window, WINDOW_SIZE, as_numpy=False)
+def generate_chunks(remaining_window, window_size):
+    return chunkize_serial(remaining_window, window_size, as_numpy=False)
 
 
-def generate_combos(remaining_window):
-    chunks = generate_chunks(remaining_window)
+def generate_combos(remaining_window, window_size):
+    chunks = generate_chunks(remaining_window, window_size)
     for chunk in chunks:
         for word_a, word_b in combinations(chunk, 2):
             yield word_a, word_b
 
 
-def process_remaining_windows(graph, lem_text):
-    remaining_window = remaining_windows(lem_text)
-    combos = generate_combos(remaining_window)
+def process_remaining_windows(graph, lem_text, window_size):
+    remaining_window = remaining_windows(lem_text, window_size)
+    combos = generate_combos(remaining_window, window_size)
     for word_a, word_b in combos:
         set_graph_edge(graph, lem_text, word_a, word_b)
 
@@ -87,8 +87,8 @@ def add_nodes(lem_text, graph):
             graph.add_node(token)
 
 
-def process_first_window(graph, lem_text, window_size=WINDOW_SIZE):
-    first_window = get_first_window(lem_text)
+def process_first_window(graph, lem_text, window_size):
+    first_window = get_first_window(lem_text, window_size)
     for word_a, word_b in combinations(first_window, 2):
         set_graph_edge(graph, lem_text, word_a, word_b)
 
@@ -100,10 +100,10 @@ def set_graph_edge(graph, lem_text, word_a, word_b):
         graph.add_edge(edge)
 
 
-def build_graph(lem_text):
+def build_graph(lem_text, window_size=WINDOW_SIZE):
     graph = Graph()
     add_nodes(lem_text, graph)
-    process_first_window(graph, lem_text)
-    process_remaining_windows(graph, lem_text)
+    process_first_window(graph, lem_text, window_size)
+    process_remaining_windows(graph, lem_text, window_size)
     return graph
 
