@@ -31,6 +31,8 @@ def assign_deviations(scores_dict):
 
 
 def get_cat(x, std_dev):
+    if std_dev == 0:
+        return 0
     return math.floor(x/std_dev)
 
 

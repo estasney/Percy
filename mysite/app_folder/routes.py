@@ -190,4 +190,6 @@ def kw_data():
               'source_color': source_color, 'target_color': target_color}
         data.append(td)
 
+    del edges, scores, dev_dict, dev_count, color_dict
+
     return jsonify({'data': data})
