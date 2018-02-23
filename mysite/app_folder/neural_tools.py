@@ -13,10 +13,12 @@ def prettify_dict(d):
         p_dict[pk] = pv
     return p_dict
 
-
-model = Doc2Vec.load(Config.model)
+def load_model():
+    model = Doc2Vec.load(Config.model)
+    return model
 
 def word_sims(user_query, prettify=True):
+    model = load_model()
     try:
         result = dict(model.similar_by_word(user_query.lower()))
     except KeyError as error:
