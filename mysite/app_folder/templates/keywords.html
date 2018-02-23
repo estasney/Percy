@@ -14,7 +14,6 @@
 
         <span style="vertical-align:middle;" class="input-group" id="window_size"><select class="form-control">
      Window Size
-  <option>1</option>
   <option>2</option>
   <option>3</option>
   <option>4</option>
@@ -90,13 +89,13 @@ function getData(term, limit, is_update) {
         url: data_url,
         data: {
             "raw_text": term,
-            "limit": limit,
         },
         dataType: 'json',
         beforeSend: function(xhr) {
             xhr.setRequestHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
             xhr.setRequestHeader('Accept-Language', 'en-US,en;q=0.8');
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('Window-Limit', limit);
         },
         success: function(data) {
             var json_data = JSON.stringify(data);

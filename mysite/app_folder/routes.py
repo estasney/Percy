@@ -171,7 +171,7 @@ def kw_data():
     if not raw_text:
         abort(401)
 
-    window_size = int(request.form.get('limit', 2))
+    window_size = int(request.headers.get('Window-Limit', 2))
 
     lem_text = text_tools.process_graph_text(raw_text)
     graph = graph_tools.build_graph(lem_text, window_size)
