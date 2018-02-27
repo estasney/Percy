@@ -2,7 +2,7 @@ import os
 
 cwd = os.getcwd()
 
-resource_path = r'mysite\app_folder\resources'
+resource_path = r'mysite/app_folder/resources'
 
 rp = os.path.join(cwd, resource_path)
 
@@ -24,9 +24,9 @@ class Config(object):
     lg_tfidf_model_path = os.path.join(rp, 'lg_tfidf.model')
     UPLOAD_FOLDER = os.path.join(cwd, r'mysite\uploads')
     dupcheck_version = '0.1.1'
-    debug = True
+    debug = False
     secret_key = 'its-a-secret'
-    profiler = True
+    profiler = False
 
 
 

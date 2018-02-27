@@ -1,12 +1,14 @@
+from flask import render_template, request, jsonify, abort
+from gensim.summarization.pagerank_weighted import pagerank_weighted
+
 from app_folder import app_run
 
-from flask import render_template, request
 try:
     from app_folder.local_config import Config
 except ImportError:
     from app_folder.web_config import Config
 
-from app_folder import text_tools, Utils, diversity_tools, neural_tools, upload_tools
+from app_folder import text_tools, Utils, diversity_tools, neural_tools, upload_tools, graph_tools
 
 
 @app_run.route('/')
@@ -41,17 +43,9 @@ def stemmed():
         return render_template('stemmed.html', stemmed_bool=stemmed_search, success='True', original=search)
 
 
-@app_run.route('/keywords', methods=['GET', 'POST'])
+@app_run.route('/keywords', methods=['GET'])
 def keywords():
-    if request.method == 'GET':
-        return render_template('keywords.html')
-    elif request.method == 'POST':
-        keywords = text_tools.get_keywords(request.form['raw_text'])
-        if keywords:
-            return render_template('keywords.html', keywords=keywords, success='True',
-                                   original=request.form['raw_text'])
-        else:
-            return render_template('keywords.html', success='False')
+    return render_template('keywords.html')
 
 
 @app_run.route('/thisplusthat', methods=['GET', 'POST'])
@@ -169,3 +163,33 @@ def tfidf():
 
         scored_tfidf = text_tools.score_tfidf(user_input, gram_mode, lem_mode)
         return render_template('tf_idf.html', success='True', original=user_input, result=scored_tfidf)
+
+
+@app_run.route('/kw_data', methods=['POST'])
+def kw_data():
+    raw_text = request.form.get('raw_text')
+    if not raw_text:
+        abort(401)
+
+    window_size = int(request.headers.get('Window-Limit', 2))
+
+    lem_text = text_tools.process_graph_text(raw_text)
+    graph = graph_tools.build_graph(lem_text, window_size)
+
+    edges = graph.edges()
+    data = []
+    scores = pagerank_weighted(graph)
+    dev_dict, dev_count = graph_tools.assign_deviations(scores)
+    color_dict = graph_tools.compute_colors_dict(dev_count)
+    for edge in edges:
+        source, target = edge
+        source_score, target_score = int(dev_dict.get(source, 0)), int(dev_dict.get(target, 0))
+        source_color, target_color = (color_dict.get(source_score, color_dict[0])), (color_dict.get(target_score,
+                                                                                                    color_dict[0]))
+        td = {'source': source, 'source_score': source_score, 'target': target, 'target_score': target_score,
+              'source_color': source_color, 'target_color': target_color}
+        data.append(td)
+
+    del edges, scores, dev_dict, dev_count, color_dict
+
+    return jsonify({'data': data})

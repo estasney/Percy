@@ -1,14 +1,16 @@
 import re
 import string
+from operator import itemgetter
+
 import gensim
 import nltk
 import pandas as pd
 from gensim.corpora import Dictionary
 from gensim.models import TfidfModel
 from gensim.summarization import keywords as KW
+from gensim.summarization.textcleaner import tokenize_by_word as _tokenize_by_word
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
-from operator import itemgetter
 
 try:
     from app_folder.local_config import Config
@@ -16,22 +18,69 @@ except ImportError:
     from app_folder.web_config import Config
 
 # Raw
-tfidf_model = TfidfModel.load(Config.tfidf_model)
-dictionary = Dictionary.load(Config.raw_dict)
+def load_tfidf_model():
+    tfidf_model = TfidfModel.load(Config.tfidf_model)
+    return tfidf_model
+
+def load_dictionary():
+    dictionary = Dictionary.load(Config.raw_dict)
+    return dictionary
 # Grams Only
-bigram_tfidf_model = TfidfModel.load(Config.bigram_tfidf_model_path)
-bigram_dictionary = Dictionary.load(Config.bigram_dict_path)
+
+def load_bigram_tfidf_model():
+    bigram_tfidf_model = TfidfModel.load(Config.bigram_tfidf_model_path)
+    return bigram_tfidf_model
+
+def load_bigram_dictionary():
+    bigram_dictionary = Dictionary.load(Config.bigram_dict_path)
+    return bigram_dictionary
+
 # Lems Only
-lems_tfidf_model = TfidfModel.load(Config.lem_tfidf_model_path)
-lems_dictionary = Dictionary.load(Config.lem_dict_path)
+
+def load_lems_tfidf_model():
+    lems_tfidf_model = TfidfModel.load(Config.lem_tfidf_model_path)
+    return lems_tfidf_model
+
+def load_lems_dictionary():
+    lems_dictionary = Dictionary.load(Config.lem_dict_path)
+    return lems_dictionary
+
 # Grams and Lems
-lg_tfidf_model = TfidfModel.load(Config.lg_tfidf_model_path)
-lg_dictionary = Dictionary.load(Config.lg_dict_path)
+
+def load_lg_tfidf_model():
+    lg_tfidf_model = TfidfModel.load(Config.lg_tfidf_model_path)
+    return lg_tfidf_model
+
+def load_lg_dictionary():
+    lg_dictionary = Dictionary.load(Config.lg_dict_path)
+    return lg_dictionary
+
+def load_name_list():
+    name_list = pd.read_csv(Config.name_file_path)
+    name_list = name_list['names'].tolist()
+    name_list = set(name_list)
+    return name_list
+
+# Phraser
+def load_bigram():
+    bigram = gensim.models.Phrases.load(Config.gram_path)
+    return bigram
+
+def load_bigrammer():
+    bigram = load_bigram()
+    bigrammer = gensim.models.phrases.Phraser(bigram)
+    return bigrammer
 
 month_list = ["jan", "january" "feb", "february", "mar", "march", "apr", "april", "may", "jun", "june", "jul", "july",
               "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec", "december"]
 number_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
+WORD_LEN = 3
+
+LEMMATIZER = nltk.WordNetLemmatizer()
+TOKENIZER = nltk.tokenize.moses.MosesTokenizer()
+STEMMER = nltk.stem.snowball.SnowballStemmer("english")
+WORDNET = nltk.corpus.wordnet
 
 # Load Stopwords
 # TODO Update to my collection
@@ -41,29 +90,17 @@ stopw = gensim.parsing.preprocessing.STOPWORDS
 punc = string.punctuation
 punc = punc + "●" + "•" + "-" + "ø"
 
-# Tokenizer
-tokenizer = nltk.tokenize.moses.MosesTokenizer()
-
-# Stemmer
-stemmer = nltk.stem.snowball.SnowballStemmer("english")
-
 # Stoplist
 stoplist = nltk.corpus.stopwords.words('english')
 
 # Whitespace
 wht_space = set('\t\r\x0b\x0c')
 
-# Namelist
-name_list = pd.read_csv(Config.name_file_path)
-name_list = name_list['names'].tolist()
-name_list = set(name_list)
-
-# Phraser
-bigram = gensim.models.Phrases.load(Config.gram_path)
-bigrammer = gensim.models.phrases.Phraser(bigram)
-
-
 def remove_noise(text, sent=False):
+
+    tokenizer = TOKENIZER
+    name_list = load_name_list()
+
     # CV/Resume Specific Cleaning
     regex_email = re.compile(r"((\w|\d|\.)+)(@)(\w+)(\.)(\w{3})")
     regex_dates = re.compile(r"([A-z]+\.? ?\d{2,4}| +- (P|p)resent)|(\d{2}\/\d{2}\/\d{2,4})")
@@ -133,6 +170,9 @@ def word_number_test(word):
 
 
 def document_to_tokens(clean_text, lem_tokens):
+
+    tokenizer=TOKENIZER
+
     tokens = tokenizer.tokenize(clean_text)
     if lem_tokens:
         pos_tokens = nltk.pos_tag(tokens)
@@ -144,7 +184,9 @@ def document_to_tokens(clean_text, lem_tokens):
 
 
 def token_stemmer(pos_tagged_tokens):
-    lemmatizer = nltk.WordNetLemmatizer()
+
+    lemmatizer = LEMMATIZER
+
     stemmed_tokens = []
     for tagged_tuple in pos_tagged_tokens:
         token = tagged_tuple[0]
@@ -160,7 +202,7 @@ def token_stemmer(pos_tagged_tokens):
 
 # https://stackoverflow.com/questions/15586721/wordnet-lemmatization-and-pos-tagging-in-python
 def get_wordnet_pos(treebank_tag):
-    wordnet = nltk.corpus.wordnet
+    wordnet = WORDNET
     if treebank_tag.startswith('J'):
         return wordnet.ADJ
     elif treebank_tag.startswith('V'):
@@ -174,6 +216,9 @@ def get_wordnet_pos(treebank_tag):
 
 
 def clean_it(text, lem_tokens=True, gram_tokens=True, sent_mode=False):
+
+    bigrammer = load_bigrammer()
+
     quiet_text = remove_noise(text, sent=sent_mode)  # sent_mode will return a list of sentences
     if sent_mode:
         sent_holder = []
@@ -264,20 +309,20 @@ def score_tfidf(user_input, gram_mode, lem_mode):
     clean_text = clean_it(user_input, lem_tokens=lem_mode, gram_tokens=gram_mode)
     # choose model from gram tokens parameter
     if gram_mode is False and lem_mode is False:
-        d = dictionary
-        m = tfidf_model
+        d = load_dictionary()
+        m = load_tfidf_model()
     elif gram_mode is True and lem_mode is False:
-        d = bigram_dictionary
-        m = bigram_tfidf_model
+        d = load_bigram_dictionary()
+        m = load_bigram_tfidf_model()
     elif gram_mode is True and lem_mode is True:
-        d = lg_dictionary
-        m = lg_tfidf_model
+        d = load_lg_dictionary()
+        m = load_lg_tfidf_model()
     elif gram_mode is False and lem_mode is True:
-        d = lems_dictionary
-        m = lems_tfidf_model
+        d = load_lems_dictionary()
+        m = load_lems_tfidf_model()
     else:
-        d = dictionary
-        m = tfidf_model
+        d = load_dictionary()
+        m = load_tfidf_model()
 
     tfidf_values = dict(m[d.doc2bow(clean_text.split())])
     tfidf_tokens = {}
@@ -291,3 +336,23 @@ def score_tfidf(user_input, gram_mode, lem_mode):
     tfidf_scored = tfidf_scored[:25]
     tfidf_scored = [(token, "{:.2%}".format(score)) for token, score in tfidf_scored]
     return tfidf_scored
+
+def process_graph_text(text, word_len=WORD_LEN):
+    wnl = LEMMATIZER
+    split_text = list(_tokenize_by_word(text))
+    lem_text = [wnl.lemmatize(word, get_wordnet_pos_graph(pos)) for word, pos in nltk.pos_tag(split_text)]
+    lem_text = [word for word in lem_text if len(word) >= word_len and word not in stopw]
+    return lem_text
+
+def get_wordnet_pos_graph(treebank_tag):
+    wordnet = WORDNET
+    if treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('N'):
+        return wordnet.NOUN
+    elif treebank_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return wordnet.NOUN

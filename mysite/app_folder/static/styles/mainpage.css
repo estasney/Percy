@@ -201,3 +201,9 @@ body {
         font-size: 150px;
     }
   }
+
+  line.link {
+      stroke: #049FD9;
+      opacity: 0.6;
+      stroke-width: 1.5px;
+    }
