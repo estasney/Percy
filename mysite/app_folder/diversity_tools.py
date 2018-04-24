@@ -4,27 +4,22 @@ from operator import itemgetter
 
 import numpy as np
 import scipy
-
-
-try:
-    from app_folder.local_config import Config
-except ImportError:
-    from app_folder.web_config import Config
+from app_folder.site_config import FConfig
 
 # Load Tree Classifier
 
-f = open(Config.tree, "rb")
+f = open(FConfig.tree, "rb")
 
 tree_model = pickle.load(f)
 f.close()
 
 # Load Name Dictionary
-f = open(Config.name_dict, "rb")
+f = open(FConfig.name_dict, "rb")
 name_dict = pickle.load(f)
 f.close()
 
 # Load Global Name Dictionary
-f = open(Config.global_name_dict, "rb")
+f = open(FConfig.global_name_dict, "rb")
 global_name_dict = pickle.load(f)
 f.close()
 

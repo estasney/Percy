@@ -1,8 +1,5 @@
 from gensim.models import Doc2Vec
-try:
-    from app_folder.local_config import Config
-except ImportError:
-    from app_folder.web_config import Config
+from app_folder.site_config import FConfig
 
 def prettify_dict(d):
     p_dict = {}
@@ -14,7 +11,7 @@ def prettify_dict(d):
     return p_dict
 
 def load_model():
-    model = Doc2Vec.load(Config.model)
+    model = Doc2Vec.load(FConfig.model)
     return model
 
 def word_sims(user_query, prettify=True):

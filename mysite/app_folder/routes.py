@@ -3,10 +3,7 @@ from gensim.summarization.pagerank_weighted import pagerank_weighted
 
 from app_folder import app_run
 
-try:
-    from app_folder.local_config import Config
-except ImportError:
-    from app_folder.web_config import Config
+from app_folder.site_config import FConfig
 
 from app_folder import text_tools, Utils, diversity_tools, neural_tools, upload_tools, graph_tools
 

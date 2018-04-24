@@ -12,58 +12,55 @@ from gensim.summarization.textcleaner import tokenize_by_word as _tokenize_by_wo
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
 
-try:
-    from app_folder.local_config import Config
-except ImportError:
-    from app_folder.web_config import Config
+from app_folder.site_config import FConfig
 
 # Raw
 def load_tfidf_model():
-    tfidf_model = TfidfModel.load(Config.tfidf_model)
+    tfidf_model = TfidfModel.load(FConfig.tfidf_model)
     return tfidf_model
 
 def load_dictionary():
-    dictionary = Dictionary.load(Config.raw_dict)
+    dictionary = Dictionary.load(FConfig.raw_dict)
     return dictionary
 # Grams Only
 
 def load_bigram_tfidf_model():
-    bigram_tfidf_model = TfidfModel.load(Config.bigram_tfidf_model_path)
+    bigram_tfidf_model = TfidfModel.load(FConfig.bigram_tfidf_model_path)
     return bigram_tfidf_model
 
 def load_bigram_dictionary():
-    bigram_dictionary = Dictionary.load(Config.bigram_dict_path)
+    bigram_dictionary = Dictionary.load(FConfig.bigram_dict_path)
     return bigram_dictionary
 
 # Lems Only
 
 def load_lems_tfidf_model():
-    lems_tfidf_model = TfidfModel.load(Config.lem_tfidf_model_path)
+    lems_tfidf_model = TfidfModel.load(FConfig.lem_tfidf_model_path)
     return lems_tfidf_model
 
 def load_lems_dictionary():
-    lems_dictionary = Dictionary.load(Config.lem_dict_path)
+    lems_dictionary = Dictionary.load(FConfig.lem_dict_path)
     return lems_dictionary
 
 # Grams and Lems
 
 def load_lg_tfidf_model():
-    lg_tfidf_model = TfidfModel.load(Config.lg_tfidf_model_path)
+    lg_tfidf_model = TfidfModel.load(FConfig.lg_tfidf_model_path)
     return lg_tfidf_model
 
 def load_lg_dictionary():
-    lg_dictionary = Dictionary.load(Config.lg_dict_path)
+    lg_dictionary = Dictionary.load(FConfig.lg_dict_path)
     return lg_dictionary
 
 def load_name_list():
-    name_list = pd.read_csv(Config.name_file_path)
+    name_list = pd.read_csv(FConfig.name_file_path)
     name_list = name_list['names'].tolist()
     name_list = set(name_list)
     return name_list
 
 # Phraser
 def load_bigram():
-    bigram = gensim.models.Phrases.load(Config.gram_path)
+    bigram = gensim.models.Phrases.load(FConfig.gram_path)
     return bigram
 
 def load_bigrammer():
