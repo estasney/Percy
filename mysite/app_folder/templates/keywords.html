@@ -61,7 +61,7 @@ var graph = {
 };
 
 
-var force = d3.layout.force().size([width, height]).linkDistance(25).charge(-300);
+var force = d3.layout.force().size([width, height]).linkDistance(45).charge(-300);
 
 var svg = d3.select('body').append('svg')
     .attr('width', width)
@@ -189,6 +189,7 @@ function startForce() {
           var n = 11 + (d.node_score)*1.2;
           return n + "px serif";
         })
+        .style("font-family", "OpenSans")
         .text(function(d) {
             return d.node_text;
         });
