@@ -1,8 +1,9 @@
 import os
+
 import pandas as pd
-from flask import Flask
 from werkzeug.utils import secure_filename
-from app_folder.site_config import FConfig
+
+from site_config import FConfig
 
 """
 

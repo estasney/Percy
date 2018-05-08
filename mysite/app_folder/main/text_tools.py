@@ -12,7 +12,8 @@ from gensim.summarization.textcleaner import tokenize_by_word as _tokenize_by_wo
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
 
-from app_folder.site_config import FConfig
+from site_config import FConfig
+
 
 # Raw
 def load_tfidf_model():
