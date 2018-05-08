@@ -1,5 +1,7 @@
 from gensim.models import Doc2Vec
+
 from app_folder.site_config import FConfig
+
 
 def prettify_dict(d):
     p_dict = {}
@@ -29,6 +31,7 @@ def word_math(request):
     word_one = request.form['word1'].lower()
     word_two = request.form['word2'].lower()
     word_three = request.form['word3'].lower()
+    model = load_model()
     try:
         if word_three == '':
             user_equation = word_one.title() + " + " + word_two.title() + " = "

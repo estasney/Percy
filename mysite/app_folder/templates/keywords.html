@@ -2,30 +2,28 @@
 {% block content %}
 
 <div id="main-menu" class="container">
+    <div class="row">
+        <div class="col">
+            <textarea id="search_term" rows="4" class="form-control"
+                      placeholder="Paste in Text..."></textarea>
+        </div>
+        <div class="row text-center">
+            <div class="col">
+                <button class="btn btn-secondary" type="button" id="search">Go!</button>
+                <button class="btn btn-secondary disabled" type="button" id="reset">Reset!</button>
+                <label>Window Size</label>
+                <select id="window_size">
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+                <label>Phrase Detection</label>
+                <input id="phrase_check" type="checkbox" value="Yes">
+            </div>
+        </div>
 
-    <div class="input-group">
-        <textarea id="search_term" type="text" rows="4" class="form-control" placeholder="Paste in Text..."></textarea>
-        <span class="input-group-btn">
-        <button class="btn btn-secondary" type="button" id="search">Go!</button>
-      </span>
-        <span class="input-group-btn">
-        <button class="btn btn-secondary disabled" type="button" id="reset">Reset!</button>
-      </span>
-
-        <span style="vertical-align:middle;" class="input-group" ><select id="window_size" class="form-control">
-
-  <option>2</option>
-  <option>3</option>
-  <option>4</option>
-  <option>5</option>
-</select>
-</span>
-        <span style="vertical-align:middle;" class="input-group"><label>Window Size
-</label>
-</span></div>
-</div>
-
-<script>
+        <script>
 var data_url = "/kw_data";
 
 var r_base = 4;
@@ -63,7 +61,7 @@ var graph = {
 };
 
 
-var force = d3.layout.force().size([width, height]).linkDistance(25).charge(-300);
+var force = d3.layout.force().size([width, height]).linkDistance(45).charge(-300);
 
 var svg = d3.select('body').append('svg')
     .attr('width', width)
@@ -72,7 +70,8 @@ var svg = d3.select('body').append('svg')
 function startSearch() {
     var search_term = $("#search_term").prop('value');
     var window_size = windowSize();
-    getData(search_term, window_size, false);
+    var phrase_checked = $("#phrase_check").prop('checked');
+    getData(search_term, window_size, false, phrase_checked);
     disableGo();
 }
 
@@ -81,7 +80,7 @@ function appendSearch(clicked_term) {
     getData(clicked_term, limit_to, true);
 }
 
-function getData(term, limit, is_update) {
+function getData(term, limit, is_update, phrase_checked) {
     $.ajax({
         type: 'POST',
         async: true,
@@ -96,6 +95,7 @@ function getData(term, limit, is_update) {
             xhr.setRequestHeader('Accept-Language', 'en-US,en;q=0.8');
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.setRequestHeader('Window-Limit', limit);
+            xhr.setRequestHeader('Phrase-Checked', phrase_checked);
         },
         success: function(data) {
             var json_data = JSON.stringify(data);
@@ -189,6 +189,7 @@ function startForce() {
           var n = 11 + (d.node_score)*1.2;
           return n + "px serif";
         })
+        .style("font-family", "OpenSans")
         .text(function(d) {
             return d.node_text;
         });
@@ -266,5 +267,6 @@ function startForce() {
 }
 
 
-</script>
-{% endblock %}
+
+        </script>
+        {% endblock %}

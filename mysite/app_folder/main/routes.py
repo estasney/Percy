@@ -1,19 +1,17 @@
 from flask import render_template, request, jsonify, abort
 from gensim.summarization.pagerank_weighted import pagerank_weighted
 
-from app_folder import app_run
-
-from app_folder.site_config import FConfig
-
-from app_folder import text_tools, Utils, diversity_tools, neural_tools, upload_tools, graph_tools
+from app_folder.main import Utils, diversity_tools, neural_tools, upload_tools
+from app_folder.main import bp
+from app_folder.main import graph_tools, text_tools
 
 
-@app_run.route('/')
+@bp.route('/')
 def open_page():
     return render_template('home_page.html')
 
 
-@app_run.route('/related', methods=['GET', 'POST'])
+@bp.route('/related', methods=['GET', 'POST'])
 def related():
     if request.method == 'GET':
         return render_template('related.html')
@@ -30,7 +28,7 @@ def related():
             return render_template('related.html', result=result[1], success='False')
 
 
-@app_run.route('/stemmed', methods=['GET', 'POST'])
+@bp.route('/stemmed', methods=['GET', 'POST'])
 def stemmed():
     if request.method == 'GET':
         return render_template('stemmed.html')
@@ -40,12 +38,12 @@ def stemmed():
         return render_template('stemmed.html', stemmed_bool=stemmed_search, success='True', original=search)
 
 
-@app_run.route('/keywords', methods=['GET'])
+@bp.route('/keywords', methods=['GET'])
 def keywords():
     return render_template('keywords.html')
 
 
-@app_run.route('/thisplusthat', methods=['GET', 'POST'])
+@bp.route('/thisplusthat', methods=['GET', 'POST'])
 def thisplusthat():
     if request.method == 'GET':
         return render_template('thisplusthat.html')
@@ -60,7 +58,7 @@ def thisplusthat():
             return render_template('thisplusthat.html', result=solution['result'], success='False')
 
 
-@app_run.route('/infer', methods=['GET', 'POST'])
+@bp.route('/infer', methods=['GET', 'POST'])
 def infer_name():
     if request.method == 'GET':
         return render_template('infer.html')
@@ -89,7 +87,7 @@ def infer_name():
         return render_template('infer.html', success='False')
 
 
-@app_run.route('/diversity', methods=['GET', 'POST'])
+@bp.route('/diversity', methods=['GET', 'POST'])
 def diversity():
     if request.method == 'GET':
         return render_template('diversity_score.html')
@@ -138,7 +136,7 @@ def diversity():
                            d_known=d_known, d_female_percent=d_female_percent, confidence_interval=confidence_interval)
 
 
-@app_run.route('/tf_idf', methods=['GET', 'POST'])
+@bp.route('/tf_idf', methods=['GET', 'POST'])
 def tfidf():
     if request.method == 'GET':
         return render_template('tf_idf.html')
@@ -162,15 +160,20 @@ def tfidf():
         return render_template('tf_idf.html', success='True', original=user_input, result=scored_tfidf)
 
 
-@app_run.route('/kw_data', methods=['POST'])
+@bp.route('/kw_data', methods=['POST'])
 def kw_data():
     raw_text = request.form.get('raw_text')
+    phrase_checked = request.headers.get('Phrase-Checked')
+    if phrase_checked == 'true':
+        phrase_checked = True
+    else:
+        phrase_checked = False
     if not raw_text:
         abort(401)
 
     window_size = int(request.headers.get('Window-Limit', 2))
 
-    lem_text = text_tools.process_graph_text(raw_text)
+    lem_text = text_tools.process_graph_text(raw_text, phrase_checked)
     graph = graph_tools.build_graph(lem_text, window_size)
 
     edges = graph.edges()
