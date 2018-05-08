@@ -4,6 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
     DEBUG = True
+    DEBUG_TB_TEMPLATE_EDITOR_ENABLED = True
     UPLOAD_FOLDER = os.path.join(basedir, 'resources/uploads')
     SECRET_KEY = 'never-guess-this'
 

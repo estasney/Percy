@@ -335,11 +335,15 @@ def score_tfidf(user_input, gram_mode, lem_mode):
     tfidf_scored = [(token, "{:.2%}".format(score)) for token, score in tfidf_scored]
     return tfidf_scored
 
-def process_graph_text(text, word_len=WORD_LEN):
+def process_graph_text(text, phrases, word_len=WORD_LEN):
     wnl = LEMMATIZER
     split_text = list(_tokenize_by_word(text))
+    if phrases:
+        phraser = load_bigram()
+        split_text = phraser[split_text]
     lem_text = [wnl.lemmatize(word, get_wordnet_pos_graph(pos)) for word, pos in nltk.pos_tag(split_text)]
     lem_text = [word for word in lem_text if len(word) >= word_len and word not in stopw]
+
     return lem_text
 
 def get_wordnet_pos_graph(treebank_tag):

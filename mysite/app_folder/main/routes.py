@@ -163,12 +163,17 @@ def tfidf():
 @bp.route('/kw_data', methods=['POST'])
 def kw_data():
     raw_text = request.form.get('raw_text')
+    phrase_checked = request.headers.get('Phrase-Checked')
+    if phrase_checked == 'true':
+        phrase_checked = True
+    else:
+        phrase_checked = False
     if not raw_text:
         abort(401)
 
     window_size = int(request.headers.get('Window-Limit', 2))
 
-    lem_text = text_tools.process_graph_text(raw_text)
+    lem_text = text_tools.process_graph_text(raw_text, phrase_checked)
     graph = graph_tools.build_graph(lem_text, window_size)
 
     edges = graph.edges()
