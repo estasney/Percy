@@ -31,6 +31,7 @@ def word_math(request):
     word_one = request.form['word1'].lower()
     word_two = request.form['word2'].lower()
     word_three = request.form['word3'].lower()
+    model = load_model()
     try:
         if word_three == '':
             user_equation = word_one.title() + " + " + word_two.title() + " = "
