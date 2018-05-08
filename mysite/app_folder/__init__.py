@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
-from site_config import Config
+
+from app_folder.site_config import Config
 
 toolbar = DebugToolbarExtension()
 

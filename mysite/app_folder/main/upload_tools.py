@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from werkzeug.utils import secure_filename
 
-from site_config import FConfig
+from app_folder.site_config import Config
 
 """
 
@@ -13,7 +13,7 @@ GLOBAL PARAMETERS
 ALLOWED_EXTENSIONS = ['.csv', '.xls', '.xlsx']
 
 TRY_ENCODINGS = ['', 'latin1', 'cp1252', 'iso-8859-1']
-UPLOAD_FOLDER = FConfig.UPLOAD_FOLDER
+UPLOAD_FOLDER = Config.UPLOAD_FOLDER
 
 
 def inject_allowed_ext():
@@ -90,10 +90,10 @@ class UploadManager(object):
             return None
 
         # Save file to open later for analysis
-        file.save(os.path.join(FConfig.UPLOAD_FOLDER, filename))
+        file.save(os.path.join(Config.UPLOAD_FOLDER, filename))
 
         # Save location
-        file_path = os.path.join(FConfig.UPLOAD_FOLDER, filename)
+        file_path = os.path.join(Config.UPLOAD_FOLDER, filename)
 
         return file_path
 

@@ -1,6 +1,6 @@
 from gensim.models import Doc2Vec
 
-from site_config import FConfig
+from app_folder.site_config import FConfig
 
 
 def prettify_dict(d):

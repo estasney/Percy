@@ -5,7 +5,7 @@ from operator import itemgetter
 import numpy as np
 import scipy
 
-from site_config import FConfig
+from app_folder.site_config import FConfig
 
 # Load Tree Classifier
 
