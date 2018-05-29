@@ -1,6 +1,4 @@
-from gensim.models import Doc2Vec
-
-from app_folder.site_config import FConfig
+from app_folder import model
 
 
 def prettify_dict(d):
@@ -13,7 +11,6 @@ def prettify_dict(d):
     return p_dict
 
 def load_model():
-    model = Doc2Vec.load(FConfig.model)
     return model
 
 def word_sims(user_query, prettify=True):

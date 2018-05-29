@@ -13,44 +13,37 @@ from nltk.stem.porter import PorterStemmer
 from nltk.tokenize.moses import MosesTokenizer
 
 from app_folder.site_config import FConfig
-
+from app_folder import tfidf_model, dictionary, bigram_tfidf_model, bigram_dictionary, lems_tfidf_model, \
+    lems_dictionary, lg_tfidf_model, lg_dictionary, bigram
 
 # Raw
 def load_tfidf_model():
-    tfidf_model = TfidfModel.load(FConfig.tfidf_model)
     return tfidf_model
 
 def load_dictionary():
-    dictionary = Dictionary.load(FConfig.raw_dict)
     return dictionary
 # Grams Only
 
 def load_bigram_tfidf_model():
-    bigram_tfidf_model = TfidfModel.load(FConfig.bigram_tfidf_model_path)
     return bigram_tfidf_model
 
 def load_bigram_dictionary():
-    bigram_dictionary = Dictionary.load(FConfig.bigram_dict_path)
     return bigram_dictionary
 
 # Lems Only
 
 def load_lems_tfidf_model():
-    lems_tfidf_model = TfidfModel.load(FConfig.lem_tfidf_model_path)
     return lems_tfidf_model
 
 def load_lems_dictionary():
-    lems_dictionary = Dictionary.load(FConfig.lem_dict_path)
     return lems_dictionary
 
 # Grams and Lems
 
 def load_lg_tfidf_model():
-    lg_tfidf_model = TfidfModel.load(FConfig.lg_tfidf_model_path)
     return lg_tfidf_model
 
 def load_lg_dictionary():
-    lg_dictionary = Dictionary.load(FConfig.lg_dict_path)
     return lg_dictionary
 
 def load_name_list():
@@ -61,13 +54,10 @@ def load_name_list():
 
 # Phraser
 def load_bigram():
-    bigram = gensim.models.Phrases.load(FConfig.gram_path)
     return bigram
 
 def load_bigrammer():
-    bigram = load_bigram()
-    bigrammer = gensim.models.phrases.Phraser(bigram)
-    return bigrammer
+    return bigram
 
 month_list = ["jan", "january" "feb", "february", "mar", "march", "apr", "april", "may", "jun", "june", "jul", "july",
               "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec", "december"]
