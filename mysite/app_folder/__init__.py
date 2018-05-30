@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
 from gensim.models.doc2vec import Doc2Vec
+from gensim.models.wrappers.fasttext import FastText as FT_wrapper
 from app_folder.site_config import Config, FConfig
 import gensim
 from gensim.corpora import Dictionary
@@ -9,7 +10,7 @@ from gensim.models import TfidfModel
 
 toolbar = DebugToolbarExtension()
 
-model = Doc2Vec.load(FConfig.model)
+model = FT_wrapper.load(FConfig.model)
 tfidf_model = TfidfModel.load(FConfig.tfidf_model)
 dictionary = Dictionary.load(FConfig.raw_dict)
 bigram_tfidf_model = TfidfModel.load(FConfig.bigram_tfidf_model_path)

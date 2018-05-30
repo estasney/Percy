@@ -16,7 +16,7 @@ def load_model():
 def word_sims(user_query, prettify=True):
     model = load_model()
     try:
-        result = dict(model.similar_by_word(user_query.lower()))
+        result = dict(model.similar_by_word(user_query, topn=50))
     except KeyError as error:
         return False, error
     if prettify:

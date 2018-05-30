@@ -16,7 +16,7 @@ def related():
     if request.method == 'GET':
         return render_template('related.html')
     elif request.method == 'POST':
-        user_query = request.form['query'].lower()
+        user_query = request.form['query']
         result = neural_tools.word_sims(user_query)
         if result[0] is True:
             return render_template('related.html', result=result[1], success='True', title_h2='Word Similarity Score',
