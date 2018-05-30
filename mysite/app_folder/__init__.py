@@ -21,6 +21,7 @@ lg_tfidf_model = TfidfModel.load(FConfig.lg_tfidf_model_path)
 lg_dictionary = Dictionary.load(FConfig.lg_dict_path)
 bigram = gensim.models.phrases.Phraser(gensim.models.Phrases.load(FConfig.gram_path))
 
+
 def create_app(config_class=Config):
     app_run = Flask(__name__)
     app_run.config.from_object(config_class)
@@ -28,4 +29,7 @@ def create_app(config_class=Config):
 
     from app_folder.main import bp as main_bp
     app_run.register_blueprint(main_bp)
+
+    from app_folder.api import bp as api_bp
+    app_run.register_blueprint(api_bp, url_prefix='/api/v1')
     return app_run
