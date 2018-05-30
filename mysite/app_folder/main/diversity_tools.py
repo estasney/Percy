@@ -248,22 +248,3 @@ class Genderize(object):
         results.append(model_results)
         data_sources = self.list_datas_()
         return results, data_sources
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
