@@ -13,10 +13,11 @@ def prettify_dict(d):
 def load_model():
     return model
 
-def word_sims(user_query, prettify=True):
+
+def word_sims(user_query, prettify=True, topn=50):
     model = load_model()
     try:
-        result = dict(model.similar_by_word(user_query, topn=50))
+        result = dict(model.similar_by_word(user_query, topn=topn))
     except KeyError as error:
         return False, error
     if prettify:

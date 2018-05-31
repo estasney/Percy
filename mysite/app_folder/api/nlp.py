@@ -2,6 +2,7 @@ import re
 import abc
 from app_folder.main.neural_tools import word_sims
 from nltk import word_tokenize, pos_tag
+from app_folder import model
 
 class IntentParser(object):
 
@@ -65,6 +66,18 @@ class SynonymParser(object):
         entities = list(filter(filter_tag, entities))  # Filter by POS
         entities = [word for word, tag in entities]  # Remove tag
         return entities
+
+    def run_query(self, entities, topn=5):
+        if isinstance(entities, str):
+            entities = [entities]
+
+        results = []
+        for e in entities:
+            sims = word_sims(e, topn=topn)
+
+
+
+
 
 
 
