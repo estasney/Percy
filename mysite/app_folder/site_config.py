@@ -35,5 +35,7 @@ class FConfig(object):
     bot_room_id = load_p(os.path.join(basedir, 'resources{}bot_room_id.pkl'.format(os.path.sep)))
     message_api_f = "https://api.ciscospark.com/v1/messages/{}"
     message_api = "https://api.ciscospark.com/v1/messages"
+    person_details_api_f = "https://api.ciscospark.com/v1/people/{}"
+    person_details= "https://api.ciscospark.com/v1/people"
 
 

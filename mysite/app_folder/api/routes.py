@@ -12,8 +12,11 @@ def listen_webhook():
     # Request the message details
     message_details = request_message_details(data_id)
 
-    # Make a reply
-    reply_to = message_details['person_id']
+
+
+
+
+
     reply_body = "Hello to you too!"
 
     make_reply(reply_body)
