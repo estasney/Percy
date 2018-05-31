@@ -1,19 +1,12 @@
-import pickle
 import requests
 from app_folder.site_config import FConfig
 
 
-def load_p(fn):
-    with open(fn, "rb") as pfile:
-        p = pickle.load(pfile)
-    return p
-
-
 def request_message_details(message_id):
     s = requests.session()
-    s.headers.update({'Authorization': load_p(FConfig.key_path)})
+    s.headers.update({'Authorization': FConfig.bot_key})
     s.headers.update({'Content-type': 'application/json; charset=utf-8'})
-    message_details = s.get(FConfig.message_api.format(message_id))
+    message_details = s.get(FConfig.message_api_f.format(message_id))
     return parse_message(message_details.json())
 
 
@@ -27,3 +20,20 @@ def parse_message(message_details):
           'person_id': person_id,
           'message_body': message_body}
     return td
+
+
+def make_reply(message_text):
+    s = requests.session()
+    s.headers.update({'Authorization': FConfig.bot_key})
+    s.headers.update({'Content-type': 'application/json; charset=utf-8'})
+
+    request_params = {
+        'roomId': FConfig.bot_room_id,
+        'text': message_text
+    }
+
+    s.post(FConfig.message_api, json=request_params)
+
+
+
+
