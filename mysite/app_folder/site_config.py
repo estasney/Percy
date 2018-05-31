@@ -24,4 +24,6 @@ class FConfig(object):
     lem_tfidf_model_path = os.path.join(basedir, 'resources{}l_tfidf.model'.format(os.path.sep))
     lg_dict_path = os.path.join(basedir, 'resources{}lg_dictionary.dict'.format(os.path.sep))
     lg_tfidf_model_path = os.path.join(basedir, 'resources{}lg_tfidf.model'.format(os.path.sep))
+    key_path = os.path.join(basedir, 'resources{}bot_key.pkl'.format(os.path.sep))
+    message_api = "https://api.ciscospark.com/v1/messages/{}"
 
