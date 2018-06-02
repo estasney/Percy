@@ -2,7 +2,7 @@ import re
 import abc
 from app_folder.main.neural_tools import word_sims
 from nltk import word_tokenize, pos_tag
-from app_folder import model
+
 
 class IntentParser(object):
 
@@ -14,6 +14,25 @@ class IntentParser(object):
             return True
         else:
             return False
+
+    def filter_parsers_(self, text, intent_mappers_):
+        for im in intent_mappers_:
+            if im.run_search_(text) is True:
+                return True
+
+    def map_(self, text):
+        matched = list(filter(lambda x: x.run_search_(text), self.intent_mappers))
+        if not matched:
+            raise Exception("IntentParser Found no Matches")
+        elif len(matched) > 1:
+            raise Exception("IntentParser Found multiple Matches")
+        return matched[0]
+
+    def answer_question(self, text):
+        matched_parser = self.map_(text)
+        answer = matched_parser.answer_question_(text)
+        return answer
+
 
 class SynonymParser(object):
 
@@ -49,7 +68,11 @@ class SynonymParser(object):
     def search_method(self):
         return re.compile(self.search_method_, flags=re.IGNORECASE)
 
-    def preprocess_string(self, text):
+    @property
+    def preamble_(self):
+        return "Here are some synonyms for {}:"
+
+    def preprocess_string_(self, text):
         # Splitting query to text following search_method
         word_matched = self.search_method.search(text).group()  # "Synonym" or variant
         text_list = self.search_method.split(text) # Before, "Synonym", After
@@ -67,47 +90,42 @@ class SynonymParser(object):
         entities = [word for word, tag in entities]  # Remove tag
         return entities
 
-    def run_query(self, entities, topn=5):
+    def run_query_(self, entities, topn=5):
         if isinstance(entities, str):
             entities = [entities]
 
         results = []
         for e in entities:
             sims = word_sims(e, topn=topn)
+            results.append(sims)
+
+        return results
+
+    def transform_to_data_(self, text):
+        entities = self.preprocess_string_(text)
+        query_result = self.run_query_(entities)
+        return entities, query_result
+
+    def make_preamble_(self, entities):
+        if len(entities) == 1:
+            return self.preamble_.format(entities[0])
+        entities_list = ", ".join(entities[:-1])
+        entities_list += " and {}".format(entities[-1])
+        return self.preamble_.format(entities_list)
 
 
+    def convey_results_(self, results):
+        words = [word for word, score in results]
+        return ", ".join(words)
+
+    def make_conveyable_(self, entities, results):
+        preamble = self.make_preamble_(entities)
+        results = self.convey_results_(results)
+        return "{}\n{}".format(preamble, results)
+
+    def answer_question_(self, text):
+        entites, query_result = self.transform_to_data_(text)
+        text_result = self.make_conveyable_(entites, query_result)
+        return text_result
 
 
-
-
-
-
-
-
-
-
-
-    def run_search_(self, text):
-        return super().run_search_(text)
-
-
-
-
-
-def parse_intent(message_body):
-
-
-
-def make_response(message):
-    """
-    message :
-        created: datetime or str(if conversion failed)
-        person_email:
-        person_id:
-        person_fname:
-        person_lname:
-        person_displayname:
-        person_nname: person nick-name
-
-    :return:
-    """

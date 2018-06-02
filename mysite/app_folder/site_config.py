@@ -1,5 +1,6 @@
 import os
 import pickle
+from app_folder.api.nlp import IntentParser, SynonymParser
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 def load_p(fn):
@@ -36,6 +37,8 @@ class FConfig(object):
     message_api_f = "https://api.ciscospark.com/v1/messages/{}"
     message_api = "https://api.ciscospark.com/v1/messages"
     person_details_api_f = "https://api.ciscospark.com/v1/people/{}"
-    person_details= "https://api.ciscospark.com/v1/people"
+    person_details = "https://api.ciscospark.com/v1/people"
+    parsers = [SynonymParser]
+
 
 
