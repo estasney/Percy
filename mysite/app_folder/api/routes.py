@@ -1,8 +1,7 @@
-from flask import request, abort, jsonify
-from app_folder.site_config import FConfig
+from flask import request
 from app_folder.api import bp
 from app_folder.api.utils import request_message_details, make_reply
-from app_folder.api.nlp import IntentParser
+from app_folder.api.nlp import IntentParser, SynonymParser
 
 
 @bp.route('/spark', methods=['GET', 'POST'])
@@ -12,7 +11,7 @@ def listen_webhook():
 
     message_details = request_message_details(data_id)
 
-    intent_parser = IntentParser([parser() for parser in FConfig.parsers])
+    intent_parser = IntentParser(SynonymParser())
 
     if message_details['message_body'] not in intent_parser:
         # Unable to match query

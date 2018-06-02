@@ -5,13 +5,16 @@ from datetime import datetime
 
 def request_message_details(message_id):
     s = requests.session()
+    print(FConfig.bot_key)
     s.headers.update({'Authorization': FConfig.bot_key})
     s.headers.update({'Content-type': 'application/json; charset=utf-8'})
     message_details = s.get(FConfig.message_api_f.format(message_id))
+    print(message_details.status_code)
+    print(message_details.json())
 
     # Get sender's display name
     # TODO Cache this
-    sender_id = message_details.json()['person_id']
+    sender_id = message_details.json()['personId']
     sender_details = s.get(FConfig.person_details_api_f.format(sender_id))
 
     return parse_message(message_details.json(), sender_details.json())
