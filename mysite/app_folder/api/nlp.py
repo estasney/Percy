@@ -103,7 +103,7 @@ class SynonymParser(object):
         entities = [word for word, tag in entities]  # Remove tag
         return entities
 
-    def run_query_(self, entities, topn=5):
+    def run_query_(self, entities, topn=10):
         if isinstance(entities, str):
             entities = [entities]
 
