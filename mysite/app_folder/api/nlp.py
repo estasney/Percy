@@ -14,6 +14,10 @@ class IntentParser(object):
         else:
             return False
 
+    @property
+    def link_to_resource(self):
+        return "\n\nPlease visit [Percy - Related Words](https://estasney.pythonanywhere.com/related) for more!"
+
     def load_intent_(self, intent_mappers):
         if not isinstance(intent_mappers, list):
             return [intent_mappers]
@@ -36,6 +40,7 @@ class IntentParser(object):
     def answer_question(self, text):
         matched_parser = self.map_(text)
         answer = matched_parser.answer_question_(text)
+        answer += self.link_to_resource
         return answer
 
 

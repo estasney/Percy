@@ -8,6 +8,7 @@ from app_folder.api.nlp import IntentParser, SynonymParser
 def listen_webhook():
     hook_data = request.json
     data_id = hook_data['data']['id']  # The message id
+    room_type = hook_data['data']['roomType']  # direct or group
 
     message_details = request_message_details(data_id)
 
@@ -19,7 +20,7 @@ def listen_webhook():
 
     answer = intent_parser.answer_question(message_details['message_body'])
     answer = "Hi {}, {}".format(message_details['person_fname'], answer)
-    make_reply(answer)
+    make_reply(answer, room_type, message_details)
 
     return ""
 

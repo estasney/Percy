@@ -5,12 +5,9 @@ from datetime import datetime
 
 def request_message_details(message_id):
     s = requests.session()
-    print(FConfig.bot_key)
     s.headers.update({'Authorization': FConfig.bot_key})
     s.headers.update({'Content-type': 'application/json; charset=utf-8'})
     message_details = s.get(FConfig.message_api_f.format(message_id))
-    print(message_details.status_code)
-    print(message_details.json())
 
     # Get sender's display name
     # TODO Cache this
@@ -44,18 +41,25 @@ def parse_message(message_details, sender_details):
     return td
 
 
-def make_reply(message_text):
+def make_reply(message_text, room_type, message_details):
     s = requests.session()
     s.headers.update({'Authorization': FConfig.bot_key})
     s.headers.update({'Content-type': 'application/json; charset=utf-8'})
 
-    request_params = {
-        'roomId': FConfig.bot_room_id,
-        'text': message_text
-    }
+    if room_type == 'group':
+
+        request_params = {
+            'roomId': FConfig.bot_room_id,
+            'markdown': message_text
+        }
+
+    else:
+        request_params = {
+            'toPersonEmail': message_details['person_email'],
+            'markdown': message_text
+        }
 
     s.post(FConfig.message_api, json=request_params)
 
-
-
-
+def make_error_response():
+    return "Sorry I didn't understand that"
