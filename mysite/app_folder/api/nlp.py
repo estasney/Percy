@@ -148,10 +148,3 @@ class SynonymParser(object):
         entites, query_result = self.transform_to_data_(text)
         text_result = self.make_conveyable_(entites, query_result)
         return text_result
-
-
-class Conversation(object):
-
-
-
-
