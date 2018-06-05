@@ -8,6 +8,19 @@ from gensim.corpora import Dictionary
 from gensim.models import TfidfModel
 from time import time
 
+from chatterbot import ChatBot
+chatbot = ChatBot("Percy")
+from chatterbot.trainers import ChatterBotCorpusTrainer
+chatbot.set_trainer(ChatterBotCorpusTrainer)
+print("Training Chatbot")
+b = time()
+chatbot.train(
+    "chatterbot.corpus.english.greetings",
+    "chatterbot.corpus.english.conversations"
+)
+a = time()
+print("Finished Training Chatbot in {}".format(a-b))
+
 toolbar = DebugToolbarExtension()
 b = time()
 model = FT_wrapper.load(FConfig.model)

@@ -22,4 +22,3 @@ def register_webhook(api_key, hook_name, target_url, room_id, resource='messages
 
 # roomType — limit to a particular room type (such as direct or group)
 
-register_webhook(bot)

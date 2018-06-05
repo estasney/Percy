@@ -1,5 +1,6 @@
 import re
 from app_folder.main.neural_tools import word_sims
+from app_folder import chatbot
 from nltk import word_tokenize, pos_tag
 
 
@@ -32,13 +33,16 @@ class IntentParser(object):
     def map_(self, text):
         matched = list(filter(lambda x: x.run_search_(text), self.intent_mappers))
         if not matched:
-            raise Exception("IntentParser Found no Matches")
+            return None
         elif len(matched) > 1:
-            raise Exception("IntentParser Found multiple Matches")
+            return None
         return matched[0]
 
     def answer_question(self, text):
         matched_parser = self.map_(text)
+        if not matched_parser:
+            answer =str(chatbot.get_response(text))
+            return answer
         answer = matched_parser.answer_question_(text)
         answer += self.link_to_resource
         return answer
@@ -144,5 +148,10 @@ class SynonymParser(object):
         entites, query_result = self.transform_to_data_(text)
         text_result = self.make_conveyable_(entites, query_result)
         return text_result
+
+
+class Conversation(object):
+
+
 
 
