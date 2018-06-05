@@ -42,10 +42,10 @@ class IntentParser(object):
         matched_parser = self.map_(text)
         if not matched_parser:
             answer =str(chatbot.get_response(text))
-            return answer
+            return (None, answer)
         answer = matched_parser.answer_question_(text)
         answer += self.link_to_resource
-        return answer
+        return (matched_parser, answer)
 
 
 class SynonymParser(object):

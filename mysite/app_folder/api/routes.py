@@ -18,9 +18,13 @@ def listen_webhook():
         # Unable to match query
         return ""
 
-    answer = intent_parser.answer_question(message_details['message_body'])
-    answer = "Hi {}, {}".format(message_details['person_fname'], answer)
-    make_reply(answer, room_type, message_details)
+    parser, answer = intent_parser.answer_question(message_details['message_body'])
+    if not parser:
+        answer = "{}".format(answer)
+        make_reply(answer, room_type, message_details)
+    else:
+        answer = "Hi {}, {}".format(message_details['person_fname'], answer)
+        make_reply(answer, room_type, message_details)
 
     return ""
 
