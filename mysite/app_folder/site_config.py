@@ -1,5 +1,12 @@
 import os
+import pickle
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+def load_p(fn):
+    with open(fn, "rb") as pfile:
+        p = pickle.load(pfile)
+    return p
+
 
 
 class Config(object):
@@ -10,8 +17,8 @@ class Config(object):
 
 
 class FConfig(object):
-    model = os.path.join(basedir, 'resources{}indeed_model_wrapper'.format(os.path.sep))
-    gram_path = os.path.join(basedir, 'resources{}trigram_model.p'.format(os.path.sep))
+    model = os.path.join(basedir, 'resources{}indeed_wrapper_lite'.format(os.path.sep))
+    gram_path = os.path.join(basedir, 'resources{}bigram_model.model'.format(os.path.sep))
     tree = os.path.join(basedir, 'resources{}tree_classifier.pickle'.format(os.path.sep))
     name_dict = os.path.join(basedir, 'resources{}name_dict.pickle'.format(os.path.sep))
     global_name_dict = os.path.join(basedir, 'resources{}global_name_dict.pickle'.format(os.path.sep))
@@ -24,4 +31,12 @@ class FConfig(object):
     lem_tfidf_model_path = os.path.join(basedir, 'resources{}l_tfidf.model'.format(os.path.sep))
     lg_dict_path = os.path.join(basedir, 'resources{}lg_dictionary.dict'.format(os.path.sep))
     lg_tfidf_model_path = os.path.join(basedir, 'resources{}lg_tfidf.model'.format(os.path.sep))
+    bot_key = load_p(os.path.join(basedir, 'resources{}bot_key.pkl'.format(os.path.sep)))
+    bot_room_id = load_p(os.path.join(basedir, 'resources{}bot_room_id.pkl'.format(os.path.sep)))
+    message_api_f = "https://api.ciscospark.com/v1/messages/{}"
+    message_api = "https://api.ciscospark.com/v1/messages"
+    person_details_api_f = "https://api.ciscospark.com/v1/people/{}"
+    person_details = "https://api.ciscospark.com/v1/people"
+
+
 

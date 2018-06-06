@@ -1,8 +1,9 @@
 from app_folder import model
+from collections import OrderedDict
 
 
 def prettify_dict(d):
-    p_dict = {}
+    p_dict = OrderedDict()
     for k, v in d.items():
         pk = k.replace("_", " ")
         pk = pk.title()
@@ -13,10 +14,11 @@ def prettify_dict(d):
 def load_model():
     return model
 
-def word_sims(user_query, prettify=True):
+
+def word_sims(user_query, prettify=True, topn=50):
     model = load_model()
     try:
-        result = dict(model.similar_by_word(user_query, topn=50))
+        result = dict(model.similar_by_word(user_query, topn=topn))
     except KeyError as error:
         return False, error
     if prettify:
