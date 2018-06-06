@@ -1,8 +1,9 @@
 from app_folder import model
+from collections import OrderedDict
 
 
 def prettify_dict(d):
-    p_dict = {}
+    p_dict = OrderedDict()
     for k, v in d.items():
         pk = k.replace("_", " ")
         pk = pk.title()
