@@ -17,8 +17,8 @@ class Config(object):
 
 
 class FConfig(object):
-    model = os.path.join(basedir, 'resources{}indeed_model_wrapper'.format(os.path.sep))
-    gram_path = os.path.join(basedir, 'resources{}trigram_model.p'.format(os.path.sep))
+    model = os.path.join(basedir, 'resources{}indeed_wrapper_lite'.format(os.path.sep))
+    gram_path = os.path.join(basedir, 'resources{}bigram_model.model'.format(os.path.sep))
     tree = os.path.join(basedir, 'resources{}tree_classifier.pickle'.format(os.path.sep))
     name_dict = os.path.join(basedir, 'resources{}name_dict.pickle'.format(os.path.sep))
     global_name_dict = os.path.join(basedir, 'resources{}global_name_dict.pickle'.format(os.path.sep))
@@ -36,6 +36,7 @@ class FConfig(object):
     message_api_f = "https://api.ciscospark.com/v1/messages/{}"
     message_api = "https://api.ciscospark.com/v1/messages"
     person_details_api_f = "https://api.ciscospark.com/v1/people/{}"
-    person_details= "https://api.ciscospark.com/v1/people"
+    person_details = "https://api.ciscospark.com/v1/people"
+
 
 

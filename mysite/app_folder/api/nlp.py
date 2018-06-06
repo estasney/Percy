@@ -1,19 +1,52 @@
 import re
-import abc
 from app_folder.main.neural_tools import word_sims
+from app_folder import chatbot
 from nltk import word_tokenize, pos_tag
-from app_folder import model
+
 
 class IntentParser(object):
 
     def __init__(self, intent_mappers):
-        self.intent_mappers = intent_mappers
+        self.intent_mappers = self.load_intent_(intent_mappers)
 
     def __contains__(self, item):
         if any([lambda x: x, [im.run_search_(item) for im in self.intent_mappers]]):
             return True
         else:
             return False
+
+    @property
+    def link_to_resource(self):
+        return "\n\nPlease visit [Percy - Related Words](https://estasney.pythonanywhere.com/related) for more!"
+
+    def load_intent_(self, intent_mappers):
+        if not isinstance(intent_mappers, list):
+            return [intent_mappers]
+        else:
+            return intent_mappers
+
+    def filter_parsers_(self, text, intent_mappers_):
+        for im in intent_mappers_:
+            if im.run_search_(text) is True:
+                return True
+
+    def map_(self, text):
+        matched = list(filter(lambda x: x.run_search_(text), self.intent_mappers))
+        if not matched:
+            return None
+        elif len(matched) > 1:
+            return None
+        return matched[0]
+
+    def answer_question(self, text):
+        matched_parser = self.map_(text)
+        if not matched_parser:
+            answer =str(chatbot.get_response(text))
+            return (None, answer)
+        answer = matched_parser.answer_question_(text)
+        answer += self.link_to_resource
+        return (matched_parser, answer)
+
 
 class SynonymParser(object):
 
@@ -49,10 +82,22 @@ class SynonymParser(object):
     def search_method(self):
         return re.compile(self.search_method_, flags=re.IGNORECASE)
 
-    def preprocess_string(self, text):
+    @property
+    def preamble_(self):
+        return "Here are some synonyms for {}:"
+
+    def run_search_(self, text):
+        search_method = self.search_method
+        if search_method.search(text) is not None:
+            return True
+        else:
+            return False
+
+
+    def preprocess_string_(self, text):
         # Splitting query to text following search_method
         word_matched = self.search_method.search(text).group()  # "Synonym" or variant
-        text_list = self.search_method.split(text) # Before, "Synonym", After
+        text_list = self.search_method.split(text)  # Before, "Synonym", After
         text_pos = text_list.index(word_matched) + 1  # Position of After in list
         entities = text_list[text_pos] # After
         entities = pos_tag(word_tokenize(entities))  # Tokenize and POS Tag
@@ -67,47 +112,39 @@ class SynonymParser(object):
         entities = [word for word, tag in entities]  # Remove tag
         return entities
 
-    def run_query(self, entities, topn=5):
+    def run_query_(self, entities, topn=10):
         if isinstance(entities, str):
             entities = [entities]
 
         results = []
         for e in entities:
             sims = word_sims(e, topn=topn)
+            results.append(sims[1])
 
+        return results
 
+    def transform_to_data_(self, text):
+        entities = self.preprocess_string_(text)
+        query_result = self.run_query_(entities)
+        return entities, query_result
 
+    def make_preamble_(self, entity):
+        return self.preamble_.format(entity)
 
+    def convey_results_(self, result):
+        words = [word for word, score in result.items()]
+        return ", ".join(words)
 
+    def make_conveyable_(self, entities, results):
+        preamble = [self.make_preamble_(entity) for entity in entities]
+        results = [self.convey_results_(result) for result in results]
+        message = []
+        for p, r in zip(preamble, results):
+            reply = "{} {}".format(p, r)
+            message.append(reply)
+        return "\n".join(message)
 
-
-
-
-
-
-
-
-    def run_search_(self, text):
-        return super().run_search_(text)
-
-
-
-
-
-def parse_intent(message_body):
-
-
-
-def make_response(message):
-    """
-    message :
-        created: datetime or str(if conversion failed)
-        person_email:
-        person_id:
-        person_fname:
-        person_lname:
-        person_displayname:
-        person_nname: person nick-name
-
-    :return:
-    """
+    def answer_question_(self, text):
+        entites, query_result = self.transform_to_data_(text)
+        text_result = self.make_conveyable_(entites, query_result)
+        return text_result
