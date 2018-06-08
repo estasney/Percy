@@ -19,6 +19,10 @@ def related():
         user_query = request.form['query']
         result = neural_tools.word_sims(user_query)
         if result[0] is True:
+
+            # To preserve order from OrderedDict, convert to list
+            result[1] = list(result[1].items())
+
             return render_template('related.html', result=result[1], success='True', title_h2='Word Similarity Score',
                                    title_th='Similarity Score', original=user_query)
         if result[0] is False:
