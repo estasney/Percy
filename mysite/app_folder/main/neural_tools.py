@@ -1,6 +1,6 @@
 from app_folder import model
 from collections import OrderedDict
-
+from operator import itemgetter
 
 def prettify_dict(d):
     p_dict = OrderedDict()
@@ -18,7 +18,9 @@ def load_model():
 def word_sims(user_query, prettify=True, topn=50):
     model = load_model()
     try:
-        result = dict(model.similar_by_word(user_query, topn=topn))
+        result = model.similar_by_word(user_query, topn=topn)
+        result = sorted(result, key=itemgetter(1), reverse=True)
+        result = OrderedDict(result)
     except KeyError as error:
         return False, error
     if prettify:
