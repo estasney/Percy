@@ -4,6 +4,7 @@ from gensim.parsing.preprocessing import strip_tags, strip_punctuation, strip_mu
     strip_numeric, strip_short, stem_text
 from gensim.summarization import keywords as KW
 from gensim.utils import lemmatize
+import nltk
 
 # Raw
 
@@ -61,10 +62,41 @@ def remove_stopwords(s, sw=STOPWORDS):
     return " ".join(w for w in s.split() if w not in sw)
 
 
+def get_wordnet_pos_graph(treebank_tag, wordnet=nltk.corpus.wordnet):
+    if treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('N'):
+        return wordnet.NOUN
+    elif treebank_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return wordnet.NOUN
+
+
+def lemmatize_text(s, lemmatizer_=nltk.wordnet.WordNetLemmatizer):
+    lemmatizer = lemmatizer_()
+    lemmas = lemmatize(s)
+    lemmas = [x.decode() for x in lemmas]
+
+    def lem_token(grp):
+        try:
+            token, pos = grp.split("/")
+        except IndexError:
+            return grp
+        pos = get_wordnet_pos_graph(pos)
+        lem_token = lemmatizer.lemmatize(token, pos)
+        return lem_token
+
+    lem_tokens = list(map(lem_token(grp), lemmas))
+    return " ".join(lem_tokens)
+
+
 DEFAULT_FILTERS = frozenset([
     char_search, lambda x: x.lower(), strip_tags, strip_punctuation,
     strip_multiple_whitespaces, strip_numeric,
-    remove_stopwords, strip_short, lemmatize
+    remove_stopwords, strip_short, lemmatize_text
 ])
 
 
@@ -115,7 +147,7 @@ def score_tfidf(text):
     # TODO
 
 
-def process_graph_text(text, phrases, min_word_len=3):
+def process_graph_text(text, min_word_len=3):
     lem_tokens = preprocess_text(text)
     lem_tokens = list(filter(lambda x: len(x) > min_word_len, lem_tokens))
     return lem_tokens
