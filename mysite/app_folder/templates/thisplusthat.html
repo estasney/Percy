@@ -6,11 +6,11 @@
  {% if success == 'True' %}
  <form class="form" action="/thisplusthat" method="POST">
      <div class="form-group">
-        <label class="sr-only" for="pos_words">Add Words Together</label>
+        <label for="pos_words">Add Words Together</label>
         <input type="text" class="addition-word form-control" name="pwords" id="pos_words" value="{{pos_words}}">
     </div>
      <div class="form-group">
-         <label class="sr-only" for="pos_words">Subtract These Words</label>
+         <label for="pos_words">Subtract These Words</label>
         <input type="text" class="subtraction-word form-control" name="negwords" id="neg_words" value="{{neg_words}}">
      </div>
      <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
@@ -18,11 +18,11 @@
  {% else %}
      <form class="form" action="/thisplusthat" method="POST">
      <div class="form-group">
-        <label class="sr-only" for="pos_words">Add Words Together</label>
+        <label for="pos_words">Add Words Together</label>
         <input type="text" class="addition-word form-control" name="pwords" id="pos_words" value="" placeholder="Hardware, Software">
     </div>
      <div class="form-group">
-         <label class="sr-only" for="neg_words">Subtract These Words</label>
+         <label for="neg_words">Subtract These Words</label>
         <input type="text" class="subtraction-word form-control" name="negwords" id="neg_words" value="">
      </div>
      <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
