@@ -1,7 +1,7 @@
-import re
 import numpy as np
 from gensim.corpora import Dictionary
 from app_folder.site_config import FConfig
+from app_folder.main.text_tools import parse_form_text
 
 
 def word_math(request):
@@ -13,8 +13,7 @@ def word_math(request):
 
     ws = WordSims()
 
-    pwords = re.findall(r"\"?'?([A-z ]{2,})\"?'?", pwords)
-    pwords = [x.strip().replace(" ", "_").lower() for x in pwords]
+    pwords = parse_form_text(pwords)
 
     if not pwords:
         return False, None
@@ -27,20 +26,15 @@ def word_math(request):
         unknown_words.extend(unknown_words_p)
 
     if neg_words:
-        neg_words = re.findall(r"\"?'?([A-z ]{2,})\"?'?", neg_words)
-        neg_words = [x.strip().replace(" ", "_").lower() for x in neg_words]
+        neg_words = parse_form_text(neg_words)
         neg_words_idx = ws.in_vocab(neg_words)
         neg_words, unknown_words_n = neg_words_idx['known'], neg_words_idx['unknown']
-        if unknown_words_n:
-            unknown_words.extend(unknown_words_n)
+        unknown_words.extend(unknown_words_n)
     else:
         neg_words = None
 
-    if not pwords:
+    if not pwords:  # Ensuring at least one word in vocab
         return False, unknown_words
-
-    print(pwords)
-    print(neg_words)
 
     vec = ws.word_math_vec_(pwords, neg_words)
     sims = {}
@@ -55,11 +49,10 @@ def word_math(request):
 
 
 def word_sims(query):
-    query = re.findall(r"\"?'?([A-z ]{2,})\"?'?", query)
+    query = parse_form_text(query)
     if not query:
         return False, None
     query = query[0]  # Selecting the first word
-    query = query.replace(" ", "_").lower()
     ws = WordSims()
     sims = ws.find_similar(query)
     return sims
