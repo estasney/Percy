@@ -25,16 +25,6 @@ def related():
             return render_template('related.html', result=user_query, success='False')
 
 
-@bp.route('/stemmed', methods=['GET', 'POST'])
-def stemmed():
-    if request.method == 'GET':
-        return render_template('stemmed.html')
-    elif request.method == 'POST':
-        search = request.form['raw_stem']
-        stemmed_search = text_tools.wild_stem(search)
-        return render_template('stemmed.html', stemmed_bool=stemmed_search, success='True', original=search)
-
-
 @bp.route('/keywords', methods=['GET'])
 def keywords():
     return render_template('keywords.html')
@@ -45,14 +35,13 @@ def thisplusthat():
     if request.method == 'GET':
         return render_template('thisplusthat.html')
     elif request.method == 'POST':
-        solution = neural_tools.word_sims(request)
-        if solution['success'] == True:
-            return render_template('thisplusthat.html', result=solution['result'], success='True',
-                                   user_equation=solution['user_equation'],
-                                   word_one=solution['word_one'].strip(), word_two=solution['word_two'].strip(),
-                                   word_three=solution['word_three'].strip())
-        elif solution['success'] == False:
-            return render_template('thisplusthat.html', result=solution['result'], success='False')
+        solution_success, solution = neural_tools.word_math(request)
+        if solution_success:
+            return render_template('thisplusthat.html', result=solution['scores'], success='True',
+                                   user_equation=solution['equation'], pos_words=solution['positives'],
+                                   neg_words=solution['negatives'], unknown_words=solution['unknowns'])
+        else:
+            return render_template('thisplusthat.html', success='False')
 
 
 @bp.route('/infer', methods=['GET', 'POST'])

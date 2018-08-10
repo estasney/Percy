@@ -1,13 +1,15 @@
 {% extends "layout.html" %}
 {% block content %}
 {% include 'partials/helps/helps_thisplusthat.html' %}
- <div class="container-fluid text-center">
+ <div class="container text-center">
      <h3>Let's Try Some Word Equations</h3>
  {% if success == 'True' %}
  <form class="form" action="/thisplusthat" method="POST">
-     <div class="form-group">
+     <div class="form-group ">
+       
         <label for="pos_words">Add Words Together</label>
-        <input type="text" class="addition-word form-control" name="pwords" id="pos_words" value="{{pos_words}}">
+        <input type="text" class="addition-word form-control mb2" name="pwords" id="pos_words" value="{{pos_words}}">
+       
     </div>
      <div class="form-group">
          <label for="pos_words">Subtract These Words</label>
@@ -35,6 +37,11 @@
 </div>
 {% if success == 'True' %}
 <div class="container-fluid bg-grey text-center">
+    {% if unknown_words is not none and unknown_words != "" %}
+    <h2>I removed some words outside of my vocabulary</h2>
+    <h3>{{unknown_words}}</h3>
+    {% endif %}
+
   <h2>According to my calculations...</h2>
   <h3>{{user_equation}}</h3>
 <table class="table">
@@ -46,10 +53,10 @@
       </tr>
     </thead>
     <tbody>
-        {% for key, value in result.items() %}
+        {% for word, score in result %}
       <tr>
-        <td> {{ key }} </td>
-        <td> {{ value }} </td>
+        <td> {{ word }} </td>
+        <td> {{ score }} </td>
       </tr>
         {% endfor %}
       </tr>
@@ -58,8 +65,8 @@
 </div>
 {% elif success == 'False' %}
 <div class="container-fluid">
-    <h2>Oops!</h2>
-    <p>It would appear that the word <strong>{{ result }}</strong> is not in my vocabulary.</p>
+    <h2>I don't know!</h2>
+
 </div>
 {% else %}
 {% endif %}

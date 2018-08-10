@@ -6,7 +6,7 @@ from app_folder.site_config import FConfig
 
 def word_math(request):
     pwords = request.form.get('pwords')
-    neg_words = request.form.get('neg_words')
+    neg_words = request.form.get('negwords')
 
     if not pwords:
         return False, None  # Can't do anything
@@ -14,7 +14,7 @@ def word_math(request):
     ws = WordSims()
 
     pwords = re.findall(r"\"?'?([A-z ]{2,})\"?'?", pwords)
-    pwords = [x.replace(" ", "_").lower() for x in pwords]
+    pwords = [x.strip().replace(" ", "_").lower() for x in pwords]
 
     if not pwords:
         return False, None
@@ -28,20 +28,29 @@ def word_math(request):
 
     if neg_words:
         neg_words = re.findall(r"\"?'?([A-z ]{2,})\"?'?", neg_words)
-        neg_words = [x.replace(" ", "_").lower() for x in neg_words]
+        neg_words = [x.strip().replace(" ", "_").lower() for x in neg_words]
         neg_words_idx = ws.in_vocab(neg_words)
         neg_words, unknown_words_n = neg_words_idx['known'], neg_words_idx['unknown']
         if unknown_words_n:
-            unknown_words.extend(unknown_words_p)
+            unknown_words.extend(unknown_words_n)
     else:
         neg_words = None
 
     if not pwords:
         return False, unknown_words
 
+    print(pwords)
+    print(neg_words)
+
     vec = ws.word_math_vec_(pwords, neg_words)
-    sims_success, sims = ws.find_similar_vec(vec)
+    sims = {}
+    sims_success, scores = ws.find_similar_vec(vec)
+    scores = list(filter(lambda x: x[0] not in pwords, scores))
+    sims['scores'] = scores
     sims['equation'] = ws.as_equation(pwords, neg_words)
+    sims['positives'] = request.form.get('pwords')
+    sims['negatives'] = request.form.get('negwords', "")
+    sims['unknowns'] = " ".join(unknown_words)
     return sims_success, sims
 
 
