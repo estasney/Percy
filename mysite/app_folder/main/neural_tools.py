@@ -1,9 +1,9 @@
 
 import numpy as np
 from gensim.corpora import Dictionary
-from collections import OrderedDict
-from operator import itemgetter
+from app_folder.main.text_tools import preprocess_text
 from app_folder.site_config import FConfig
+
 
 def word_math(request):
     pwords = request.form.get('pwords').split(",")
@@ -18,6 +18,11 @@ def word_math(request):
     return sims
 
 
+def word_sims(query):
+    query = preprocess_text(query)
+    ws = WordSims()
+    sims = ws.find_similar(query)
+    return sims
 
 
 class WordSims(object):
@@ -31,7 +36,7 @@ class WordSims(object):
         try:
             word_id = self.idx.token2id[word]
         except KeyError:
-            return None
+            return False, None
 
         dd = np.dot(self.array, self.array[word_id])  # Cosine similarity for this unigram against all others.
         sims = np.argsort(-1 * dd)[:100]
@@ -40,7 +45,7 @@ class WordSims(object):
         # Remove None Id2Word
         sim_scores = list(filter(lambda x: x[0] is not None, sim_scores))
         sim_scores.sort(key=lambda x: x[1], reverse=True)
-        return sim_scores
+        return True, sim_scores
 
     def find_similar_vec(self, vec):
 
@@ -51,7 +56,7 @@ class WordSims(object):
         # Remove None Id2Word
         sim_scores = list(filter(lambda x: x[0] is not None, sim_scores))
         sim_scores.sort(key=lambda x: x[1], reverse=True)
-        return sim_scores
+        return True, sim_scores
 
     def word_math_vec_(self, positive_words, negative_words=None):
         positive_words_ids = [self.idx.token2id.get(w) for w in positive_words]

@@ -17,19 +17,12 @@ def related():
         return render_template('related.html')
     elif request.method == 'POST':
         user_query = request.form['query']
-        result = neural_tools.word_sims(user_query)
-        if result[0] is True:
-
-            # To preserve order from OrderedDict, convert to list
-            result[1] = list(result[1].items())
-
-            return render_template('related.html', result=result[1], success='True', title_h2='Word Similarity Score',
+        result_success, result = neural_tools.word_sims(user_query)
+        if result_success:
+            return render_template('related.html', result=result, success='True', title_h2='Word Similarity Score',
                                    title_th='Similarity Score', original=user_query)
-        if result[0] is False:
-            error_message = str(result[1])
-            offending_term = error_message.split("'")[1]
-            result = offending_term.title()
-            return render_template('related.html', result=result[1], success='False')
+        else:
+            return render_template('related.html', result=user_query, success='False')
 
 
 @bp.route('/stemmed', methods=['GET', 'POST'])
@@ -52,7 +45,7 @@ def thisplusthat():
     if request.method == 'GET':
         return render_template('thisplusthat.html')
     elif request.method == 'POST':
-        solution = neural_tools.word_math(request)
+        solution = neural_tools.word_sims(request)
         if solution['success'] == True:
             return render_template('thisplusthat.html', result=solution['result'], success='True',
                                    user_equation=solution['user_equation'],
