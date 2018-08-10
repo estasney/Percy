@@ -8,10 +8,10 @@ import nltk
 
 # Raw
 
-months = {}
-
 char_search_ = re.compile(r"[^\u0020\u0027\u002c-\u002e\u0030-\u0039\u0041-\u005a\u0061-\u007a]")
 strip_multi_ws_ = re.compile(r"( {2,})")
+quoted_terms = re.compile(r"(?:'|\")([A-z ]+)(?:'|\")")
+word_re = re.compile(r"(\w+)")
 
 STOPWORDS = frozenset(
     ['a', 'about', 'above', 'across', 'after', 'afterwards', 'again', 'against', 'ain', 'all', 'almost',
@@ -89,7 +89,7 @@ def lemmatize_text(s, lemmatizer_=nltk.wordnet.WordNetLemmatizer):
         lem_token = lemmatizer.lemmatize(token, pos)
         return lem_token
 
-    lem_tokens = list(map(lem_token(grp), lemmas))
+    lem_tokens = list(map(lem_token, lemmas))
     return " ".join(lem_tokens)
 
 
@@ -151,3 +151,23 @@ def process_graph_text(text, min_word_len=3):
     lem_tokens = preprocess_text(text)
     lem_tokens = list(filter(lambda x: len(x) > min_word_len, lem_tokens))
     return lem_tokens
+
+
+def parse_form_text(text):
+    """
+    Given a string such as :
+        Cloud, Software, "Quality Assurance"
+    return text as:
+        ['cloud', 'software', 'quality_assurance']
+    """
+    quoted_form_terms = quoted_terms.findall(text)
+    text = quoted_terms.sub("", text)
+    terms = word_re.findall(text)
+    terms.extend(quoted_form_terms)
+
+    def prep_tokens(x):
+        return x.strip().lower().replace(" ", "_")
+
+    parsed_terms = list(map(prep_tokens, terms))
+    return parsed_terms
+
