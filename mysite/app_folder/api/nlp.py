@@ -1,6 +1,5 @@
 import re
 from app_folder.main.neural_tools import word_sims
-from app_folder import chatbot
 from nltk import word_tokenize, pos_tag
 
 
@@ -41,8 +40,7 @@ class IntentParser(object):
     def answer_question(self, text):
         matched_parser = self.map_(text)
         if not matched_parser:
-            answer =str(chatbot.get_response(text))
-            return (None, answer)
+            return None, None
         answer = matched_parser.answer_question_(text)
         answer += self.link_to_resource
         return (matched_parser, answer)
@@ -93,13 +91,15 @@ class SynonymParser(object):
         else:
             return False
 
-
     def preprocess_string_(self, text):
         # Splitting query to text following search_method
         word_matched = self.search_method.search(text).group()  # "Synonym" or variant
         text_list = self.search_method.split(text)  # Before, "Synonym", After
         text_pos = text_list.index(word_matched) + 1  # Position of After in list
-        entities = text_list[text_pos] # After
+        entities = text_list[text_pos]  # After
+        # Pull any quoted entities out - these won't work in the pos filter but we can assume they are part of the
+        # synonym request
+        quoted_entities = re.findall(r"\"?'?([A-z ]{2,})\"?'?", entities)
         entities = pos_tag(word_tokenize(entities))  # Tokenize and POS Tag
 
         def filter_tag(token_tag, pos_filter=self.default_pos_):
@@ -110,6 +110,8 @@ class SynonymParser(object):
 
         entities = list(filter(filter_tag, entities))  # Filter by POS
         entities = [word for word, tag in entities]  # Remove tag
+        if quoted_entities:
+            entities.extend(quoted_entities)
         return entities
 
     def run_query_(self, entities, topn=10):
@@ -118,8 +120,12 @@ class SynonymParser(object):
 
         results = []
         for e in entities:
-            sims = word_sims(e, topn=topn)
-            results.append(sims[1])
+            sims_success, sim_scores = word_sims(e)
+            if sims_success:
+                sim_scores = sim_scores[:topn]
+            else:
+                sim_scores = []
+            results.append((sims_success, e, sim_scores))
 
         return results
 
@@ -128,16 +134,27 @@ class SynonymParser(object):
         query_result = self.run_query_(entities)
         return entities, query_result
 
-    def make_preamble_(self, entity):
-        return self.preamble_.format(entity)
+    def make_preamble_(self, entity, success=True):
+        if success:
+            return self.preamble_.format(entity)
+        else:
+            return "I dont know the word {}".format(entity)
 
     def convey_results_(self, result):
-        words = [word for word, score in result.items()]
+        words = [word for word, score in result]
         return ", ".join(words)
 
-    def make_conveyable_(self, entities, results):
-        preamble = [self.make_preamble_(entity) for entity in entities]
-        results = [self.convey_results_(result) for result in results]
+    def make_conveyable_(self, entities, r):
+        preamble, results, message = [], [], []
+        print(r)
+        for sim_success, entity, sim_result in r:
+            if sim_success:
+                preamble.append(self.make_preamble_(entity))
+                results.append(self.convey_results_(sim_result))
+            else:
+                preamble.append(self.make_preamble_(entity, success=False))
+                results.append("")
+
         message = []
         for p, r in zip(preamble, results):
             reply = "{} {}".format(p, r)
