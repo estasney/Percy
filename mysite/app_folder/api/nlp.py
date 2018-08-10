@@ -62,7 +62,7 @@ class SynonymParser(object):
         """
 
         chunker = nltk.RegexpParser(self.grammar)
-        tokens = nltk.word_tokenize(text)
+        tokens = parse_form_text(text)
         pos_tokens = nltk.pos_tag(tokens)
 
         tree = chunker.parse(pos_tokens)
