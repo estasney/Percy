@@ -4,6 +4,7 @@ from gensim.parsing.preprocessing import strip_tags, strip_punctuation, strip_mu
     strip_numeric, strip_short, stem_text
 from gensim.summarization import keywords as KW
 from gensim.utils import lemmatize
+from app_folder.site_config import FConfig
 import nltk
 
 # Raw
@@ -147,8 +148,12 @@ def score_tfidf(text):
     # TODO
 
 
-def process_graph_text(text, min_word_len=3):
-    lem_tokens = preprocess_text(text)
+def process_graph_text(text, phrases, min_word_len=3):
+    lem_tokens = preprocess_text(text).split()
+    if phrases:
+        from gensim.models.phrases import Phraser
+        phrase_detect = Phraser.load(FConfig.PHRASER)
+        lem_tokens = phrase_detect[lem_tokens]
     lem_tokens = list(filter(lambda x: len(x) > min_word_len, lem_tokens))
     return lem_tokens
 
