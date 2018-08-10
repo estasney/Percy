@@ -1,7 +1,7 @@
 from flask import request
 from app_folder.api import bp
 from app_folder.api.utils import request_message_details, make_reply
-from app_folder.api.nlp import IntentParser, SynonymParser
+from app_folder.api.nlp import SynonymParser
 
 
 @bp.route('/spark', methods=['GET', 'POST'])
@@ -12,19 +12,17 @@ def listen_webhook():
 
     message_details = request_message_details(data_id)
 
-    intent_parser = IntentParser(SynonymParser())
+    intent_parser = SynonymParser()
 
     if message_details['message_body'] not in intent_parser:
         # Unable to match query
         return ""
 
-    parser, answer = intent_parser.answer_question(message_details['message_body'])
-    if not parser:
-        answer = "{}".format(answer)
-        make_reply(answer, room_type, message_details)
+    answer = intent_parser.answer_question(message_details['message_body'])
+    if not answer:
+        return
     else:
         answer = "Hi {}, {}".format(message_details['person_fname'], answer)
         make_reply(answer, room_type, message_details)
-
     return ""
 

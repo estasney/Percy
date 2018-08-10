@@ -1,4 +1,3 @@
-import re
 from app_folder.main.neural_tools import word_sims
 from app_folder.main.text_tools import parse_form_text
 import nltk
@@ -128,7 +127,7 @@ class SynonymParser(object):
 
         return "\n".join(message)
 
-    def answer_question_(self, text):
+    def answer_question(self, text):
         query_result = self.transform_to_data(text)
         text_result = self.make_conveyable_(query_result)
         return text_result
