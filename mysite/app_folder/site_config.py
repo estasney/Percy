@@ -8,7 +8,6 @@ def load_p(fn):
     return p
 
 
-
 class Config(object):
     DEBUG = True
     DEBUG_TB_TEMPLATE_EDITOR_ENABLED = True
@@ -17,6 +16,11 @@ class Config(object):
 
 
 class FConfig(object):
+    lda_pmi = os.path.join(basedir, 'resources{}lda_pmi.npy').format(os.path.sep)
+    dictionary = os.path.join(basedir, 'resources{}dictionary.model').format(os.path.sep)
+    lda_pmi_skills = os.path.join(basedir, 'resources{}lda_pmi_skills.npy').format(os.path.sep)
+    dictionary_skills = os.path.join(basedir, 'resources{}dictionary_skills.model').format(os.path.sep)
+
     model = os.path.join(basedir, 'resources{}indeed_wrapper_lite'.format(os.path.sep))
     gram_path = os.path.join(basedir, 'resources{}bigram_model.model'.format(os.path.sep))
     tree = os.path.join(basedir, 'resources{}tree_classifier.pickle'.format(os.path.sep))
