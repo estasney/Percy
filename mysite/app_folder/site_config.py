@@ -20,6 +20,7 @@ class FConfig(object):
     dictionary = os.path.join(basedir, 'resources{}dictionary.model').format(os.path.sep)
     lda_pmi_skills = os.path.join(basedir, 'resources{}lda_pmi_skills.npy').format(os.path.sep)
     dictionary_skills = os.path.join(basedir, 'resources{}dictionary_skills.model').format(os.path.sep)
+    phraser = os.path.join(basedir, 'resources{}phrases.model').format(os.path.sep)
 
     model = os.path.join(basedir, 'resources{}indeed_wrapper_lite'.format(os.path.sep))
     gram_path = os.path.join(basedir, 'resources{}bigram_model.model'.format(os.path.sep))

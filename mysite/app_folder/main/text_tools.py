@@ -5,6 +5,8 @@ from gensim.parsing.preprocessing import strip_tags, strip_punctuation, strip_mu
 from gensim.summarization import keywords as KW
 from gensim.utils import lemmatize
 import nltk
+from app_folder.site_config import FConfig
+from gensim.models.phrases import Phraser
 
 # Raw
 
@@ -77,7 +79,8 @@ def get_wordnet_pos_graph(treebank_tag, wordnet=nltk.corpus.wordnet):
 
 def lemmatize_text(s, lemmatizer_=nltk.wordnet.WordNetLemmatizer):
     lemmatizer = lemmatizer_()
-    lemmas = lemmatize(s)
+    accept_tags = re.compile(r"([A-Z]{2,})")  # We want all tags
+    lemmas = lemmatize(s, accept_tags)
     lemmas = [x.decode() for x in lemmas]
 
     def lem_token(grp):
@@ -147,8 +150,11 @@ def score_tfidf(text):
     # TODO
 
 
-def process_graph_text(text, min_word_len=3):
-    lem_tokens = preprocess_text(text)
+def process_graph_text(text, phrasing, min_word_len=3):
+    lem_tokens = preprocess_text(text).split()
+    if phrasing:
+        phraser = Phraser.load(FConfig.phraser)
+        lem_tokens = phraser[lem_tokens]
     lem_tokens = list(filter(lambda x: len(x) > min_word_len, lem_tokens))
     return lem_tokens
 
