@@ -14,12 +14,22 @@ def open_page():
 @bp.route('/related', methods=['GET', 'POST'])
 def related():
     if request.method == 'GET':
-        return render_template('related.html')
+        if not request.args:
+            return render_template('related.html')
+        else:
+            user_query, query_scope = request.args.get('q'), request.args.get('scope')
+            result_success, result = neural_tools.word_sims(user_query, query_scope)
+            if result_success:
+                return render_template('related.html', result=result, success='True', title_h2='{} Similarity Score'.format(query_scope.title()),
+                                       title_th='Similarity Score', original=user_query)
+            else:
+                return render_template('related.html', result=user_query, success='False')
+
     elif request.method == 'POST':
-        user_query = request.form['query']
-        result_success, result = neural_tools.word_sims(user_query)
+        user_query, query_scope = request.form.get('q'), request.form.get('scope')
+        result_success, result = neural_tools.word_sims(user_query, query_scope)
         if result_success:
-            return render_template('related.html', result=result, success='True', title_h2='Word Similarity Score',
+            return render_template('related.html', result=result, success='True', title_h2='{} Similarity Score'.format(query_scope.title()),
                                    title_th='Similarity Score', original=user_query)
         else:
             return render_template('related.html', result=user_query, success='False')

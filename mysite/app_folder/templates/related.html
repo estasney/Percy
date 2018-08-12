@@ -6,27 +6,57 @@
     <div class="row">
       <div class="col-lg-4 col-lg-offset-4">
       <div class="input-group">
-      <input type="query" name="query" class="form-control" size="50" value="{{original}}" required>
+      <input type="query" name="q" class="form-control" size="50" value="{{original}}" required>
       <div class="input-group-btn">
         <button type="query" name="button" value="query" class="btn btn-danger">Ask Percy</button>
       </div>
       </div>
       </div>
       </div>
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    Similar Words
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="skillsradio" value="skills">
+                  Similar Skills
+                </label>
+            </div>
+        </div>
     </div>
   </form>
 {% else %}
- <form action="/related" method="POST">
+<form action="/related" method="POST">
     <div class="row">
       <div class="col-lg-4 col-lg-offset-4">
       <div class="input-group">
-      <input type="query" name="query" class="form-control" size="50" placeholder="Percy...what are some similar words to...?" required>
+      <input type="query" name="q" class="form-control" size="50" value="" required>
       <div class="input-group-btn">
         <button type="query" name="button" value="query" class="btn btn-danger">Ask Percy</button>
       </div>
       </div>
       </div>
       </div>
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    Similar Words
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="skillsradio" value="skills">
+                  Similar Skills
+                </label>
+            </div>
+        </div>
     </div>
   </form>
 {% endif %}

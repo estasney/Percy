@@ -7,11 +7,15 @@ from app_folder.main.text_tools import parse_form_text
 def word_math(request):
     pwords = request.form.get('pwords')
     neg_words = request.form.get('negwords')
+    scope = request.form.get('scope')
 
     if not pwords:
         return False, None  # Can't do anything
 
-    ws = WordSims()
+    if scope == 'words':
+        ws = WordSims()
+    else:
+        ws = SkillSims()
 
     pwords = parse_form_text(pwords)
 
@@ -48,12 +52,15 @@ def word_math(request):
     return sims_success, sims
 
 
-def word_sims(query):
-    query = parse_form_text(query)
+def word_sims(user_query, query_scope):
+    if query_scope == 'words':
+        ws = WordSims()
+    else:
+        ws = SkillSims()
+    query = parse_form_text(user_query)
     if not query:
         return False, None
     query = query[0]  # Selecting the first word
-    ws = WordSims()
     sims = ws.find_similar(query)
     return sims
 
