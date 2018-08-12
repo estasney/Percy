@@ -17,13 +17,21 @@
         <div class="col-lg-4 col-lg-offset-4">
             <div class="radio">
                 <label>
+                    {% if scope == "words" %}
                     <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    {% else %}
+                    <input type="radio" name="scope" id="wordsradio" value="words">
+                    {% endif %}
                     Similar Words
                 </label>
             </div>
             <div class="radio">
                 <label>
+                    {% if scope == "skills" %}
+                    <input type="radio" name="scope" id="skillsradio" value="skills" checked>
+                    {% else %}
                     <input type="radio" name="scope" id="skillsradio" value="skills">
+                    {% endif %}
                   Similar Skills
                 </label>
             </div>
