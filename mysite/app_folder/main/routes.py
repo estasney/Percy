@@ -172,12 +172,13 @@ def kw_data():
     window_size = int(request.headers.get('Window-Limit', 2))
 
     lem_text = text_tools.process_graph_text(raw_text, phrase_checked)
-    graph = graph_tools.build_graph(lem_text, window_size)
+    graph = graph_tools.make_graph(lem_text, window_size)
+
+    # Assign each word a color
+    color_idx = nx.greedy_color(graph, 'connected_sequential_dfs')
 
     edges = graph.edges()
     data = []
-    scores = pagerank_weighted(graph)
-    dev_dict, dev_count = graph_tools.assign_deviations(scores)
     color_dict = graph_tools.compute_colors_dict(dev_count)
     for edge in edges:
         source, target = edge
