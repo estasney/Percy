@@ -51,36 +51,50 @@ def apply_by_multiprocessing(df, func, **kwargs):
 def lang_detect(x):
     return detect(x['summary'])
 
-
-
-if __name__ == "__main__":
-    df = pd.read_csv(r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv")
-    df.dropna(subset=['summary'], inplace=True)
-    start = datetime.now()
-    print("Starting Language Detection")
-    df['lang'] = apply_by_multiprocessing(df, lang_detect, axis=1, workers=8)
-    elapsed = datetime.now() - start
-    print("Finished Language Detection in {} seconds".format(elapsed.seconds))
-
-df = df.loc[df['lang'] == 'en']
-
-def preprocess_text(x, preserve_sent=False, stopwords=STOPWORDS):
+def preprocess_text(x, stopwords=STOPWORDS):
     from pattern.en import parsetree
 
     punc = set(string.punctuation)
     tree = parsetree(x['summary'], tokenize=True, lemmata=True)
     doc = [sent.lemma for sent in tree]
-    if preserve_sent is False:
-        pdoc = [word for sent in doc for word in sent]
-        pdoc = [word for word in pdoc if word not in punc]
-        pdoc = [word for word in pdoc if word not in stopwords]
-    else:
-        pdoc = []
-        for sent in doc:
-            psent = [word for word in sent if word not in punc]
-            psent = [word for word in psent if word not in stopwords]
-            pdoc.append(psent)
+    # if preserve_sent is False:
+    #     pdoc = [word for sent in doc for word in sent]
+    #     pdoc = [word for word in pdoc if word not in punc]
+    #     pdoc = [word for word in pdoc if word not in stopwords]
+    # else:
+    pdoc = []
+    for sent in doc:
+        psent = [word for word in sent if word not in punc]
+        psent = [word for word in psent if word not in stopwords]
+        pdoc.append(psent)
     return pdoc
+
+def flatten_sents(x):
+    doc = x['sent']
+    return [word for sent in doc for word in sent]
+
+
+if __name__ == "__main__":
+    df = pd.read_csv(r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv")
+    df.dropna(subset=['summary', 'skills'], inplace=True)
+    if 'lang' not in df.columns:
+        start = datetime.now()
+        print("Starting Language Detection")
+        df['lang'] = apply_by_multiprocessing(df, lang_detect, axis=1, workers=8)
+        elapsed = datetime.now() - start
+        print("Finished Language Detection in {} seconds".format(elapsed.seconds))
+        df.to_csv(r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv")
+    df = df.loc[df['lang'] == 'en']
+    del df['lang']
+    print("Preprocessing Text into Sentences")
+    start = datetime.now()
+    df['sent'] = apply_by_multiprocessing(df, preprocess_text, axis=1, workers=8)
+    elapsed = datetime.now() - start
+    print("Finished With Sentences in {}".format(elapsed.seconds))
+    print("Flattening Doc")
+    df['flat'] = apply_by_multiprocessing(df, flatten_sents, axis=1, workers=8)
+
+
 
 
 """
@@ -88,11 +102,7 @@ DICTIONARY - Words
 """
 print("Building Dictionary")
 start = datetime.now()
-if __name__ == "__main__":
-    df['pdocs'] = apply_by_multiprocessing(df, preprocess_text, axis=1, workers=8)
-pdocs = df['pdocs'].values.tolist()
-del df['pdocs']
-dictionary = Dictionary(pdocs)
+dictionary = Dictionary(df['flat'].values.tolist())
 print("Dictionary found {} unique tokens".format(len(dictionary)))
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 dictionary.filter_extremes(no_below=10, no_above=0.9)
@@ -102,8 +112,8 @@ dictionary.save(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/d
 # Write out autocomplete
 with open(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/dictionary_autocomplete.txt", "w+") as tfile:
     for term in dictionary.values():
+        term += "\n"
         tfile.write(term)
-        tfile.write(r'\n')
 
 elapsed = datetime.now() - start
 print("Finished Dictionary in {} seconds".format(elapsed.seconds))
@@ -116,8 +126,9 @@ VECTORS - Words
 
 print("Getting Occurrence Counts for Words")
 start = datetime.now()
-bow = list(map(lambda x: [z for z in dictionary.doc2idx(x) if z > -1], pdocs))
+bow = list(map(lambda x: [z for z in dictionary.doc2idx(x) if z > -1], df['flat'].values.tolist()))
 cx = Counter([i for doc in bow for i in doc])
+del bow
 word_sums = sum(cx.values())
 probabilities = np.array(list(cx.values()))
 probabilities = probabilities / word_sums
@@ -126,12 +137,9 @@ elapsed = datetime.now() - start
 print("Bow Complete in {}".format(elapsed.seconds))
 
 
-def stream_pairs(docs=docs):
+def stream_pairs(docs=df['sent'].values.tolist()):
     for doc in docs:
-        pdoc = preprocess_text(doc, preserve_sent=True)
-        if not pdoc:
-            continue
-        for sent in pdoc:
+        for sent in doc:
             bow_sent = dictionary.doc2idx(sent)
             bow_sent = [b for b in bow_sent if b > -1]
             if len(bow_sent) < 3:
@@ -140,9 +148,6 @@ def stream_pairs(docs=docs):
             for w in windows:
                 for x, y in map(sorted, combinations(w, 2)):
                     yield x, y
-
-
-# Rerun preprocessing to preserve sentence structure
 
 print("Starting Pair Stream")
 start = datetime.now()
@@ -168,7 +173,7 @@ U, _, _ = svds(PMI, k=100)
 norms = np.sqrt(np.sum(np.square(U), axis=1, keepdims=True))
 U /= np.maximum(norms, 1e-9)
 np.save("/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/lda_pmi.npy", U)
-del U, norms, pmi_samples
+del U, norms, pmi_samples, cx, cxy, cxp, cxyp
 
 """
 
@@ -179,7 +184,7 @@ Words - Fingerprinting
 print("Starting Fingerprint")
 start = datetime.now()
 cnt = TfidfVectorizer(use_idf=True, sublinear_tf=True)
-X = cnt.fit_transform(pdocs)
+X = cnt.fit_transform([" ".join(doc) for doc in df['flat'].values.tolist()])
 X_grp1 = X
 doc_freqs_grp1 = np.sum(X_grp1, axis=0)
 doc_freqs_grp1 = np.array(doc_freqs_grp1)[0]
@@ -188,35 +193,24 @@ doc_probs_grp1 = doc_freqs_grp1 / X_grp1.shape[0]
 np.save(arr=doc_probs_grp1,
         file=r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/fingerprint_pop_occ.npy")
 
+del X, X_grp1, doc_probs_grp1, doc_freqs_grp1
+
 elapsed = datetime.now() - start
 
 with open(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/fingerprint_vec.pkl", 'wb+') as pfile:
     pickle.dump(cnt, pfile)
 print("Finished Fingerprint in {}".format(elapsed.seconds))
 
-del df, cnt, pdocs, X, X_grp1, doc_freqs_grp1, doc_probs_grp1, PMI, cxy, cx, cxyp, cxp
+del cnt
+
+
 
 """
 
 SKILLS
 
 """
-if __name__ == "__main__":
-    df = pd.read_csv(r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv")
-    df.dropna(subset=['skills'], inplace=True)
-    start = datetime.now()
-    print("Starting Language Detection for Skills")
-    df['lang'] = apply_by_multiprocessing(df, lang_detect, axis=1, workers=8)
-    df = df.loc[df['lang'] == 'en']
-    elapsed = datetime.now() - start
-
-    print("Finished Language Detection in {} minutes".format(elapsed.seconds // 60))
-
-docs = df['skills'].values.tolist()
-
-
-def preprocess_skills(x):
-    return x.lower().split()
+df['skills'] = df['skills'].apply(lambda x: x.lower().split(", "))
 
 
 """
@@ -224,8 +218,7 @@ DICTIONARY - Skills
 """
 print("Building Skills Dictionary")
 start = datetime.now()
-pdocs = [preprocess_skills(doc) for doc in docs]
-dictionary = Dictionary(pdocs)
+dictionary = Dictionary(df['skills'].values.tolist())
 print("Dictionary found {} unique tokens".format(len(dictionary)))
 dictionary.filter_extremes(no_below=10, no_above=0.9)
 dictionary.compactify()
@@ -235,8 +228,8 @@ dictionary.save(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/d
 with open(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/dictionary_skills_autocomplete.txt",
           "w+") as tfile:
     for term in dictionary.values():
+        term += "\n"
         tfile.write(term)
-        tfile.write(r'\n')
 
 elapsed = datetime.now() - start
 print("Finished Skills Dictionary in {} seconds".format(elapsed.seconds))
@@ -247,7 +240,7 @@ VECTORS - Skills
 
 print("Getting Skills Occurrence Counts")
 start = datetime.now()
-bow = list(map(lambda x: [z for z in dictionary.doc2idx(x) if z > -1], pdocs))
+bow = list(map(lambda x: [z for z in dictionary.doc2idx(x) if z > -1], df['skills'].values.tolist()))
 cx = Counter([i for doc in bow for i in doc])
 word_sums = sum(cx.values())
 probabilities = np.array(list(cx.values()))
@@ -257,7 +250,7 @@ elapsed = datetime.now() - start
 print("Bow Complete in {}".format(elapsed.seconds))
 
 
-def stream_skills(docs=pdocs):
+def stream_skills(docs=df['skills'].values.tolist()):
     for skill_grp in docs:
         if not skill_grp:
             continue
@@ -296,43 +289,16 @@ np.save("/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/lda_pmi_sk
 elapsed = datetime.now() - start
 print("Finished Skills Vec in {}".format(elapsed.seconds))
 
+del cx, cxp, cxyp, cxy, pmi_samples, bow
+
 """
 Phraser
 """
 
-
-
-if __name__ == "__main__":
-    df = pd.read_csv(r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv")
-    df.dropna(subset=['summary'], inplace=True)
-    start = datetime.now()
-    print("Starting Language Detection for Phrases")
-    df['lang'] = apply_by_multiprocessing(df, lang_detect, axis=1, workers=8)
-    df = df.loc[df['lang'] == 'en']
-    elapsed = datetime.now() - start
-
-    print("Finished Language Detection in {} seconds".format(elapsed.seconds))
-
-docs = df['summary'].values.tolist()
-
-def stream_phrases(docs=docs, stopwords=STOPWORDS):
-    from pattern.en import parsetree
-    punc = set(string.punctuation)
+def stream_phrases(docs=df['sent'].values.tolist()):
     for doc in docs:
-        tree = parsetree(x, tokenize=True, lemmata=True)
-        doc = [sent.lemma for sent in tree]
         for sent in doc:
-            if not sent:
-                continue
-            psent = [word for word in sent if word not in punc]
-            if not sent:
-                continue
-            psent = [word for word in psent if word not in stopwords]
-            if not sent:
-                continue
-            if len(psent) < 3:
-                continue
-            yield psent
+            yield sent
 
 phrase_stream = stream_phrases()
 print("Starting Phrase Stream")
