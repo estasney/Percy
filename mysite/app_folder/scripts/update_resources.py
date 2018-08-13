@@ -74,7 +74,7 @@ print("Finished Dictionary in {} seconds".format(elapsed.seconds))
 VECTORS - Words
 """
 
-print("Getting BOW for Occurence Counts")
+print("Getting BOW for Occurrence Counts")
 start = datetime.now()
 bow = list(map(lambda x: [z for z in dictionary.doc2idx(x) if z > -1], pdocs))
 cx = Counter([i for doc in bow for i in doc])
@@ -140,5 +140,99 @@ U /= np.maximum(norms, 1e-9)
 
 np.save("/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/lda_pmi.npy", U)
 
+del U,norms, pmi_samples, probabilities, pair_sums, docs, pdocs, dictionary
 
+
+"""
+
+SKILLS
+
+"""
+df = pd.read_csv(r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv")
+df.dropna(subset=['skills'], inplace=True)
+skills = df['skills'].values.tolist()
+del df
+
+
+def preprocess_skills(x):
+    return x.lower().split()
+
+
+"""
+DICTIONARY - Skills
+"""
+print("Building Skills Dictionary")
+start = datetime.now()
+pdocs = [preprocess_skills(doc) for doc in skills]
+del skills
+dictionary = Dictionary(pdocs)
+print("Dictionary found {} unique tokens".format(len(dictionary)))
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+dictionary.filter_extremes(no_below=10, no_above=0.9)
+dictionary.compactify()
+dictionary.save(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/dictionary_skills.model")
+
+elapsed = datetime.now() - start
+print("Finished Skills Dictionary in {} seconds".format(elapsed.seconds))
+
+"""
+VECTORS - Skills
+"""
+
+print("Getting BOW for Skills Occurrence Counts")
+start = datetime.now()
+bow = list(map(lambda x: [z for z in dictionary.doc2idx(x) if z > -1], pdocs))
+cx = Counter([i for doc in bow for i in doc])
+word_sums = sum(cx.values())
+probabilities = np.array(list(cx.values()))
+probabilities = probabilities / word_sums
+cxp = {k: v for k, v in zip(list(cx.keys()), probabilities)}
+
+elapsed = datetime.now() - start
+print("Bow Complete in {}".format(elapsed.seconds))
+
+def stream_skills(docs=pdocs):
+    for skill_grp in docs:
+        if not skill_grp:
+            continue
+        skill_grp = dictionary.doc2idx(skill_grp)
+        skill_grp = [x for x in skill_grp if x > -1]
+        if len(skill_grp) < 3:
+            continue
+        for x, y in map(sorted, combinations(skill_grp, 2)):
+            yield x, y
+
+
+print("Starting Skills Pair Stream")
+start = datetime.now()
+pair_stream = stream_skills()
+cxy = Counter(pair_stream)
+
+elapsed = datetime.now() - start
+print("Got cxy values in {} seconds".format(elapsed.seconds))
+pair_sums = sum(cxy.values())
+
+probabilities = np.array(list(cxy.values()))
+probabilities = probabilities / pair_sums
+
+cxyp = {k: v for k, v in zip(list(cxy.keys()), probabilities)}
+
+print('Building Sparse PMI Matrix for Skills')
+
+pmi_samples = Counter()
+data, rows, cols = [], [], []
+for (x, y), n in cxy.items():
+    rows.append(x)
+    cols.append(y)
+    data.append(log((n / pair_sums) / (cx[x] / word_sums) / (cx[y] / word_sums)))
+    pmi_samples[(x, y)] = data[-1]
+PMI = csc_matrix((data, (rows, cols)))
+
+del data, rows, cols, probabilities
+
+U, _, _ = svds(PMI, k=100)
+norms = np.sqrt(np.sum(np.square(U), axis=1, keepdims=True))
+U /= np.maximum(norms, 1e-9)
+
+np.save("/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/lda_pmi_skills.npy", U)
 
