@@ -61,14 +61,19 @@ def get_cat(x, std_dev):
         return 0
     return math.floor(x/std_dev)
 
+
 def get_colors(graph):
     color_idx = nx.greedy_color(graph, 'connected_sequential_dfs')
     color_dict = compute_colors_dict(color_idx)
-    return color_dict
+    color_merged = {}
+    for word, color_index in color_idx.items():
+        color_merged[word] = color_dict[color_index]
+
+    return color_merged
 
 
-def compute_colors_dict(color_idx, low="blue", high="red"):
-    steps = max(color_idx.values())
+def compute_colors_dict(color_idx, low="palegreen", high="red"):
+    steps = max(color_idx.values()) + 1
     low = Color(low)
     high = Color(high)
     color_list = list(low.range_to(high, steps))

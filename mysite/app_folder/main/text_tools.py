@@ -150,13 +150,37 @@ def score_tfidf(text):
     # TODO
 
 
-def process_graph_text(text, phrasing, min_word_len=3):
-    lem_tokens = preprocess_text(text).split()
-    if phrasing:
-        phraser = Phraser.load(FConfig.phraser)
-        lem_tokens = phraser[lem_tokens]
-    lem_tokens = list(filter(lambda x: len(x) > min_word_len, lem_tokens))
-    return lem_tokens
+def process_graph_text(text, stopwords=STOPWORDS):
+
+    from pattern.en import parsetree
+
+    def filter_chunks(chunk, f=frozenset(['NP'])):
+        if chunk.pos in f:
+            return True
+        else:
+            return False
+
+    def normalize_chunk(chunk, stopwords=stopwords):
+        normed = [word for word in chunk.lemmata if word not in stopwords and len(word) > 4]
+        if not normed:
+            return None
+        else:
+            normed = " ".join(normed)
+            if len(normed) > 4:
+                return normed
+            else:
+                return None
+
+    tree = parsetree(text, tokenize=True, tags=True, chunks=True, relations=False, lemmata=True)
+
+    text_chunks = [chunk for chunks in [sent.chunks for sent in tree] for chunk in chunks]
+    filtered_chunks = list(filter(lambda x: filter_chunks(x), text_chunks))
+
+    del text_chunks
+
+    normed_chunks = list(map(normalize_chunk, filtered_chunks))
+    normed_chunks = list(filter(lambda x: x is not None, normed_chunks))
+    return normed_chunks
 
 
 def parse_form_text(text):

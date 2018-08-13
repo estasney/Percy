@@ -161,34 +161,25 @@ def tfidf():
 @bp.route('/kw_data', methods=['POST'])
 def kw_data():
     raw_text = request.form.get('raw_text')
-    phrase_checked = request.headers.get('Phrase-Checked')
-    if phrase_checked == 'true':
-        phrase_checked = True
-    else:
-        phrase_checked = False
     if not raw_text:
         abort(401)
 
     window_size = int(request.headers.get('Window-Limit', 2))
 
-    lem_text = text_tools.process_graph_text(raw_text, phrase_checked)
+    lem_text = text_tools.process_graph_text(raw_text)
     graph = graph_tools.make_graph(lem_text, window_size)
 
     # Assign each word a color
-    color_idx = nx.greedy_color(graph, 'connected_sequential_dfs')
+    color_dict = graph_tools.get_colors(graph)
+    print(color_dict)
 
-    edges = graph.edges()
     data = []
-    color_dict = graph_tools.compute_colors_dict(dev_count)
-    for edge in edges:
+    for edge in graph.edges():
         source, target = edge
-        source_score, target_score = int(dev_dict.get(source, 0)), int(dev_dict.get(target, 0))
-        source_color, target_color = (color_dict.get(source_score, color_dict[0])), (color_dict.get(target_score,
-                                                                                                    color_dict[0]))
-        td = {'source': source, 'source_score': source_score, 'target': target, 'target_score': target_score,
-              'source_color': source_color, 'target_color': target_color}
+        print(source)
+        print(target)
+        source_color, target_color = color_dict.get(source, (0, 0, 255)), color_dict.get(target, (0, 0, 255))
+        td = {'source': source, 'target': target, 'source_color': source_color, 'target_color': target_color}
         data.append(td)
-
-    del edges, scores, dev_dict, dev_count, color_dict
 
     return jsonify({'data': data})
