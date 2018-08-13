@@ -5,8 +5,7 @@ from gensim.parsing.preprocessing import strip_tags, strip_punctuation, strip_mu
 from gensim.summarization import keywords as KW
 from gensim.utils import lemmatize
 import nltk
-from app_folder.site_config import FConfig
-from gensim.models.phrases import Phraser
+
 
 # Raw
 

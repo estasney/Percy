@@ -18,8 +18,12 @@ class Config(object):
 class FConfig(object):
     lda_pmi = os.path.join(basedir, 'resources{}lda_pmi.npy').format(os.path.sep)
     dictionary = os.path.join(basedir, 'resources{}dictionary.model').format(os.path.sep)
+    dictionary_autocomplete = os.path.join(basedir, 'resources{}dictionary_autocomplete.txt').format(os.path.sep)
+
     lda_pmi_skills = os.path.join(basedir, 'resources{}lda_pmi_skills.npy').format(os.path.sep)
     dictionary_skills = os.path.join(basedir, 'resources{}dictionary_skills.model').format(os.path.sep)
+    dictionary_skills_autocomplete = os.path.join(basedir, 'resources{}dictionary_skills_autocomplete.txt').format(os.path.sep)
+
     phraser = os.path.join(basedir, 'resources{}phrases.model').format(os.path.sep)
     fingerprint_vec = os.path.join(basedir, 'resources{}fingerprint_vec.pkl').format(os.path.sep)
     fingerprint_pop_occ = os.path.join(basedir, 'resources{}fingerprint_pop_occ.npy').format(os.path.sep)
