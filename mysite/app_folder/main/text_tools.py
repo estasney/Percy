@@ -4,8 +4,8 @@ from gensim.parsing.preprocessing import strip_tags, strip_punctuation, strip_mu
     strip_numeric, strip_short, stem_text
 from gensim.summarization import keywords as KW
 from gensim.utils import lemmatize
-from app_folder.site_config import FConfig
 import nltk
+
 
 # Raw
 
@@ -78,7 +78,8 @@ def get_wordnet_pos_graph(treebank_tag, wordnet=nltk.corpus.wordnet):
 
 def lemmatize_text(s, lemmatizer_=nltk.wordnet.WordNetLemmatizer):
     lemmatizer = lemmatizer_()
-    lemmas = lemmatize(s)
+    accept_tags = re.compile(r"([A-Z]{2,})")  # We want all tags
+    lemmas = lemmatize(s, accept_tags)
     lemmas = [x.decode() for x in lemmas]
 
     def lem_token(grp):
@@ -148,14 +149,37 @@ def score_tfidf(text):
     # TODO
 
 
-def process_graph_text(text, phrases, min_word_len=3):
-    lem_tokens = preprocess_text(text).split()
-    if phrases:
-        from gensim.models.phrases import Phraser
-        phrase_detect = Phraser.load(FConfig.PHRASER)
-        lem_tokens = phrase_detect[lem_tokens]
-    lem_tokens = list(filter(lambda x: len(x) > min_word_len, lem_tokens))
-    return lem_tokens
+def process_graph_text(text, stopwords=STOPWORDS):
+
+    from pattern.en import parsetree
+
+    def filter_chunks(chunk, f=frozenset(['NP'])):
+        if chunk.pos in f:
+            return True
+        else:
+            return False
+
+    def normalize_chunk(chunk, stopwords=stopwords):
+        normed = [word for word in chunk.lemmata if word not in stopwords and len(word) > 4]
+        if not normed:
+            return None
+        else:
+            normed = " ".join(normed)
+            if len(normed) > 4:
+                return normed
+            else:
+                return None
+
+    tree = parsetree(text, tokenize=True, tags=True, chunks=True, relations=False, lemmata=True)
+
+    text_chunks = [chunk for chunks in [sent.chunks for sent in tree] for chunk in chunks]
+    filtered_chunks = list(filter(lambda x: filter_chunks(x), text_chunks))
+
+    del text_chunks
+
+    normed_chunks = list(map(normalize_chunk, filtered_chunks))
+    normed_chunks = list(filter(lambda x: x is not None, normed_chunks))
+    return normed_chunks
 
 
 def parse_form_text(text):

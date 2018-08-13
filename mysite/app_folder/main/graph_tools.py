@@ -2,19 +2,45 @@ import colorsys
 import math
 import random
 from itertools import combinations
+from collections import defaultdict
+import networkx as nx
+from cytoolz import itertoolz
 from operator import itemgetter
 
 import numpy as np
 import pandas as pd
 from colour import Color
-from gensim.summarization.graph import Graph
-from gensim.utils import chunkize_serial
 
 WINDOW_SIZE = 3
 
 
 INCLUDING_FILTER = ['NN', 'JJ']
 EXCLUDING_FILTER = []
+
+
+def make_graph(tokens, window_size, edge_weighting='cooc_freq'):
+
+    # Adapted from textacy
+
+    windows = itertoolz.sliding_window(window_size, tokens)
+
+    graph = nx.Graph()
+
+    if edge_weighting == 'cooc_freq':
+        cooc_mat = defaultdict(lambda: defaultdict(int))
+        for window in windows:
+            for w1, w2 in combinations(sorted(window), 2):
+                cooc_mat[w1][w2] += 1
+        graph.add_edges_from(
+            (w1, w2, {'weight': cooc_mat[w1][w2]})
+            for w1, w2s in cooc_mat.items() for w2 in w2s)
+
+    elif edge_weighting == 'binary':
+        graph.add_edges_from(
+            w1_w2 for window in windows
+            for w1_w2 in combinations(window, 2))
+
+    return graph
 
 
 def assign_deviations(scores_dict):
@@ -36,7 +62,18 @@ def get_cat(x, std_dev):
     return math.floor(x/std_dev)
 
 
-def compute_colors_dict(steps, low="blue", high="red"):
+def get_colors(graph):
+    color_idx = nx.greedy_color(graph, 'connected_sequential_dfs')
+    color_dict = compute_colors_dict(color_idx)
+    color_merged = {}
+    for word, color_index in color_idx.items():
+        color_merged[word] = color_dict[color_index]
+
+    return color_merged
+
+
+def compute_colors_dict(color_idx, low="palegreen", high="red"):
+    steps = max(color_idx.values()) + 1
     low = Color(low)
     high = Color(high)
     color_list = list(low.range_to(high, steps))
@@ -55,57 +92,3 @@ def bright_color():
     h,s,l = random.random(), 0.5 + random.random()/2.0, 0.4 + random.random()/5.0
     r,g,b = [int(256*i) for i in colorsys.hls_to_rgb(h,l,s)]
     return (r, g, b)
-
-
-def remaining_windows(lem_text, window_size):
-    return lem_text[window_size:]
-
-
-def get_first_window(lem_text, window_size):
-    return lem_text[:window_size]
-
-
-def generate_chunks(remaining_window, window_size):
-    return chunkize_serial(remaining_window, window_size, as_numpy=False)
-
-
-def generate_combos(remaining_window, window_size):
-    chunks = generate_chunks(remaining_window, window_size)
-    for chunk in chunks:
-        for word_a, word_b in combinations(chunk, 2):
-            yield word_a, word_b
-
-
-def process_remaining_windows(graph, lem_text, window_size):
-    remaining_window = remaining_windows(lem_text, window_size)
-    combos = generate_combos(remaining_window, window_size)
-    for word_a, word_b in combos:
-        set_graph_edge(graph, lem_text, word_a, word_b)
-
-
-def add_nodes(lem_text, graph):
-    for token in lem_text:
-        if not graph.has_node(token):
-            graph.add_node(token)
-
-
-def process_first_window(graph, lem_text, window_size):
-    first_window = get_first_window(lem_text, window_size)
-    for word_a, word_b in combinations(first_window, 2):
-        set_graph_edge(graph, lem_text, word_a, word_b)
-
-
-def set_graph_edge(graph, lem_text, word_a, word_b):
-    if word_a in lem_text and word_b in lem_text:
-        edge = (word_a, word_b)
-    if graph.has_node(word_a) and graph.has_node(word_b) and not graph.has_edge(edge):
-        graph.add_edge(edge)
-
-
-def build_graph(lem_text, window_size=WINDOW_SIZE):
-    graph = Graph()
-    add_nodes(lem_text, graph)
-    process_first_window(graph, lem_text, window_size)
-    process_remaining_windows(graph, lem_text, window_size)
-    return graph
-

@@ -15,6 +15,30 @@
          <label for="pos_words">Subtract These Words</label>
         <input type="text" class="subtraction-word form-control" name="negwords" id="neg_words" value="{{neg_words}}">
      </div>
+   <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="radio">
+                <label>
+                    {% if scope == "words" %}
+                    <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    {% else %}
+                    <input type="radio" name="scope" id="wordsradio" value="words">
+                    {% endif %}
+                    Calculate Words
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    {% if scope == "skills" %}
+                    <input type="radio" name="scope" id="skillsradio" value="skills" checked>
+                    {% else %}
+                    <input type="radio" name="scope" id="skillsradio" value="skills">
+                    {% endif %}
+                  Calculate Skills
+                </label>
+            </div>
+        </div>
+    </div>
      <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
 </form>
  {% else %}
@@ -27,13 +51,28 @@
          <label for="neg_words">Subtract These Words</label>
         <input type="text" class="subtraction-word form-control" name="negwords" id="neg_words" value="">
      </div>
+       <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    Calculate Words
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="skillsradio" value="skills">
+                  Calculate Skills
+                </label>
+            </div>
+        </div>
+    </div>
      <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
 </form>
  {% endif %}
   <h5>Hints:</h5>
   <p>You can leave the 'Subtraction Words' blank.</p>
-     <p>Percy recognizes terms. For "Quality Assurance", type quality_assurance</p>
-     <p>Try Hardware + Software</p>
+   <p>Percy recognizes  multiple word phrases. For example: Java, "Quality Assurance"</p>
 </div>
 {% if success == 'True' %}
 <div class="container-fluid bg-grey text-center">

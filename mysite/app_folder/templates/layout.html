@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Percy - Sourcing Made Smarter</title>
+    <title>Percy</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -12,7 +12,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://d3js.org/d3.v3.js"></script>
-  <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+  <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script>
 </head>
 <body>
 <body id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">
@@ -34,39 +36,18 @@
             SEARCH TOOLS<span class="caret"></span></a>
           <ul class="dropdown-menu bg-blue">
             <li><a href="/related">RELATED WORDS</a></li>
-            <li><a href="/keywords">KEYWORD FINDER</a></li>
+            <li><a href="/keywords">SEMANTIC NETWORKS</a></li>
             <li><a href="/tf_idf">RESUME FINGERPRINTING</a></li>
-            <li><a href="/stemmed">WILD BOOLEANS</a> </li>
+            <li><a href="/thisplusthat">THIS PLUS THAT</a></li>
           </ul>
         </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">
-            DIVERSITY TOOLS<span class="caret"></span></a>
-          <ul class="dropdown-menu bg-blue">
-            <li><a href="/infer">INFER NAME</a></li>
-        <li><a href="/diversity">DIVERSITY SCORE</a></li>
-          </ul>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">
-            JUST FOR FUN<span class="caret"></span></a>
-          <ul class="dropdown-menu bg-blue">
-        <li><a href="/thisplusthat">THIS PLUS THAT</a></li>
-          </ul>
-        </li>
-
-
-
-
-
-
-
       </ul>
     </div>
   </div>
 </nav>
 <div class="jumbotron text-center">
   <h1>Percy</h1>
-  <p>A Neural Network Trained from Résumés</p>
+  <p>Data Science + Talent Acquisition </p>
 </div>
 <div id="content">{% block content %}{% endblock %}</div>
 <script>
