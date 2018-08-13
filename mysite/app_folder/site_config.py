@@ -21,6 +21,8 @@ class FConfig(object):
     lda_pmi_skills = os.path.join(basedir, 'resources{}lda_pmi_skills.npy').format(os.path.sep)
     dictionary_skills = os.path.join(basedir, 'resources{}dictionary_skills.model').format(os.path.sep)
     phraser = os.path.join(basedir, 'resources{}phrases.model').format(os.path.sep)
+    fingerprint_vec = os.path.join(basedir, 'resources{}fingerprint_vec.pkl').format(os.path.sep)
+    fingerprint_pop_occ = os.path.join(basedir, 'resources{}fingerprint_pop_occ.npy').format(os.path.sep)
 
     model = os.path.join(basedir, 'resources{}indeed_wrapper_lite'.format(os.path.sep))
     gram_path = os.path.join(basedir, 'resources{}bigram_model.model'.format(os.path.sep))
