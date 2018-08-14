@@ -99,11 +99,11 @@ class WordSims(object):
 
     def word_math_vec_(self, positive_words, negative_words=None):
         positive_words_ids = [self.idx.token2id.get(w) for w in positive_words]
-        positive_word_vec = np.sum([self.array[x] for x in positive_words_ids], axis=0)
+        positive_word_vec = np.sum([self.array[x] for x in positive_words_ids], axis=0) / len(positive_words)
         if not negative_words:
             return positive_word_vec
         negative_words_ids = [self.idx.token2id.get(w) for w in negative_words]
-        negative_word_vec = np.sum([self.array[x] for x in negative_words_ids], axis=0)
+        negative_word_vec = np.sum([self.array[x] for x in negative_words_ids], axis=0) / len(negative_words)
         result_vec = positive_word_vec - negative_word_vec
         return result_vec
 
@@ -156,11 +156,11 @@ class SkillSims(object):
 
     def word_math_vec_(self, positive_words, negative_words=None):
         positive_words_ids = [self.idx.token2id.get(w) for w in positive_words]
-        positive_word_vec = np.sum([self.array[x] for x in positive_words_ids], axis=0)
+        positive_word_vec = np.sum([self.array[x] for x in positive_words_ids], axis=0) / len(positive_words)
         if not negative_words:
             return positive_word_vec
         negative_words_ids = [self.idx.token2id.get(w) for w in negative_words]
-        negative_word_vec = np.sum([self.array[x] for x in negative_words_ids], axis=0)
+        negative_word_vec = np.sum([self.array[x] for x in negative_words_ids], axis=0) / len(negative_words)
         result_vec = positive_word_vec - negative_word_vec
         return result_vec
 
