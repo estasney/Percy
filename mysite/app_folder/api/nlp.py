@@ -4,7 +4,6 @@ import nltk
 
 
 class SynonymParser(object):
-
     """
     Checks message and returns true if message indicates checking for synonyms
 
@@ -38,7 +37,6 @@ class SynonymParser(object):
     @property
     def grammar(self):
         return "GRAMMAR: {<IN><NN>*<VB>*<JJ>*}"
-
 
     @property
     def default_pos_(self):
@@ -113,6 +111,7 @@ class SynonymParser(object):
             if result['success'] is True:
                 preamble = self.make_preamble_(result['entity'])
                 sims = self.convey_results_(result['scores'])
+                preamble += ": {}"
                 message.append(preamble.format(sims))
             else:
                 preamble = self.make_preamble_(result['entity'], success=False)
