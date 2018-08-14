@@ -72,8 +72,12 @@ def get_colors(graph):
     return color_merged
 
 
-def compute_colors_dict(color_idx, low="palegreen", high="red"):
-    steps = max(color_idx.values()) + 1
+def compute_colors_dict(edge_dict, low="palegreen", high="red"):
+    # Get number of unique values in edge_dict
+    step_values = list(set(edge_dict.values()))
+    step_values.sort()
+    steps = len(step_values)
+
     low = Color(low)
     high = Color(high)
     color_list = list(low.range_to(high, steps))
@@ -84,8 +88,28 @@ def compute_colors_dict(color_idx, low="palegreen", high="red"):
         for r in rgb:
             rgb_web.append(int(r * 255))
         rgb_web = tuple(rgb_web)
-        color_dict[i] = rgb_web
+        # Lookup ith value
+        color_dict[step_values[i]] = rgb_web
     return color_dict
+
+def get_n_edges(graph):
+    edge_dict = {}
+    for n in graph.nodes:
+        edge_dict[n] = len(graph.adj[n].keys())
+
+    normed_dict = normalize_n_edges(edge_dict)
+    return normed_dict
+
+def normalize_n_edges(edge_dict):
+    min_edges, max_edges = min(edge_dict.values()), max(edge_dict.values())
+    new_min, new_max = 1, 5
+    normed_dict = {}
+    for node, n_edges in edge_dict.items():
+        normed_edges = (new_max - new_min) / (max_edges - min_edges) * (n_edges - min_edges) + new_min
+        normed_dict[node] = normed_edges
+
+    return normed_dict
+
 
 
 def bright_color():

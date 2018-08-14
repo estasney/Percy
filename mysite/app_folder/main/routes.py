@@ -87,14 +87,19 @@ def kw_data():
 
     lem_text = text_tools.process_graph_text(raw_text)
     graph = graph_tools.make_graph(lem_text, window_size)
-
-    # Assign each word a color
-    color_dict = graph_tools.get_colors(graph)
+    edge_dict = graph_tools.get_n_edges(graph)
+    base_color = graph_tools.compute_colors_dict(edge_dict)
+    color_dict = {}
+    for word, edge in edge_dict.items():
+        word_color = base_color[edge]
+        color_dict[word] = word_color
     data = []
     for edge in graph.edges():
         source, target = edge
         source_color, target_color = color_dict.get(source, (0, 0, 255)), color_dict.get(target, (0, 0, 255))
-        td = {'source': source, 'target': target, 'source_color': source_color, 'target_color': target_color}
+        source_n_links, target_n_links = edge_dict.get(source, 1), edge_dict.get(target, 1)
+        td = {'source': source, 'target': target, 'source_color': source_color, 'target_color': target_color,
+              'source_n_links': source_n_links, 'target_n_links': target_n_links}
         data.append(td)
 
     return jsonify({'data': data})

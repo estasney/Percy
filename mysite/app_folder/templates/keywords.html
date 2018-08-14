@@ -60,8 +60,17 @@ var graph = {
 };
 
 
-var force = d3.layout.force().size([width, height]).linkDistance(45).charge(-400);
-
+var force = d3.layout.force().size([width, height])
+.linkDistance(function(d) {
+        var source_w = d.source_n_links * 30;
+        var target_w = d.target_n_links * 30;
+        return Math.max(source_w, target_w);
+        })
+.charge(function(d) {
+        var x = (d.node_n_links * -300);
+        return x;
+        })
+.gravity(0.15);
 var svg = d3.select('body').append('svg')
   .attr('width', width)
   .attr('height', height);
@@ -110,10 +119,12 @@ function newLinks(search_data) {
     d.source = graph.nodes[d.source] || (graph.nodes[d.source] = {
       node_text: d.source.valueOf(),
       node_color: d.source_color,
+      node_n_links: d.source_n_links,
     });
     d.target = graph.nodes[d.target] || (graph.nodes[d.target.valueOf()] = {
       node_text: d.target.valueOf(),
       node_color: d.target_color,
+      node_n_links: d.target_n_links
     });
   }
   for (var i = 0, len = search_data.length; i < len; i++) {
@@ -151,14 +162,15 @@ function startForce() {
     .data(force.nodes())
     .enter().append("g")
     .attr("class", "node")
-
     .on("mouseover", mouseover)
     .on("mouseout", mouseout)
     .on("click", click)
     .call(force.drag);
 
   node.append("circle")
-    .attr("r", r_base)
+    .attr("r", function(d) {
+        return r_base * d.node_n_links;
+        })
     .style("fill", function(d) {
       function componentToHex(c) {
         var hex = c.toString(16);
@@ -174,9 +186,10 @@ function startForce() {
 
   node.append("text")
     .attr("x", 0)
+    .attr("y", 10)
     .attr("dy", ".35em")
     .style("fill", "#333")
-    .style("font", "11px")
+    .style("font", "13px")
     .style("font-family", "OpenSans")
     .text(function(d) {
       return d.node_text;
@@ -205,7 +218,7 @@ function startForce() {
     d3.select(this).select("circle").transition()
       .duration(750)
       .attr("r", function(d) {
-        return r_base * 1.5;
+        return r_base * d.node_n_links * 1.25;
       });
 
   }
@@ -214,7 +227,7 @@ function startForce() {
     d3.select(this).select("circle").transition()
       .duration(750)
       .attr("r", function(d) {
-        return r_base;
+        return r_base * d.node_n_links;
       });
   }
   // action to take on mouse click
@@ -230,7 +243,7 @@ function startForce() {
       .duration(750)
       .style("fill", "#049FD9")
       .attr("r", function(d) {
-        return 10 * 1.5;
+        return d.node_n_links * 1.25;
       });
 
   }
