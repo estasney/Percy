@@ -51,7 +51,7 @@ STOPWORDS = frozenset(
      'yet', 'you', "you'd", "you'll", "you're", "you've", 'your', 'yours', 'yourself', 'yourselves',
      'experience', "jan", "january" "feb", "february", "mar", "march", "apr", "april", "may", "jun", "june",
      "jul", "july", "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec",
-     "december"])
+     "december", "team", "level", "work"])
 
 
 def char_search(s, search=char_search_):
