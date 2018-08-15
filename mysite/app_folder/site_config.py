@@ -28,6 +28,8 @@ class FConfig(object):
     fingerprint_vec = os.path.join(basedir, 'resources{}fingerprint_vec.pkl').format(os.path.sep)
     fingerprint_pop_occ = os.path.join(basedir, 'resources{}fingerprint_pop_occ.npy').format(os.path.sep)
 
+    namesearch = os.path.join(basedir, 'resources{}namesearch.pkl').format(os.path.sep)
+
     bot_key = load_p(os.path.join(basedir, 'resources{}bot_key.pkl'.format(os.path.sep)))
     bot_room_id = load_p(os.path.join(basedir, 'resources{}bot_room_id.pkl'.format(os.path.sep)))
     message_api_f = "https://api.ciscospark.com/v1/messages/{}"
