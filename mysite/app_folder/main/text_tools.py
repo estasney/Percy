@@ -12,7 +12,7 @@ import nltk
 char_search_ = re.compile(r"[^\u0020\u0027\u002c-\u002e\u0030-\u0039\u0041-\u005a\u0061-\u007a]")
 strip_multi_ws_ = re.compile(r"( {2,})")
 quoted_terms = re.compile(r"(?:'|\")([A-z ]+)(?:'|\")")
-word_re = re.compile(r"(\w+)")
+word_re = re.compile(r"([\w|-]+)")
 
 STOPWORDS = frozenset(
     ['a', 'about', 'above', 'across', 'after', 'afterwards', 'again', 'against', 'ain', 'all', 'almost',
@@ -51,7 +51,7 @@ STOPWORDS = frozenset(
      'yet', 'you', "you'd", "you'll", "you're", "you've", 'your', 'yours', 'yourself', 'yourselves',
      'experience', "jan", "january" "feb", "february", "mar", "march", "apr", "april", "may", "jun", "june",
      "jul", "july", "aug", "august", "sep", "sept", "september", "oct", "october", "nov", "november", "dec",
-     "december"])
+     "december", "team", "level", "work"])
 
 
 def char_search(s, search=char_search_):
@@ -185,9 +185,9 @@ def process_graph_text(text, stopwords=STOPWORDS):
 def parse_form_text(text):
     """
     Given a string such as :
-        Cloud, Software, "Quality Assurance"
+        Cloud, Software, "Quality Assurance", pre-sale
     return text as:
-        ['cloud', 'software', 'quality_assurance']
+        ['cloud', 'software', 'quality_assurance', pre-sale]
     """
     quoted_form_terms = quoted_terms.findall(text)
     text = quoted_terms.sub("", text)

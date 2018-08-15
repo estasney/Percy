@@ -4,7 +4,6 @@ import nltk
 
 
 class SynonymParser(object):
-
     """
     Checks message and returns true if message indicates checking for synonyms
 
@@ -39,7 +38,6 @@ class SynonymParser(object):
     def grammar(self):
         return "GRAMMAR: {<IN><NN>*<VB>*<JJ>*}"
 
-
     @property
     def default_pos_(self):
         return ['NN', 'JJ', 'VB']
@@ -65,27 +63,20 @@ class SynonymParser(object):
         pos_tokens = nltk.pos_tag(tokens)
 
         tree = chunker.parse(pos_tokens)
-        words = []
+        entities = []
 
         for subtree in tree.subtrees():
             if subtree.label() == "GRAMMAR":
                 matched_words = list(filter(self.tag_match, subtree.leaves()))
-                words.append(matched_words)
+                entities.extend(matched_words)
 
-        def filter_tag(token_tag, pos_filter=self.default_pos_):
-            tag = token_tag[1]
-            if any([tag.startswith(pf) for pf in pos_filter]):
-                    return True
-            return False
-
-        entities = list(filter(filter_tag, words))  # Filter by POS
         entities = [word for word, tag in entities]  # Remove tag
         return entities
 
     def run_query(self, entities, topn=20):
         results = []
         for e in entities:
-            sims_success, sim_scores = word_sims(e)
+            sims_success, sim_scores = word_sims(e, query_scope='words')
             if sims_success:
                 sim_scores = sim_scores[:topn]
             else:
@@ -120,6 +111,7 @@ class SynonymParser(object):
             if result['success'] is True:
                 preamble = self.make_preamble_(result['entity'])
                 sims = self.convey_results_(result['scores'])
+                preamble += ": {}"
                 message.append(preamble.format(sims))
             else:
                 preamble = self.make_preamble_(result['entity'], success=False)
