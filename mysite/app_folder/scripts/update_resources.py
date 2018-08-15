@@ -33,6 +33,7 @@ Words
 
 """
 
+script_start = datetime.now()
 
 def _apply_df(args):
     df, func, num, kwargs = args
@@ -76,15 +77,12 @@ def flatten_sents(x):
 
 if __name__ == "__main__":
     df = pd.read_csv(r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv")
-    df.dropna(subset=['summary', 'skills'], inplace=True)
-    if 'lang' not in df.columns:
-        start = datetime.now()
-        print("Starting Language Detection")
-        df['lang'] = apply_by_multiprocessing(df, lang_detect, axis=1, workers=8)
-        elapsed = datetime.now() - start
-        print("Finished Language Detection in {} seconds".format(elapsed.seconds))
-        df.to_csv(r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv")
+    df.dropna(subset=['summary'], inplace=True)
+    original_count = len(df)
+    df.fillna("", inplace=True)
     df = df.loc[df['lang'] == 'en']
+    print("Corpus loaded with {} records".format(original_count))
+    print("Dropping {} non english records".format(original_count - len(df)))
     del df['lang']
     print("Preprocessing Text into Sentences")
     start = datetime.now()
@@ -210,6 +208,7 @@ del cnt
 SKILLS
 
 """
+df = df.loc[df['skills'] != ""]
 df['skills'] = df['skills'].apply(lambda x: x.lower().split(", "))
 
 
@@ -308,3 +307,8 @@ phrase = Phraser(phrase_model)
 phrase.save(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/phrases.model")
 elapsed = datetime.now() - start
 print("Finished Phrase Model in {} minutes".format(elapsed.seconds // 60))
+
+script_elapsed = (datetime.now() - script_start).seconds
+script_elapsed_minutes = script_elapsed // 60
+script_elapsed_seconds = script_elapsed % 60
+print("Finished updating resources in {} : {}".format(script_elapsed_minutes, script_elapsed_seconds))
