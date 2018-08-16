@@ -1,7 +1,6 @@
 from flask import render_template, request, jsonify, abort
-from app_folder.main import neural_tools
-from app_folder.main import bp
-from app_folder.main import graph_tools, text_tools, fingerprint_tools, autocomplete_tools
+
+from app_folder.main import graph_tools, text_tools, fingerprint_tools, autocomplete_tools, neural_tools, bp, upload_tools
 
 
 @bp.route('/autocomplete', methods=['GET'])
@@ -75,6 +74,18 @@ def tfidf():
         fp = fingerprint_tools.Fingerprint()
         scored_tfidf = fp.fingerprint(user_input)
         return render_template('tf_idf.html', success='True', original=user_input, result=scored_tfidf)
+
+@bp.route('/diversity', methods=['GET', 'POST'])
+def infer_diversity():
+    if request.method == "GET":
+        return render_template('diversity_score.html')
+
+    file_upload = upload_tools.UploadManager(request)
+
+    if not file_upload.status:
+        return render_template('diversity_score.html', success='False')
+
+    file_contents = file_upload.file_data()
 
 
 @bp.route('/kw_data', methods=['POST'])

@@ -74,3 +74,29 @@ class NameSearch(object):
         results = [r for r in results if r is not False]
 
         return results
+
+    def priority_search(self, item):
+        """
+        :param item: first name
+        :return: result from highest priority dataset
+        """
+
+        results = self.search(item)
+        if not results:
+            return []
+        results.sort(key=lambda x: x[1][1])
+        top_result = results[0][0]
+        return top_result
+
+
+def search_data(names):
+    ns = load_ns()
+
+    # lowercase all names
+    lnames = map(lambda x: x.lower(), names)
+    results = map(ns.priority_search, lnames)
+    knowns = list(filter(lambda x: x, results))
+    unknown = len(names) - len(knowns)
+    male = len([g for g in knowns if g == "M"])
+    female = len(knowns) - male
+    return {'total': len(names), 'male': male, 'female': female, 'unknown': unknown}
