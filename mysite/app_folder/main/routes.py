@@ -1,6 +1,7 @@
 from flask import render_template, request, jsonify, abort
 
-from app_folder.main import graph_tools, text_tools, fingerprint_tools, autocomplete_tools, neural_tools, bp, upload_tools
+from app_folder.main import graph_tools, text_tools, fingerprint_tools, autocomplete_tools, neural_tools, bp,\
+    upload_tools, diversity_tools
 
 
 @bp.route('/autocomplete', methods=['GET'])
@@ -85,7 +86,23 @@ def infer_diversity():
     if not file_upload.status:
         return render_template('diversity_score.html', success='False')
 
-    file_contents = file_upload.file_data()
+    names_list = file_upload.file_data()
+
+    results = diversity_tools.search_data(names_list)
+
+    """
+    Returns a dict with
+        :total - the number of names
+        :male - n male
+        :female - n female
+        :unknown - n unknown
+        :95 - +/- for 95% confidence
+        :99 - +/- for 99% confidence
+        :ratio_female - n female / total
+    """
+    return render_template('diversity_score.html', n_known=results['known'], total=results['total'],
+                           r_female=results['ratio_female'], n_unknown=results['unknown'], ci_95=results['95'],
+                           ci_99=results['99'], success='True', n_male=results['male'], n_female=results['female'])
 
 
 @bp.route('/kw_data', methods=['POST'])

@@ -16,17 +16,22 @@
     </thead>
     <tbody>
     <tr>
-        <td> {{ total_count }} </td>
-        <td> {{ d_male_count }} </td>
-        <td> {{ d_female_count }} </td>
-        <td> {{ d_unk_count }} </td>
+        <td> {{ total }} </td>
+        <td> {{ n_male }} </td>
+        <td> {{ n_female }} </td>
+        <td> {{ n_unknown }} </td>
       </tr>
+      </tbody>
     </table>
-    <h2>Statistically, since {{ d_known }} of {{ total_count }} names are known...</h2>
+    <h2>Statistically, since {{ n_known }} of {{ total }} names are known...</h2>
     <br>
-    <h3>And of this group, {{ d_female_percent }} are Female...</h3>
+    <h3>And of this group, {{ "{:.2%}".format(r_female) }} are Female...</h3>
     <br>
-    <h3>The likelihood of the remaining, {{ d_unk_count }}, names having the same M:F ratio is 95% +/- {{confidence_interval}} </h3>
+    <h3>The likelihood of the remaining, {{ n_unknown }}, names having the same M:F ratio is... </h3>
+    <br>
+    <h3>95% +/- {{"{:.2%}".format(ci_95)}}</h3>
+    <br>
+    <h3>99% +/- {{"{:.2%}".format(ci_99)}}</h3>
 </div>
 
 {% endif %}
@@ -44,8 +49,7 @@
 <form class="form-inline" action="/diversity" method="POST" enctype="multipart/form-data">
 		<input type="file" name="file" class="form-control" required="" size="50">
 		<input class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Header for First Name" name="header_name">
-        <label class="form-check-label">
-            <input class="form-check-input" name="use_global_names" type="checkbox" checked>Use Global Name Database?</label>
+    
 		<button class="btn btn-danger" name="button" value="Upload">Score Diversity</button>
 
 

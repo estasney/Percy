@@ -11,7 +11,7 @@ def load_p(fn):
 class Config(object):
     DEBUG = True
     DEBUG_TB_TEMPLATE_EDITOR_ENABLED = True
-    UPLOAD_FOLDER = os.path.join(basedir, 'resources/uploads')
+    UPLOAD_FOLDER = os.path.join(basedir, 'resources{}uploads').format(os.path.sep)
     SECRET_KEY = 'never-guess-this'
 
 

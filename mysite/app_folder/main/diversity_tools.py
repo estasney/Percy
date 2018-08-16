@@ -104,6 +104,8 @@ def search_data(names):
     data = {'total': len(names), 'male': male, 'female': female, 'unknown': unknown}
     ci = search_confidence(data)
     data['95'], data['99'], data['ratio_female'] = ci['95'], ci['99'], ci['mean']
+    data['known'] = len(knowns)
+    return data
 
 
 def search_confidence(data):
