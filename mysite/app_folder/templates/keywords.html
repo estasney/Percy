@@ -119,6 +119,7 @@ function appendSearch(clicked_term) {
 }
 
 function getData(term, data_type, limit, is_update) {
+  $.LoadingOverlay("show");
   $.ajax({
     type: 'POST',
     async: true,
@@ -136,6 +137,7 @@ function getData(term, data_type, limit, is_update) {
       xhr.setRequestHeader('Data-Type', data_type);
     },
     success: function(data) {
+    $.LoadingOverlay("hide");
       var json_data = JSON.stringify(data);
       var search_data = JSON.parse(json_data).data;
       if (is_update == true) {
@@ -282,9 +284,8 @@ function startForce() {
 
 
 }
-
-
-
-
-        </script>
-        {% endblock %}
+</script>
+      {% endblock %}
+      {% block js_script %}
+      <script src="https://estasney.pythonanywhere.com/js/loadingoverlay.min.js"></script>
+      {% endblock %}
