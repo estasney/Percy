@@ -2,6 +2,8 @@ from collections import OrderedDict
 from operator import itemgetter
 from app_folder.site_config import FConfig
 import pickle
+import numpy as np
+from scipy.stats import t
 
 
 def load_ns(fp=FConfig.namesearch):
@@ -92,11 +94,41 @@ class NameSearch(object):
 def search_data(names):
     ns = load_ns()
 
-    # lowercase all names
-    lnames = map(lambda x: x.lower(), names)
+    # lowercase, strip all names
+    lnames = map(lambda x: x.lower().strip(), names)
     results = map(ns.priority_search, lnames)
     knowns = list(filter(lambda x: x, results))
     unknown = len(names) - len(knowns)
     male = len([g for g in knowns if g == "M"])
     female = len(knowns) - male
-    return {'total': len(names), 'male': male, 'female': female, 'unknown': unknown}
+    data = {'total': len(names), 'male': male, 'female': female, 'unknown': unknown}
+    ci = search_confidence(data)
+    data['95'], data['99'], data['ratio_female'] = ci['95'], ci['99'], ci['mean']
+
+
+def search_confidence(data):
+    male, female, total = data['male'], data['female'], data['total']
+    # Replace M with 0, F with 1
+    vec = np.concatenate([np.zeros(male), np.ones(female)])
+    s_std = np.std(vec)
+    s_mean = np.mean(vec)
+    degrees_freedom = total - vec.shape[0] - 1
+
+    # magic coefficient for 95%, 99% confidence, double tail
+    t_value_95 = t.ppf(1 - 0.025, degrees_freedom)
+    t_value_99 = t.ppf(1 - 0.005, degrees_freedom)
+
+    # Calculate plus and minus
+    # Standard deviation divided by sqrt of sample size
+    a = s_std / np.sqrt(vec.shape[0])
+
+    # Sqrt of (Population - Sample Size) / (Population - 1)
+    b = np.sqrt((total - vec.shape[0]) / (total - 1))
+
+    ci_95 = t_value_95 * a * b
+    ci_99 = t_value_99 * a * b
+    return {'95': ci_95, '99': ci_99, 'mean': s_mean}
+
+
+
+
