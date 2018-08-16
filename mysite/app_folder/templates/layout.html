@@ -4,6 +4,21 @@
     <title>Percy</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+     (function() {
+   var current_url = window.location.href;
+   if (current_url.indexOf("https") !== -1) {
+     return
+   } else {
+     if (current_url.indexOf("5000") !== -1) {
+     	return
+     } else {
+       current_url = current_url.replace(/http:/g, "https:");
+       window.location.href = current_url;
+     }
+   }
+ })()
+  </script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mainpage.css') }}">
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
