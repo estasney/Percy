@@ -1,61 +1,101 @@
 {% extends "layout.html" %}
 {% block content %}
 {% include 'partials/helps/helps_thisplusthat.html' %}
- <div class="container-fluid text-center">
+ <div class="container text-center">
      <h3>Let's Try Some Word Equations</h3>
  {% if success == 'True' %}
- <form class="form-inline" action="/thisplusthat" method="POST">
-  <label class="sr-only" for="word1input">Word 1</label>
-     <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word1" id="word1input" value="{{word_one}}">
-  <operator>+</operator>
-  <label class="sr-only" for="word2input">Word 2</label>
-     <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word2" id="word2input" value="{{word_two}}">
-  <operator>-</operator>
-    <label class="sr-only" for="word3input">{{ word_three }}</label>
-    <input type="text" class="subtraction-word form-control mb-2 mr-sm-2 mb-sm-0" name="word3" id="word3input" value="{{word_three}}">
-    <operator>=</operator>
-    <br>
-    <br>
-    <button type="query" name="button" value="math" class="btn btn-danger">Ask Percy</button>
+ <form class="form" action="/thisplusthat" method="POST">
+     <div class="form-group ">
+       
+        <label for="pos_words">Add Words Together</label>
+        <input type="text" class="addition-word form-control mb2" name="pwords" id="pos_words" value="{{pos_words}}">
+       
+    </div>
+     <div class="form-group">
+         <label for="pos_words">Subtract These Words</label>
+        <input type="text" class="subtraction-word form-control" name="negwords" id="neg_words" value="{{neg_words}}">
+     </div>
+   <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="radio">
+                <label>
+                    {% if scope == "words" %}
+                    <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    {% else %}
+                    <input type="radio" name="scope" id="wordsradio" value="words">
+                    {% endif %}
+                    Calculate Words
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    {% if scope == "skills" %}
+                    <input type="radio" name="scope" id="skillsradio" value="skills" checked>
+                    {% else %}
+                    <input type="radio" name="scope" id="skillsradio" value="skills">
+                    {% endif %}
+                  Calculate Skills
+                </label>
+            </div>
+        </div>
+    </div>
+     <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
 </form>
  {% else %}
-     <form class="form-inline" action="/thisplusthat" method="POST">
-  <label class="sr-only" for="word1input">Word 1</label>
-  <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word1" id="word1input">
-  <operator>+</operator>
-  <label class="sr-only" for="word2input">Word 2</label>
-  <input type="text" class="addition-word form-control mb-2 mr-sm-2 mb-sm-0" name="word2" id="word2input">
-  <operator>-</operator>
-    <label class="sr-only" for="word3input">Word 3</label>
-    <input type="text" class="subtraction-word form-control mb-2 mr-sm-2 mb-sm-0" name="word3" id="word3input">
-    <operator>=</operator>
-    <br>
-    <br>
-    <button type="query" name="button" value="math" class="btn btn-danger">Ask Percy</button>
+     <form class="form" action="/thisplusthat" method="POST">
+     <div class="form-group">
+        <label for="pos_words">Add Words Together</label>
+        <input type="text" class="addition-word form-control" name="pwords" id="pos_words" value="" placeholder="Hardware, Software">
+    </div>
+     <div class="form-group">
+         <label for="neg_words">Subtract These Words</label>
+        <input type="text" class="subtraction-word form-control" name="negwords" id="neg_words" value="">
+     </div>
+       <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    Calculate Words
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="skillsradio" value="skills">
+                  Calculate Skills
+                </label>
+            </div>
+        </div>
+    </div>
+     <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
 </form>
  {% endif %}
   <h5>Hints:</h5>
-  <p>You can leave the third box (word subtraction) blank.</p>
-     <p>Percy recognizes terms. For "Quality Assurance", type quality_assurance</p>
-  <p>Try Hardware + Software</p>
+  <p>You can leave the 'Subtraction Words' blank.</p>
+   <p>Percy recognizes  multiple word phrases. For example: Java, "Quality Assurance"</p>
 </div>
 {% if success == 'True' %}
-<div class="container-fluid bg-grey text-center">
-  <h2>According to my calculations...</h2>
-  <h3>{{user_equation}}</h3>
-<table class="table">
+<div class="container bg-grey">
+    {% if unknown_words is not none and unknown_words != "" %}
+    <h2 class="text-center">I removed some words outside of my vocabulary</h2>
+    <h3 class="text-center">{{unknown_words}}</h3>
+    {% endif %}
+
+  <h2 class="text-center">According to my calculations...</h2>
+  <h3 class="text-center">{{user_equation}}</h3>
+<table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-search="true">
     <thead>
       <tr>
-        <th class="text-center">Closest Match</th>
-          <th class="text-center">Similarity Score</th>
+         <th data-field="word" data-sortable="true">Closest Match</th>
+          <th data-field="score" data-sortable="true">Similarity Score</th>
 
       </tr>
     </thead>
     <tbody>
-        {% for key, value in result.items() %}
+        {% for word, score in result %}
       <tr>
-        <td> {{ key }} </td>
-        <td> {{ value }} </td>
+        <td> {{ word }} </td>
+        <td> {{ score }} </td>
       </tr>
         {% endfor %}
       </tr>
@@ -64,9 +104,12 @@
 </div>
 {% elif success == 'False' %}
 <div class="container-fluid">
-    <h2>Oops!</h2>
-    <p>It would appear that the word <strong>{{ result }}</strong> is not in my vocabulary.</p>
+    <h2>I don't know!</h2>
+
 </div>
 {% else %}
 {% endif %}
+{% endblock %}
+{% block js_script %}
+{% include "datatables.html" %}
 {% endblock %}

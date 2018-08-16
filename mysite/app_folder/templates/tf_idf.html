@@ -4,15 +4,8 @@
 {% if success == 'True' %}
 <div class="form-group text-center">
     <form action="/tf_idf" method="POST">
-        <label for="tfidf">Paste in a Resume to Calculate TF-IDF</label>
+        <label for="tfidf">Paste in a Resume to Calculate Most Informative Words</label>
         <textarea class="form-control" id="tfidf_success" name="tfidf_text" rows="5">{{ original }}</textarea>
-        <label class="form-check-label">
-            <input class="form-check-input" data-toggle="tooltip" title="Combine words into phrases, where detected"
-                   name="gram_tokens" type="checkbox">Phrase Detection?</label>
-        <label class="form-check-label">
-            <input class="form-check-input" data-toggle="tooltip"
-                   title="Standardize words so that words such as 'develop' and 'developing' are considered equal"
-                   name="lem_tokens" type="checkbox">Lemmatize Words?</label>
         <div class="input-group-btn">
             <button class="btn btn-danger" name="button" type="tfidf" value="tfidf">Fingerprint</button>
         </div>
@@ -21,15 +14,8 @@
 {% else %}
 <div class="form-group text-center">
     <form action="/tf_idf" method="POST">
-        <label for="tfidf">Paste in a Resume to Calculate TF-IDF</label>
+        <label for="tfidf">Paste in a Resume to Calculate Most Informative Words</label>
         <textarea class="form-control" id="tfidf" name="tfidf_text" rows="5"></textarea>
-        <label class="form-check-label">
-            <input class="form-check-input" data-toggle="tooltip" title="Combine words into phrases, where detected"
-               name="gram_tokens" type="checkbox">Phrase Detection?</label>
-        <label class="form-check-label">
-            <input class="form-check-input" data-toggle="tooltip"
-                   title="Standardize words so that words such as 'develop' and 'developing' are considered equal"
-                   name="lem_tokens" type="checkbox">Lemmatize Words?</label>
         <div class="input-group-btn">
             <button class="btn btn-danger" name="button" type="tfidf" value="tfidf">Fingerprint</button>
         </div>
@@ -38,7 +24,7 @@
 {% endif %}
 {% if success == 'True' %}
 <div class="container-fluid bg-grey text-center">
-    <h2>Highest Scoring Words</h2>
+    <h2>These words seem to stand out</h2>
 
     <table class="table">
         <thead>

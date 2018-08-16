@@ -6,11 +6,7 @@
       <br>
       <p>If you build out a search string from an ideal résumé it is easy to be too specific and you risk missing your next ideal résumé.</p>
       <br>
-      <p>"Resume Fingerprinting" uses a simple but highly effective NLP technique known as Term - Frequency, Inverse Document Frequency</p>
-      <br>
-      <p>When you enter an example résumé, Percy runs a tally of the number of times a word appears in your document.
-          Each of these tallies is then divided by the total number of words. (To accommodate documents of any length). <i>Then</i>
-      Percy makes use of its résumé training data to calculate "Inverse Document Frequency"</p>
+      <p>"Resume Fingerprinting" computes the probability of each word in your resume and compares it to a large body of résumés. Those with the greatest difference in probability are ranked highest </p>
       <br>
       <div class="panel-group">
             <div class="panel-heading">
@@ -21,8 +17,8 @@
         </div>
       <div id="collapse1" class="panel-collapse collapse">
             <ul class="list-group">
-                <li class="list-group-item">The more frequent a word is used in a résumé, the higher its score.</li>
-                <li class="list-group-item">The more frequent a word is used in all résumés, the lower its score.</li>
+                <li class="list-group-item">Words like "purple", "LTE", "numpy" score high because they occur infrequently</li>
+                <li class="list-group-item">Words like "experience", "develop", "manage" score low because they occur frequently</li>
             </ul>
         </div>
   </div>

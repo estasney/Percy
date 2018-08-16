@@ -2,43 +2,82 @@
 {% block content %}
 {% include 'partials/helps/helps_related.html' %}
 {% if success == 'True' %}
+
  <form action="/related" method="POST">
     <div class="row">
       <div class="col-lg-4 col-lg-offset-4">
       <div class="input-group">
-      <input type="query" name="query" class="form-control" size="50" value="{{original}}" required>
+      <input id="related_autocomplete" type="query" name="q" class="form-control ui-autocomplete-input" size="50" value="{{original}}" required>
       <div class="input-group-btn">
         <button type="query" name="button" value="query" class="btn btn-danger">Ask Percy</button>
       </div>
       </div>
       </div>
       </div>
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="radio">
+                <label>
+                    {% if scope == "words" %}
+                    <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    {% else %}
+                    <input type="radio" name="scope" id="wordsradio" value="words">
+                    {% endif %}
+                    Similar Words
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    {% if scope == "skills" %}
+                    <input type="radio" name="scope" id="skillsradio" value="skills" checked>
+                    {% else %}
+                    <input type="radio" name="scope" id="skillsradio" value="skills">
+                    {% endif %}
+                  Similar Skills
+                </label>
+            </div>
+        </div>
     </div>
   </form>
 {% else %}
- <form action="/related" method="POST">
+<form action="/related" method="POST">
     <div class="row">
       <div class="col-lg-4 col-lg-offset-4">
       <div class="input-group">
-      <input type="query" name="query" class="form-control" size="50" placeholder="Percy...what are some similar words to...?" required>
+      <input id="related_autocomplete" type="query" name="q" class="form-control ui-autocomplete-input" size="50" required>
       <div class="input-group-btn">
         <button type="query" name="button" value="query" class="btn btn-danger">Ask Percy</button>
       </div>
       </div>
       </div>
       </div>
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    Similar Words
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="skillsradio" value="skills">
+                  Similar Skills
+                </label>
+            </div>
+        </div>
     </div>
   </form>
 {% endif %}
 {% if success == 'True' %}
-<div class="container-fluid bg-grey text-center">
-  <h2> {{title_h2}} </h2>
-  <p>According to my calculations...</p>
-  <table class="table">
+<div class="container bg-grey">
+ <h2 class="text-center"> {{title_h2}} </h2>
+  <p class="text-center">According to my calculations...</p>
+  <table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-pagination="true" data-page-size="25" data-search="true">
     <thead>
       <tr>
-        <th class="text-center">Word</th>
-        <th class="text-center">{{title_th}}</th>
+        <th data-field="word" data-sortable="true">Word</th>
+        <th data-field="score" data-sortable="true">{{title_th}}</th>
       </tr>
     </thead>
     <tbody>
@@ -48,7 +87,6 @@
         <td> {{ value }} </td>
       </tr>
         {% endfor %}
-      </tr>
     </tbody>
   </table>
 </div>
@@ -59,4 +97,53 @@
 </div>
 {% else %}
 {% endif %}
+
+<script>
+    $(function() {
+  // set words to autocomplete
+  $.ajax({
+    url: '{{ url_for("main.autocomplete") }}'
+  }).done(function(data) {
+    $('#related_autocomplete').autocomplete({
+      source: data,
+      minLength: 2
+    });
+  });
+
+
+  function radioClicked(e) {
+    var radioId = e.target.id;
+    if (radioId == 'skillsradio') {
+      $("#related_autocomplete").autocomplete("destroy");
+      $.ajax({
+        url: '{{ url_for("main.autocomplete_skills") }}'
+      }).done(function(data) {
+        $('#related_autocomplete').autocomplete({
+          source: data,
+          minLength: 2
+        });
+      });
+    } else {
+    $("#related_autocomplete").autocomplete("destroy");
+      $.ajax({
+        url: '{{ url_for("main.autocomplete") }}'
+      }).done(function(data) {
+        $('#related_autocomplete').autocomplete({
+          source: data,
+          minLength: 2
+        });
+      });
+    }
+  }
+
+  $("#skillsradio").on('click', radioClicked);
+  $("#wordsradio").on('click', radioClicked);
+
+});
+
+</script>
+
+{% endblock %}
+{% block js_script %}
+{% include "datatables.html" %}
 {% endblock %}

@@ -18,253 +18,239 @@
                     <option>4</option>
                     <option>5</option>
                 </select>
-                <label>Phrase Detection</label>
-                <input id="phrase_check" type="checkbox" value="Yes">
             </div>
         </div>
 
         <script>
 var data_url = "/kw_data";
 
-var r_base = 4;
+var r_base = 6;
 $('#search').on('click', startSearch);
 $('#reset').on('click', restart);
 $('#reset').on('click', enableGo);
 $('#reset').on('click', clearGraph);
 
 function windowSize() {
-    var ws = document.getElementById('window_size');
-    return ws.options[ws.selectedIndex].value;
+  var ws = document.getElementById('window_size');
+  return ws.options[ws.selectedIndex].value;
 }
+
 function disableGo() {
   $('#search').addClass('disabled');
   $('#reset').removeClass('disabled');
-  }
+}
 
 function enableGo() {
-$('#search').removeClass('disabled');
+  $('#search').removeClass('disabled');
   $('#reset').addClass('disabled');
-  }
+}
 
-function clearGraph(){
+function clearGraph() {
   graph = {
     "nodes": {},
     "links": {}
-};
+  };
 }
 
 var width = window.outerWidth;
 var height = window.outerHeight;
 var graph = {
-    "nodes": {},
-    "links": {}
+  "nodes": {},
+  "links": {}
 };
 
 
-var force = d3.layout.force().size([width, height]).linkDistance(45).charge(-300);
-
+var force = d3.layout.force().size([width, height])
+.linkDistance(function(d) {
+        var source_w = d.source_n_links * 30;
+        var target_w = d.target_n_links * 30;
+        return Math.max(source_w, target_w);
+        })
+.charge(function(d) {
+        var x = (d.node_n_links * -300);
+        return x;
+        })
+.gravity(0.15);
 var svg = d3.select('body').append('svg')
-    .attr('width', width)
-    .attr('height', height);
+  .attr('width', width)
+  .attr('height', height);
 
 function startSearch() {
-    var search_term = $("#search_term").prop('value');
-    var window_size = windowSize();
-    var phrase_checked = $("#phrase_check").prop('checked');
-    getData(search_term, window_size, false, phrase_checked);
-    disableGo();
+  var search_term = $("#search_term").prop('value');
+  var window_size = windowSize();
+  getData(search_term, window_size, false);
+  disableGo();
 }
 
 function appendSearch(clicked_term) {
-    var limit_to = $('#limit_to').prop('value');
-    getData(clicked_term, limit_to, true);
+  var limit_to = $('#limit_to').prop('value');
+  getData(clicked_term, limit_to, true);
 }
 
-function getData(term, limit, is_update, phrase_checked) {
-    $.ajax({
-        type: 'POST',
-        async: true,
-        timeout: 10000,
-        url: data_url,
-        data: {
-            "raw_text": term,
-        },
-        dataType: 'json',
-        beforeSend: function(xhr) {
-            xhr.setRequestHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
-            xhr.setRequestHeader('Accept-Language', 'en-US,en;q=0.8');
-            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-            xhr.setRequestHeader('Window-Limit', limit);
-            xhr.setRequestHeader('Phrase-Checked', phrase_checked);
-        },
-        success: function(data) {
-            var json_data = JSON.stringify(data);
-            var search_data = JSON.parse(json_data).data;
-            if (is_update == true) {
-                restart();
-            }
-            newLinks(search_data);
-        }
-    });
+function getData(term, limit, is_update) {
+  $.ajax({
+    type: 'POST',
+    async: true,
+    timeout: 10000,
+    url: data_url,
+    data: {
+      "raw_text": term,
+    },
+    dataType: 'json',
+    beforeSend: function(xhr) {
+      xhr.setRequestHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
+      xhr.setRequestHeader('Accept-Language', 'en-US,en;q=0.8');
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      xhr.setRequestHeader('Window-Limit', limit);
+    },
+    success: function(data) {
+      var json_data = JSON.stringify(data);
+      var search_data = JSON.parse(json_data).data;
+      if (is_update == true) {
+        restart();
+      }
+      newLinks(search_data);
+    }
+  });
 }
 
 function newLinks(search_data) {
-    function updateNodes(d) {
-        d.source = graph.nodes[d.source] || (graph.nodes[d.source] = {
-            node_text: d.source.valueOf(),
-            node_color: d.source_color,
-            node_score: d.source_score
-        });
-        d.target = graph.nodes[d.target] || (graph.nodes[d.target.valueOf()] = {
-            node_text: d.target.valueOf(),
-            node_color: d.target_color,
-            node_score: d.target_score
-        });
-    }
-    for (var i = 0, len = search_data.length; i < len; i++) {
-        updateNodes(search_data[i]);
-    }
-    try {
-        graph.links = graph.links.concat(search_data);
-    } catch (e) {
-        graph.links = search_data;
-    }
-    console.log(graph.links);
-    startForce();
+  function updateNodes(d) {
+    d.source = graph.nodes[d.source] || (graph.nodes[d.source] = {
+      node_text: d.source.valueOf(),
+      node_color: d.source_color,
+      node_n_links: d.source_n_links,
+    });
+    d.target = graph.nodes[d.target] || (graph.nodes[d.target.valueOf()] = {
+      node_text: d.target.valueOf(),
+      node_color: d.target_color,
+      node_n_links: d.target_n_links
+    });
+  }
+  for (var i = 0, len = search_data.length; i < len; i++) {
+    updateNodes(search_data[i]);
+  }
+  try {
+    graph.links = graph.links.concat(search_data);
+  } catch (e) {
+    graph.links = search_data;
+  }
+  startForce();
 }
 
 function restart() {
-    svg.selectAll(".link").remove();
+  svg.selectAll(".link").remove();
 
-    svg.selectAll(".node").remove();
+  svg.selectAll(".node").remove();
 
 }
 
 function startForce() {
-    var links = graph.links;
-    var nodes = graph.nodes;
+  var links = graph.links;
+  var nodes = graph.nodes;
 
-    force.nodes(d3.values(nodes)).links(links)
-        .on("tick", tick)
-        .start();
+  force.nodes(d3.values(nodes)).links(links)
+    .on("tick", tick)
+    .start();
 
-    var link = svg.selectAll(".link")
-        .data(force.links())
-        .enter().append("line")
-        .attr("class", "link");
+  var link = svg.selectAll(".link")
+    .data(force.links())
+    .enter().append("line")
+    .attr("class", "link");
 
-    var node = svg.selectAll(".node")
-        .data(force.nodes())
-        .enter().append("g")
-        .attr("class", "node")
+  var node = svg.selectAll(".node")
+    .data(force.nodes())
+    .enter().append("g")
+    .attr("class", "node")
+    .on("mouseover", mouseover)
+    .on("mouseout", mouseout)
+    .on("click", click)
+    .call(force.drag);
 
-        .on("mouseover", mouseover)
-        .on("mouseout", mouseout)
-        .on("click", click)
-        .on("dblclick", dblclick)
-        .call(force.drag);
-
-    node.append("circle")
-        .attr("r", function(d) {
-          return d.node_score * r_base;
+  node.append("circle")
+    .attr("r", function(d) {
+        return r_base * d.node_n_links;
         })
-        .style("fill", function(d) {
-            function componentToHex(c) {
-                var hex = c.toString(16);
-                return hex.length == 1 ? "0" + hex : hex;
-            }
+    .style("fill", function(d) {
+      function componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
+      }
 
-            function rgbToHex(nc) {
-                return "#" + componentToHex(nc[0]) + componentToHex(nc[1]) + componentToHex(nc[2]);
-            }
-            return rgbToHex(d.node_color);
-        });
+      function rgbToHex(nc) {
+        return "#" + componentToHex(nc[0]) + componentToHex(nc[1]) + componentToHex(nc[2]);
+      }
+      return rgbToHex(d.node_color);
+    });
 
 
-    node.append("text")
-        .attr("x", 16)
-        .attr("dy", ".35em")
-        .style("fill", "#333")
-        .style("font", function(d) {
-          var n = 11 + (d.node_score)*1.2;
-          return n + "px serif";
-        })
-        .style("font-family", "OpenSans")
-        .text(function(d) {
-            return d.node_text;
-        });
+  node.append("text")
+    .attr("x", 0)
+    .attr("y", 10)
+    .attr("dy", ".35em")
+    .style("fill", "#333")
+    .style("font", "13px")
+    .style("font-family", "OpenSans")
+    .text(function(d) {
+      return d.node_text;
+    });
 
-    function tick() {
-        link.attr("x1", function(d) {
-                return d.source.x;
-            })
-            .attr("y1", function(d) {
-                return d.source.y;
-            })
-            .attr("x2", function(d) {
-                return d.target.x;
-            })
-            .attr("y2", function(d) {
-                return d.target.y;
-            });
+  function tick() {
+    link.attr("x1", function(d) {
+        return d.source.x;
+      })
+      .attr("y1", function(d) {
+        return d.source.y;
+      })
+      .attr("x2", function(d) {
+        return d.target.x;
+      })
+      .attr("y2", function(d) {
+        return d.target.y;
+      });
 
-        node.attr("transform", function(d) {
-            return "translate(" + d.x + "," + d.y + ")";
-        });
-    }
+    node.attr("transform", function(d) {
+      return "translate(" + d.x + "," + d.y + ")";
+    });
+  }
 
-    function mouseover() {
-        d3.select(this).select("circle").transition()
-            .duration(750)
-            .attr("r", function(d) {
-              return (d.node_score * r_base)*1.5;
-            });
+  function mouseover() {
+    d3.select(this).select("circle").transition()
+      .duration(750)
+      .attr("r", function(d) {
+        return r_base * d.node_n_links * 1.25;
+      });
 
-    }
+  }
 
-    function mouseout() {
-        d3.select(this).select("circle").transition()
-            .duration(750)
-            .attr("r", function(d) {
-              return (d.node_score * r_base);
-            });
-    }
-    // action to take on mouse click
-    function click() {
-        d3.select(this).select("text").transition()
-            .duration(750)
-            .attr("x", 22)
-            .style("stroke-width", ".5px")
-            .style("opacity", 1)
-            .style("fill", "#E34A33")
-            .style("font", "17.5px serif");
-        d3.select(this).select("circle").transition()
-            .duration(750)
-            .style("fill", "#049FD9")
-            .attr("r", function(d) {
-              return (d.node_score * r_base)*1.5;
-            });
+  function mouseout() {
+    d3.select(this).select("circle").transition()
+      .duration(750)
+      .attr("r", function(d) {
+        return r_base * d.node_n_links;
+      });
+  }
+  // action to take on mouse click
+  function click() {
+    d3.select(this).select("text").transition()
+      .duration(750)
+      .attr("x", 22)
+      .style("stroke-width", ".5px")
+      .style("opacity", 1)
+      .style("fill", "#E34A33")
+      .style("font", "17.5px OpenSans");
+    d3.select(this).select("circle").transition()
+      .duration(750)
+      .style("fill", "#049FD9")
+      .attr("r", function(d) {
+        return d.node_n_links * 1.25;
+      });
 
-    }
+  }
 
-    // action to take on mouse double click
-    function dblclick() {
-        d3.select(this).select("circle").transition()
-            .duration(750)
-            .attr("r", function(d) {
-              return (d.node_score * r_base)*1.5;
-            })
-            .style("fill", "#E34A33");
-        d3.select(this).select("text").transition()
-            .duration(750)
-            .attr("x", 14)
-            .style("stroke", "none")
-            .style("fill", "#049FD9")
-            .style("stroke", "none")
-            .style("opacity", 0.6)
-            .style("font", "14px serif");
-    }
+
 }
+
 
 
 

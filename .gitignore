@@ -1,2 +1,4 @@
 
-/mysite/app_folder/resources/*
+/mysite/app_folder/resources/bot_key.pkl
+/mysite/app_folder/resources/bot_room_id.pkl
+/mysite/app_folder/resources/bot_room_id_test.pkl

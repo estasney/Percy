@@ -1,55 +1,9 @@
-import re
 from app_folder.main.neural_tools import word_sims
-from app_folder import chatbot
-from nltk import word_tokenize, pos_tag
-
-
-class IntentParser(object):
-
-    def __init__(self, intent_mappers):
-        self.intent_mappers = self.load_intent_(intent_mappers)
-
-    def __contains__(self, item):
-        if any([lambda x: x, [im.run_search_(item) for im in self.intent_mappers]]):
-            return True
-        else:
-            return False
-
-    @property
-    def link_to_resource(self):
-        return "\n\nPlease visit [Percy - Related Words](https://estasney.pythonanywhere.com/related) for more!"
-
-    def load_intent_(self, intent_mappers):
-        if not isinstance(intent_mappers, list):
-            return [intent_mappers]
-        else:
-            return intent_mappers
-
-    def filter_parsers_(self, text, intent_mappers_):
-        for im in intent_mappers_:
-            if im.run_search_(text) is True:
-                return True
-
-    def map_(self, text):
-        matched = list(filter(lambda x: x.run_search_(text), self.intent_mappers))
-        if not matched:
-            return None
-        elif len(matched) > 1:
-            return None
-        return matched[0]
-
-    def answer_question(self, text):
-        matched_parser = self.map_(text)
-        if not matched_parser:
-            answer =str(chatbot.get_response(text))
-            return (None, answer)
-        answer = matched_parser.answer_question_(text)
-        answer += self.link_to_resource
-        return (matched_parser, answer)
+from app_folder.main.text_tools import parse_form_text
+import nltk
 
 
 class SynonymParser(object):
-
     """
     Checks message and returns true if message indicates checking for synonyms
 
@@ -70,81 +24,102 @@ class SynonymParser(object):
         pass
 
     @property
-    def search_method_(self):
-        # matches "synonyms" are approximate spelling
-        return r"(syn[a-z]+?ms?)"
-
-    @property
-    def default_pos_(self):
-        return ['NN', 'JJ']
-
-    @property
-    def search_method(self):
-        return re.compile(self.search_method_, flags=re.IGNORECASE)
+    def intent(self):
+        """
+        Words to search for in query that indicate intent
+        """
+        return {'synonyms', 'synonym', 'similar', 'similarities'}
 
     @property
     def preamble_(self):
-        return "Here are some synonyms for {}:"
+        return "Synonyms for {}"
 
-    def run_search_(self, text):
-        search_method = self.search_method
-        if search_method.search(text) is not None:
+    @property
+    def grammar(self):
+        return "GRAMMAR: {<IN><NN>*<VB>*<JJ>*}"
+
+    @property
+    def default_pos_(self):
+        return ['NN', 'JJ', 'VB']
+
+    def tag_match(self, word_tag):
+        word, tag = word_tag
+        filters = [tag.startswith(x) for x in self.default_pos_]
+        if any(filters):
             return True
         else:
             return False
 
+    def parse_intent(self, text):
+        """
+        Extracting structured data from a natural language query
 
-    def preprocess_string_(self, text):
-        # Splitting query to text following search_method
-        word_matched = self.search_method.search(text).group()  # "Synonym" or variant
-        text_list = self.search_method.split(text)  # Before, "Synonym", After
-        text_pos = text_list.index(word_matched) + 1  # Position of After in list
-        entities = text_list[text_pos] # After
-        entities = pos_tag(word_tokenize(entities))  # Tokenize and POS Tag
+        :param text:
+        :return:
+        """
 
-        def filter_tag(token_tag, pos_filter=self.default_pos_):
-            tag = token_tag[1]
-            if any([tag.startswith(pf) for pf in pos_filter]):
-                    return True
-            return False
+        chunker = nltk.RegexpParser(self.grammar)
+        tokens = parse_form_text(text)
+        pos_tokens = nltk.pos_tag(tokens)
 
-        entities = list(filter(filter_tag, entities))  # Filter by POS
+        tree = chunker.parse(pos_tokens)
+        entities = []
+
+        for subtree in tree.subtrees():
+            if subtree.label() == "GRAMMAR":
+                matched_words = list(filter(self.tag_match, subtree.leaves()))
+                entities.extend(matched_words)
+
         entities = [word for word, tag in entities]  # Remove tag
         return entities
 
-    def run_query_(self, entities, topn=10):
-        if isinstance(entities, str):
-            entities = [entities]
-
+    def run_query(self, entities, topn=20):
         results = []
         for e in entities:
-            sims = word_sims(e, topn=topn)
-            results.append(sims[1])
+            sims_success, sim_scores = word_sims(e, query_scope='words')
+            if sims_success:
+                sim_scores = sim_scores[:topn]
+            else:
+                sim_scores = []
+            td = {'success': sims_success,
+                  'entity': e,
+                  'scores': sim_scores}
+            results.append(td)
 
         return results
 
-    def transform_to_data_(self, text):
-        entities = self.preprocess_string_(text)
-        query_result = self.run_query_(entities)
-        return entities, query_result
+    def transform_to_data(self, text):
+        entities = self.parse_intent(text)
+        query_result = self.run_query(entities)
+        return query_result
 
-    def make_preamble_(self, entity):
-        return self.preamble_.format(entity)
+    def make_preamble_(self, entity, success=True):
+        if success:
+            return self.preamble_.format(entity)
+        else:
+            return "I dont know the word: {}.".format(entity)
 
     def convey_results_(self, result):
-        words = [word for word, score in result.items()]
+        words = [word for word, score in result]
         return ", ".join(words)
 
-    def make_conveyable_(self, entities, results):
-        preamble = [self.make_preamble_(entity) for entity in entities]
-        results = [self.convey_results_(result) for result in results]
+    def make_conveyable_(self, results):
+
         message = []
-        for p, r in zip(preamble, results):
-            reply = "{} {}".format(p, r)
-            message.append(reply)
+
+        for result in results:
+            if result['success'] is True:
+                preamble = self.make_preamble_(result['entity'])
+                sims = self.convey_results_(result['scores'])
+                preamble += ": {}"
+                message.append(preamble.format(sims))
+            else:
+                preamble = self.make_preamble_(result['entity'], success=False)
+                message.append(preamble)
+
         return "\n".join(message)
 
-    def answer_question_(self, text):
-        entites, query_result = self.transform_to_data_(text)
-        text_result = self.make_conveyable_(entites, query_result)
+    def answer_question(self, text):
+        query_result = self.transform_to_data(text)
+        text_result = self.make_conveyable_(query_result)
         return text_result

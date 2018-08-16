@@ -1,9 +1,19 @@
 from flask import render_template, request, jsonify, abort
-from gensim.summarization.pagerank_weighted import pagerank_weighted
 
-from app_folder.main import Utils, diversity_tools, neural_tools, upload_tools
-from app_folder.main import bp
-from app_folder.main import graph_tools, text_tools
+from app_folder.main import graph_tools, text_tools, fingerprint_tools, autocomplete_tools, neural_tools, bp,\
+    upload_tools, diversity_tools
+
+
+@bp.route('/autocomplete', methods=['GET'])
+def autocomplete():
+    terms = autocomplete_tools.get_autocomplete(dataset='words')
+    return jsonify(terms)
+
+
+@bp.route('/autocomplete_skills', methods=['GET'])
+def autocomplete_skills():
+    terms = autocomplete_tools.get_autocomplete(dataset='skills')
+    return jsonify(terms)
 
 
 @bp.route('/')
@@ -14,32 +24,25 @@ def open_page():
 @bp.route('/related', methods=['GET', 'POST'])
 def related():
     if request.method == 'GET':
-        return render_template('related.html')
+        if not request.args:
+            return render_template('related.html')
+        else:
+            user_query, query_scope = request.args.get('q'), request.args.get('scope')
+            result_success, result = neural_tools.word_sims(user_query, query_scope)
+            if result_success:
+                return render_template('related.html', result=result, success='True', title_h2='{} Similarity Score'.format(query_scope.title()),
+                                       title_th='Similarity Score', original=user_query, scope=query_scope)
+            else:
+                return render_template('related.html', result=user_query, success='False')
+
     elif request.method == 'POST':
-        user_query = request.form['query']
-        result = neural_tools.word_sims(user_query)
-        if result[0] is True:
-
-            # To preserve order from OrderedDict, convert to list
-            result[1] = list(result[1].items())
-
-            return render_template('related.html', result=result[1], success='True', title_h2='Word Similarity Score',
-                                   title_th='Similarity Score', original=user_query)
-        if result[0] is False:
-            error_message = str(result[1])
-            offending_term = error_message.split("'")[1]
-            result = offending_term.title()
-            return render_template('related.html', result=result[1], success='False')
-
-
-@bp.route('/stemmed', methods=['GET', 'POST'])
-def stemmed():
-    if request.method == 'GET':
-        return render_template('stemmed.html')
-    elif request.method == 'POST':
-        search = request.form['raw_stem']
-        stemmed_search = text_tools.wild_stem(search)
-        return render_template('stemmed.html', stemmed_bool=stemmed_search, success='True', original=search)
+        user_query, query_scope = request.form.get('q'), request.form.get('scope')
+        result_success, result = neural_tools.word_sims(user_query, query_scope)
+        if result_success:
+            return render_template('related.html', result=result, success='True', title_h2='{} Similarity Score'.format(query_scope.title()),
+                                   title_th='Similarity Score', original=user_query, scope=query_scope)
+        else:
+            return render_template('related.html', result=user_query, success='False')
 
 
 @bp.route('/keywords', methods=['GET'])
@@ -52,92 +55,15 @@ def thisplusthat():
     if request.method == 'GET':
         return render_template('thisplusthat.html')
     elif request.method == 'POST':
-        solution = neural_tools.word_math(request)
-        if solution['success'] == True:
-            return render_template('thisplusthat.html', result=solution['result'], success='True',
-                                   user_equation=solution['user_equation'],
-                                   word_one=solution['word_one'].strip(), word_two=solution['word_two'].strip(),
-                                   word_three=solution['word_three'].strip())
-        elif solution['success'] == False:
-            return render_template('thisplusthat.html', result=solution['result'], success='False')
-
-
-@bp.route('/infer', methods=['GET', 'POST'])
-def infer_name():
-    if request.method == 'GET':
-        return render_template('infer.html')
-    elif request.method == 'POST':
-        user_query_name = request.form['infer_name']
-        global_names = request.form.get('use_global_names', False)
-        inferred, data_sources = diversity_tools.infer_one(user_query_name, global_names)
-    else:
-        return render_template('infer.html')
-
-    model_results = [result.result for result in inferred if 'model' in result.source][0]
-    model_results = Utils.readable_gender(model_results)
-
-    data_results = [result for result in inferred if 'data' in result.source]
-    if len(data_results) != 0:
-        database_name = data_results[0].source.split("-")[1]
-        data_results = data_results[0].result
-        data_results = Utils.readable_gender(data_results)
-        return render_template('infer.html', user_query=user_query_name, success='True', gender_guess=model_results,
-                               database_name=database_name, database_result=data_results)
-    elif len(data_results) == 0:
-        database_name = data_sources
-        return render_template('infer.html', user_query=user_query_name, success='Partial',
-                               gender_guess=model_results, database_name=database_name)
-    else:
-        return render_template('infer.html', success='False')
-
-
-@bp.route('/diversity', methods=['GET', 'POST'])
-def diversity():
-    if request.method == 'GET':
-        return render_template('diversity_score.html')
-    elif request.method == 'POST':
-        upload_file = upload_tools.UploadManager(request)
-    else:
-        return render_template('diversity_score.html')
-
-    # Check if anything went wrong with upload
-    if upload_file.status != True:
-        return render_template('diversity_score.html', success='False', error_message=upload_file.status)
-
-    # Check whether to use global name dict
-    user_form = request.form
-    use_global = user_form.get('use_global_names', False)
-    if use_global == 'on':
-        use_global = True
-
-    # Logic of checking names list
-    names_list = upload_file.file_data()
-
-    # Run the query
-    name_results = diversity_tools.infer_many(names_list, use_global)
-    cumul_count = name_results['Cumulative']
-    total_count = len(names_list)
-    male_count, female_count, amb_count = cumul_count['M'], cumul_count['F'], cumul_count['U']
-
-    # Data only
-
-    data_count = name_results['Data_Only']
-    d_male_count, d_female_count, d_amb_count, d_unk_count = data_count['M'], data_count['F'], data_count['U'],\
-                                                             data_count['Unk']
-    d_known = d_male_count + d_female_count
-
-    # Population distrubition
-    pop_values = diversity_tools.population_distro(male_count=d_male_count, female_count=d_female_count,
-                                                   total_count=total_count)
-    d_female_percent = "{:.2%}".format(pop_values['ratio_female'])
-
-    confidence_interval = "{:.2%}".format(pop_values['confidence_interval'])
-
-
-    return render_template('diversity_score.html', success='True', total_count=total_count, male_count=male_count,
-                           female_count=female_count, amb_count=amb_count, d_male_count=d_male_count,
-                           d_female_count=d_female_count, d_amb_count=d_amb_count, d_unk_count=d_unk_count,
-                           d_known=d_known, d_female_percent=d_female_percent, confidence_interval=confidence_interval)
+        solution_success, solution = neural_tools.word_math(request)
+        scope = request.form.get('scope')
+        if solution_success:
+            return render_template('thisplusthat.html', result=solution['scores'], success='True',
+                                   user_equation=solution['equation'], pos_words=solution['positives'],
+                                   neg_words=solution['negatives'], unknown_words=solution['unknowns'],
+                                   scope=scope)
+        else:
+            return render_template('thisplusthat.html', success='False')
 
 
 @bp.route('/tf_idf', methods=['GET', 'POST'])
@@ -146,54 +72,62 @@ def tfidf():
         return render_template('tf_idf.html')
     elif request.method == 'POST':
         user_input = request.form['tfidf_text']
-        if isinstance(user_input, str) is False:
-            return render_template('tf_idf.html', success='False', original="",
-                                   error_message="This Form Only Accepts Text...")
-        if len(user_input.split()) > 10000:
-            return render_template('tf_idf.html', success='False', original=user_input,
-                                   error_message="Word Limit Exceeded")
-        user_form = request.form
-        gram_mode = user_form.get('gram_tokens', False)
-        lem_mode = user_form.get('lem_tokens', False)
-        if gram_mode == 'on':
-            gram_mode = True
-        if lem_mode == 'on':
-            lem_mode = True
-
-        scored_tfidf = text_tools.score_tfidf(user_input, gram_mode, lem_mode)
+        fp = fingerprint_tools.Fingerprint()
+        scored_tfidf = fp.fingerprint(user_input)
         return render_template('tf_idf.html', success='True', original=user_input, result=scored_tfidf)
+
+@bp.route('/diversity', methods=['GET', 'POST'])
+def infer_diversity():
+    if request.method == "GET":
+        return render_template('diversity_score.html')
+
+    file_upload = upload_tools.UploadManager(request)
+
+    if not file_upload.status:
+        return render_template('diversity_score.html', success='False')
+
+    names_list = file_upload.file_data()
+
+    results = diversity_tools.search_data(names_list)
+
+    """
+    Returns a dict with
+        :total - the number of names
+        :male - n male
+        :female - n female
+        :unknown - n unknown
+        :95 - +/- for 95% confidence
+        :99 - +/- for 99% confidence
+        :ratio_female - n female / total
+    """
+    return render_template('diversity_score.html', n_known=results['known'], total=results['total'],
+                           r_female=results['ratio_female'], n_unknown=results['unknown'], ci_95=results['95'],
+                           ci_99=results['99'], success='True', n_male=results['male'], n_female=results['female'])
 
 
 @bp.route('/kw_data', methods=['POST'])
 def kw_data():
     raw_text = request.form.get('raw_text')
-    phrase_checked = request.headers.get('Phrase-Checked')
-    if phrase_checked == 'true':
-        phrase_checked = True
-    else:
-        phrase_checked = False
     if not raw_text:
         abort(401)
 
     window_size = int(request.headers.get('Window-Limit', 2))
 
-    lem_text = text_tools.process_graph_text(raw_text, phrase_checked)
-    graph = graph_tools.build_graph(lem_text, window_size)
-
-    edges = graph.edges()
+    lem_text = text_tools.process_graph_text(raw_text)
+    graph = graph_tools.make_graph(lem_text, window_size)
+    edge_dict = graph_tools.get_n_edges(graph)
+    base_color = graph_tools.compute_colors_dict(edge_dict)
+    color_dict = {}
+    for word, edge in edge_dict.items():
+        word_color = base_color[edge]
+        color_dict[word] = word_color
     data = []
-    scores = pagerank_weighted(graph)
-    dev_dict, dev_count = graph_tools.assign_deviations(scores)
-    color_dict = graph_tools.compute_colors_dict(dev_count)
-    for edge in edges:
+    for edge in graph.edges():
         source, target = edge
-        source_score, target_score = int(dev_dict.get(source, 0)), int(dev_dict.get(target, 0))
-        source_color, target_color = (color_dict.get(source_score, color_dict[0])), (color_dict.get(target_score,
-                                                                                                    color_dict[0]))
-        td = {'source': source, 'source_score': source_score, 'target': target, 'target_score': target_score,
-              'source_color': source_color, 'target_color': target_color}
+        source_color, target_color = color_dict.get(source, (0, 0, 255)), color_dict.get(target, (0, 0, 255))
+        source_n_links, target_n_links = edge_dict.get(source, 1), edge_dict.get(target, 1)
+        td = {'source': source, 'target': target, 'source_color': source_color, 'target_color': target_color,
+              'source_n_links': source_n_links, 'target_n_links': target_n_links}
         data.append(td)
-
-    del edges, scores, dev_dict, dev_count, color_dict
 
     return jsonify({'data': data})
