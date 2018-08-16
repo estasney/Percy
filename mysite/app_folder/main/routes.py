@@ -1,7 +1,7 @@
 from flask import render_template, request, jsonify, abort
 
 from app_folder.main import graph_tools, text_tools, fingerprint_tools, autocomplete_tools, neural_tools, bp,\
-    upload_tools, diversity_tools
+    upload_tools, diversity_tools, web_tools
 
 
 @bp.route('/autocomplete', methods=['GET'])
@@ -76,6 +76,7 @@ def tfidf():
         scored_tfidf = fp.fingerprint(user_input)
         return render_template('tf_idf.html', success='True', original=user_input, result=scored_tfidf)
 
+
 @bp.route('/diversity', methods=['GET', 'POST'])
 def infer_diversity():
     if request.method == "GET":
@@ -112,6 +113,13 @@ def kw_data():
         abort(401)
 
     window_size = int(request.headers.get('Window-Limit', 2))
+
+    # Get data-type : req_pill or paste_pill
+    data_type = request.headers.get('Data-Type')
+    if data_type == "req_pill":
+        raw_text = web_tools.get_job_posting(raw_text)
+        if not raw_text:
+            return jsonify({'data': []})
 
     lem_text = text_tools.process_graph_text(raw_text)
     graph = graph_tools.make_graph(lem_text, window_size)

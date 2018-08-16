@@ -17,6 +17,15 @@ class ElementNotFoundException(Exception):
         self.element = element
 
 
+def get_job_posting(req_id):
+    job_fetcher = CiscoJobs()
+    try:
+        req_text = job_fetcher.fetch_req(req_id)
+        return req_text
+    except:
+        return None
+
+
 class CiscoJobs(object):
 
     def __init__(self):

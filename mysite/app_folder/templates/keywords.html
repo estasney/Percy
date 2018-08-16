@@ -1,11 +1,22 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div id="main-menu" class="container">
+<div class="container">
+  <div class="col-md-3">
+<ul class="nav nav-pills nav-stacked nav-pills-stacked-example">
+	<li id="paste_pill" class="active pill-select"><a><i class="fa fa-clipboard breath-right"></i> Paste</a></li>
+    <li id="req_pill" class="pill-select"><a><i class="fa fa-cloud breath-right"></i> From Cisco Jobs</a></li>
+</ul>
+</div>
+  <div class="col-md-9">
     <div class="row">
         <div class="col">
-            <textarea id="search_term" rows="4" class="form-control"
+            <textarea id="search_term_paste" rows="4" class="form-control"
                       placeholder="Paste in Text..."></textarea>
+          <div class="form-group hidden" id="search_term_parent">
+            <label for="search_term_req">Req ID</label>
+          <input type="text" class="form-control" id="search_term_req">
+          </div>
         </div>
         <div class="row text-center">
             <div class="col">
@@ -20,7 +31,8 @@
                 </select>
             </div>
         </div>
-
+      
+    </div>
         <script>
 var data_url = "/kw_data";
 
@@ -29,6 +41,14 @@ $('#search').on('click', startSearch);
 $('#reset').on('click', restart);
 $('#reset').on('click', enableGo);
 $('#reset').on('click', clearGraph);
+$('.pill-select').on('click', pillSelect);
+ 
+
+function pillSelect() {
+  $("#search_term_paste").toggleClass('hidden');
+  $("#search_term_parent").toggleClass('hidden');
+$(".pill-select").toggleClass("active");
+}
 
 function windowSize() {
   var ws = document.getElementById('window_size');
@@ -76,9 +96,20 @@ var svg = d3.select('body').append('svg')
   .attr('height', height);
 
 function startSearch() {
-  var search_term = $("#search_term").prop('value');
+  var search_term;
+  var active_pill  =  $(".pill-select.active")[0].id;
+  switch (active_pill) {
+    case 'paste_pill':
+        search_term = $("#search_term_paste").prop('value');
+        break;
+    case 'req_pill':
+        search_term = $("#search_term_req").prop('value');
+        break;
+    default:
+        search_term = "";
+  }
   var window_size = windowSize();
-  getData(search_term, window_size, false);
+  getData(search_term, active_pill, window_size, false);
   disableGo();
 }
 
@@ -87,7 +118,7 @@ function appendSearch(clicked_term) {
   getData(clicked_term, limit_to, true);
 }
 
-function getData(term, limit, is_update) {
+function getData(term, data_type, limit, is_update) {
   $.ajax({
     type: 'POST',
     async: true,
@@ -102,6 +133,7 @@ function getData(term, limit, is_update) {
       xhr.setRequestHeader('Accept-Language', 'en-US,en;q=0.8');
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       xhr.setRequestHeader('Window-Limit', limit);
+      xhr.setRequestHeader('Data-Type', data_type);
     },
     success: function(data) {
       var json_data = JSON.stringify(data);
