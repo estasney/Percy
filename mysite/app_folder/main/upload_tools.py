@@ -161,6 +161,7 @@ class UploadManager(object):
         """
         if self.valid_header:
             try:
+                self.uploaded_file.dropna(inplace=True)
                 names_col = self.uploaded_file[self.valid_header].values.tolist()
                 self.status = True
                 return names_col
