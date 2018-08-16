@@ -70,10 +70,10 @@
   </form>
 {% endif %}
 {% if success == 'True' %}
-<div class="container-fluid bg-grey text-center">
-  <h2> {{title_h2}} </h2>
-  <p>According to my calculations...</p>
-  <table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-search="true">
+<div class="container bg-grey">
+ <h2 class="text-center"> {{title_h2}} </h2>
+  <p class="text-center">According to my calculations...</p>
+  <table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-pagination="true" data-page-size="25" data-search="true">
     <thead>
       <tr>
         <th data-field="word" data-sortable="true">Word</th>
@@ -87,7 +87,6 @@
         <td> {{ value }} </td>
       </tr>
         {% endfor %}
-      </tr>
     </tbody>
   </table>
 </div>
@@ -144,8 +143,7 @@
 
 </script>
 
-
+{% endblock %}
 {% block js_script %}
 {% include "datatables.html" %}
-{% endblock %}
 {% endblock %}

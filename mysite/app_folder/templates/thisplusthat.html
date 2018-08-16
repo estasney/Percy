@@ -75,14 +75,14 @@
    <p>Percy recognizes  multiple word phrases. For example: Java, "Quality Assurance"</p>
 </div>
 {% if success == 'True' %}
-<div class="container-fluid bg-grey text-center">
+<div class="container bg-grey">
     {% if unknown_words is not none and unknown_words != "" %}
-    <h2>I removed some words outside of my vocabulary</h2>
-    <h3>{{unknown_words}}</h3>
+    <h2 class="text-center">I removed some words outside of my vocabulary</h2>
+    <h3 class="text-center">{{unknown_words}}</h3>
     {% endif %}
 
-  <h2>According to my calculations...</h2>
-  <h3>{{user_equation}}</h3>
+  <h2 class="text-center">According to my calculations...</h2>
+  <h3 class="text-center">{{user_equation}}</h3>
 <table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-search="true">
     <thead>
       <tr>
@@ -109,7 +109,7 @@
 </div>
 {% else %}
 {% endif %}
+{% endblock %}
 {% block js_script %}
 {% include "datatables.html" %}
-{% endblock %}{% endblock %}
 {% endblock %}
