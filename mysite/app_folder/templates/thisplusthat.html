@@ -83,11 +83,11 @@
 
   <h2>According to my calculations...</h2>
   <h3>{{user_equation}}</h3>
-<table class="table">
+<table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-search="true">
     <thead>
       <tr>
-        <th class="text-center">Closest Match</th>
-          <th class="text-center">Similarity Score</th>
+         <th data-field="word" data-sortable="true">Closest Match</th>
+          <th data-field="score" data-sortable="true">Similarity Score</th>
 
       </tr>
     </thead>
@@ -109,4 +109,7 @@
 </div>
 {% else %}
 {% endif %}
+{% block js_script %}
+{% include "datatables.html" %}
+{% endblock %}{% endblock %}
 {% endblock %}

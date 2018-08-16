@@ -73,11 +73,11 @@
 <div class="container-fluid bg-grey text-center">
   <h2> {{title_h2}} </h2>
   <p>According to my calculations...</p>
-  <table class="table">
+  <table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-search="true">
     <thead>
       <tr>
-        <th class="text-center">Word</th>
-        <th class="text-center">{{title_th}}</th>
+        <th data-field="word" data-sortable="true">Word</th>
+        <th data-field="score" data-sortable="true">{{title_th}}</th>
       </tr>
     </thead>
     <tbody>
@@ -144,4 +144,8 @@
 
 </script>
 
+
+{% block js_script %}
+{% include "datatables.html" %}
+{% endblock %}
 {% endblock %}
