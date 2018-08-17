@@ -1,13 +1,11 @@
 import difflib
 import pickle
 import re
-import os
+
 from collections import Counter
 from itertools import chain, combinations
 
 import networkx as nx
-
-
 
 f = "company2id.pkl"
 f1 = "id2company.pkl"
