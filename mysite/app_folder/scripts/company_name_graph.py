@@ -1,14 +1,16 @@
-from itertools import chain, combinations
-from operator import itemgetter
-from collections import Counter
 import difflib
-import string
 import pickle
 import re
+import os
+from collections import Counter
+from itertools import chain, combinations
+
 import networkx as nx
 
-f = "app_folder/resources/company2id.pkl"
-f1 = "app_folder/resources/id2company.pkl"
+
+
+f = "company2id.pkl"
+f1 = "id2company.pkl"
 
 with open(f, 'rb') as pfile:
     id2company = pickle.load(pfile)
