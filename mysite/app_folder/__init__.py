@@ -1,10 +1,6 @@
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
 from app_folder.site_config import Config, FConfig
-import gensim
-from gensim.corpora import Dictionary
-from gensim.models import TfidfModel
-from time import time
 
 toolbar = DebugToolbarExtension()
 
