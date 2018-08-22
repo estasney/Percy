@@ -4,6 +4,7 @@ from app_folder.site_config import Config, FConfig
 
 toolbar = DebugToolbarExtension()
 
+
 def create_app(config_class=Config):
     app_run = Flask(__name__)
     app_run.config.from_object(config_class)
