@@ -89,6 +89,9 @@ def infer_diversity():
 
     names_list = file_upload.file_data()
 
+    if not names_list or names_list is False:
+        return render_template('diversity_score.html', success='False', error_message=file_upload.status)
+
     results = diversity_tools.search_data(names_list)
 
     """
