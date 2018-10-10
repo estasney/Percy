@@ -2,3 +2,7 @@
 /mysite/app_folder/resources/bot_key.pkl
 /mysite/app_folder/resources/bot_room_id.pkl
 /mysite/app_folder/resources/bot_room_id_test.pkl
+
+
+/mysite/app_folder/scripts/company2id.pkl
+/mysite/app_folder/scripts/id2company.pkl

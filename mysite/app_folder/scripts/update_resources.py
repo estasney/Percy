@@ -50,7 +50,10 @@ def apply_by_multiprocessing(df, func, **kwargs):
 
 
 def lang_detect(x):
-    return detect(x['summary'])
+    try:
+        return detect(x['summary'])
+    except:
+        return ""
 
 def preprocess_text(x, stopwords=STOPWORDS):
     from pattern.en import parsetree
@@ -80,6 +83,10 @@ if __name__ == "__main__":
     df.dropna(subset=['summary'], inplace=True)
     original_count = len(df)
     df.fillna("", inplace=True)
+    start = datetime.now()
+    df['lang'] = apply_by_multiprocessing(df, lang_detect, axis=1, workers=8)
+    elapsed = datetime.now() - start
+    print("Finished Language Detection in {}".format(elapsed.seconds))
     df = df.loc[df['lang'] == 'en']
     print("Corpus loaded with {} records".format(original_count))
     print("Dropping {} non english records".format(original_count - len(df)))
@@ -100,7 +107,7 @@ DICTIONARY - Words
 """
 print("Building Dictionary")
 start = datetime.now()
-dictionary = Dictionary(df['flat'].values.tolist())
+dictionary = Dictionary([word for word in df['flat'].values.tolist() if len(word) > 2])
 print("Dictionary found {} unique tokens".format(len(dictionary)))
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 dictionary.filter_extremes(no_below=10, no_above=0.9)
@@ -108,7 +115,7 @@ dictionary.compactify()
 dictionary.save(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/dictionary.model")
 
 # Write out autocomplete
-with open(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/dictionary_autocomplete.txt", "w+") as tfile:
+with open(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/dictionary_autocomplete.txt", "w+", encoding='utf-8') as tfile:
     for term in dictionary.values():
         term += "\n"
         tfile.write(term)
