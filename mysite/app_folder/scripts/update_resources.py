@@ -6,7 +6,8 @@ from collections import Counter
 from datetime import datetime
 from itertools import combinations
 from math import log
-
+import re
+import unicodedata
 import numpy as np
 import pandas as pd
 from gensim.corpora.dictionary import Dictionary
@@ -55,11 +56,32 @@ def lang_detect(x):
     except:
         return ""
 
-def preprocess_text(x, stopwords=STOPWORDS):
+char_search = re.compile(r"[^\u0020-\u0022\u0027\u002c-\u002e\u0030-\u0039\u003f\u0041-\u005a\u0061-\u007a]")
+strip_multi_ws = re.compile(r"( {2,})")
+
+
+def clean(s):
+    s = unicodedata.normalize("NFKD", s)
+    s = char_search.sub(" ", s)
+    s = strip_multi_ws.sub(" ", s)
+    return s
+
+def filter_tokens(x):
+    if x in set(string.punctuation) or x in set(string.whitespace):
+        return False
+    if not x.isprintable():
+        return False
+    if x.isnumeric():
+        return False
+    if x in STOPWORDS:
+        return False
+    return True
+
+def preprocess_text(x):
     from pattern.en import parsetree
 
-    punc = set(string.punctuation)
-    tree = parsetree(x['summary'], tokenize=True, lemmata=True)
+    doc = clean(x['summary'])
+    tree = parsetree(doc, tokenize=True, lemmata=True)
     doc = [sent.lemma for sent in tree]
     # if preserve_sent is False:
     #     pdoc = [word for sent in doc for word in sent]
@@ -68,14 +90,14 @@ def preprocess_text(x, stopwords=STOPWORDS):
     # else:
     pdoc = []
     for sent in doc:
-        psent = [word for word in sent if word not in punc]
-        psent = [word for word in psent if word not in stopwords]
+        psent = list(filter(lambda x: filter_tokens(x), sent))
         pdoc.append(psent)
     return pdoc
 
+
 def flatten_sents(x):
     doc = x['sent']
-    return [word for sent in doc for word in sent]
+    return [clean(word) for sent in doc for word in sent]
 
 
 if __name__ == "__main__":
@@ -84,6 +106,7 @@ if __name__ == "__main__":
     original_count = len(df)
     df.fillna("", inplace=True)
     start = datetime.now()
+    print("Starting Resource Update")
     df['lang'] = apply_by_multiprocessing(df, lang_detect, axis=1, workers=8)
     elapsed = datetime.now() - start
     print("Finished Language Detection in {}".format(elapsed.seconds))
@@ -98,6 +121,7 @@ if __name__ == "__main__":
     print("Finished With Sentences in {}".format(elapsed.seconds))
     print("Flattening Doc")
     df['flat'] = apply_by_multiprocessing(df, flatten_sents, axis=1, workers=8)
+
 
 
 
@@ -313,9 +337,9 @@ phrase_model = Phrases(phrase_stream)
 phrase = Phraser(phrase_model)
 phrase.save(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/phrases.model")
 elapsed = datetime.now() - start
-print("Finished Phrase Model in {} minutes".format(elapsed.seconds // 60))
+print("Finished Phrase Model in {}:{} minutes".format(elapsed.seconds // 60, elapsed.seconds % 60))
 
 script_elapsed = (datetime.now() - script_start).seconds
 script_elapsed_minutes = script_elapsed // 60
 script_elapsed_seconds = script_elapsed % 60
-print("Finished updating resources in {} : {}".format(script_elapsed_minutes, script_elapsed_seconds))
+print("Finished updating resources in {}:{}".format(script_elapsed_minutes, script_elapsed_seconds))

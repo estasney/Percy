@@ -102,10 +102,11 @@ def get_n_edges(graph):
 
 def normalize_n_edges(edge_dict):
     min_edges, max_edges = min(edge_dict.values()), max(edge_dict.values())
+    print(min_edges, max_edges)
     new_min, new_max = 1, 5
     normed_dict = {}
     for node, n_edges in edge_dict.items():
-        normed_edges = (new_max - new_min) / (max_edges - min_edges) * (n_edges - min_edges) + new_min
+        normed_edges = (new_max - new_min) / ((max_edges - min_edges) * (n_edges - min_edges) + new_min)
         normed_dict[node] = normed_edges
 
     return normed_dict
