@@ -10,6 +10,7 @@ from operator import itemgetter
 import numpy as np
 import pandas as pd
 from colour import Color
+from sklearn.preprocessing import MinMaxScaler
 
 WINDOW_SIZE = 3
 
@@ -92,6 +93,7 @@ def compute_colors_dict(edge_dict, low="palegreen", high="red"):
         color_dict[step_values[i]] = rgb_web
     return color_dict
 
+
 def get_n_edges(graph):
     edge_dict = {}
     for n in graph.nodes:
@@ -100,18 +102,14 @@ def get_n_edges(graph):
     normed_dict = normalize_n_edges(edge_dict)
     return normed_dict
 
+
 def normalize_n_edges(edge_dict):
-    min_edges, max_edges = min(edge_dict.values()), max(edge_dict.values())
-    print(min_edges, max_edges)
-    new_min, new_max = 1, 5
-    normed_dict = {}
-    for node, n_edges in edge_dict.items():
-        normed_edges = (new_max - new_min) / ((max_edges - min_edges) * (n_edges - min_edges) + new_min)
-        normed_dict[node] = normed_edges
-
+    edges = np.array([float(x) for x in list(edge_dict.values())])
+    scaler = MinMaxScaler(feature_range=(1, 5))
+    edges = scaler.fit_transform(edges.reshape(-1, 1))
+    normed_dict = {node: float(edge_value) for node, edge_value in zip(list(edge_dict.keys()), edges)}
+    print(normed_dict)
     return normed_dict
-
-
 
 def bright_color():
     h,s,l = random.random(), 0.5 + random.random()/2.0, 0.4 + random.random()/5.0
