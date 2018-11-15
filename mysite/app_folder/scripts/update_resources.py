@@ -56,7 +56,7 @@ def lang_detect(x):
     except:
         return ""
 
-char_search = re.compile(r"[^\u0020-\u0022\u0027\u002c-\u002e\u0030-\u0039\u003f\u0041-\u005a\u0061-\u007a]")
+char_search = re.compile(r"[^\u0020-\u0023\u0027\u002b-\u002e\u0030-\u0039\u003f\u0041-\u005a\u0061-\u007a]")
 strip_multi_ws = re.compile(r"( {2,})")
 
 
