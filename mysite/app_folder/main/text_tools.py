@@ -9,7 +9,7 @@ import nltk
 
 # Raw
 
-char_search_ = re.compile(r"[^\u0020\u0027\u002b-\u002e\u0030-\u0039\u0041-\u005a\u0061-\u007a]")
+char_search_ = re.compile(r"[^\u0020-\u0023\u0027\u002b-\u002e\u0030-\u0039\u003f\u0041-\u005a\u0061-\u007a]")
 strip_multi_ws_ = re.compile(r"( {2,})")
 quoted_terms = re.compile(r"(?:'|\")([A-z ]+)(?:'|\")")
 word_re = re.compile(r"([\w|-]+)")

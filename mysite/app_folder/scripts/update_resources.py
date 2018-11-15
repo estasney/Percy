@@ -58,12 +58,14 @@ def lang_detect(x):
 
 char_search = re.compile(r"[^\u0020-\u0023\u0027\u002b-\u002e\u0030-\u0039\u003f\u0041-\u005a\u0061-\u007a]")
 strip_multi_ws = re.compile(r"( {2,})")
+abbr = re.compile(r"(\.)\B")
 
 
 def clean(s):
     s = unicodedata.normalize("NFKD", s)
     s = char_search.sub(" ", s)
     s = strip_multi_ws.sub(" ", s)
+    s = abbr.sub("", s)
     return s
 
 def filter_tokens(x):
@@ -72,6 +74,8 @@ def filter_tokens(x):
     if not x.isprintable():
         return False
     if x.isnumeric():
+        return False
+    if "," in x and x.replace(",", "").isnumeric():  # 2,200
         return False
     if x in STOPWORDS:
         return False
