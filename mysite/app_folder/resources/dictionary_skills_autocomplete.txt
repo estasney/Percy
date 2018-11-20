@@ -146,8 +146,11 @@ managed services
 customer service
 microsoft office
 pre-sales
-linux
+business process improvement
+cross-functional team leadership
 microsoft excel
+program management
+linux
 windows
 agile methodologies
 apache spark
@@ -181,7 +184,6 @@ sql
 web services
 blockchain
 consulting
-cross-functional team leadership
 fintech
 information security
 infrastructure
@@ -190,7 +192,6 @@ it strategy
 messaging
 mobile devices
 professional services
-program management
 requirements analysis
 software development life cycle (sdlc)
 software project management
@@ -214,11 +215,47 @@ product lifecycle management
 rfid
 rfid+
 sip
+blogging
+community outreach
+content development
+content management
+content strategy
+copy editing
+copywriting
+corporate communications
+creative direction
+creative writing
+developer relations
+digital media
+digital strategy
+editing
+editorial
+interviews
+journalism
+magazines
+marketing
+marketing communications
+media relations
+new media
+online advertising
+online marketing
+online publishing
+podcasting
+public relations
+public speaking
+publications
+publishing
+social media
+social media marketing
+social networking
+storytelling
+video
+web 2.0
+web content
 akka
 amazon web services (aws)
 apache
 aws
-blogging
 cassandra
 docker
 guice
@@ -272,7 +309,6 @@ technology roadmapping
 user experience design
 analysis
 business process
-business process improvement
 ccie r&s
 ccvp
 collaboration
@@ -298,20 +334,21 @@ openflow
 quality of service (qos)
 sdn
 strategic planning
+business transformation
+change management
+customer lifecycle management
+customer success
+customer support
+executive leadership
+negotiation
+organizational development
+relationship management
 ap style
-content management
-content strategy
-copywriting
-digital media
 event management
 event planning
 graphic design
-marketing
-marketing communications
 newsletters
-online advertising
 seo
-social networking
 teaching
 technical writing
 user experience
@@ -369,7 +406,6 @@ storage virtualization
 testing
 dns administration
 freebsd
-journalism
 leadership development
 performance management
 agile
@@ -461,7 +497,6 @@ object oriented design
 programming
 rtos
 tcl
-change management
 executive management
 sales enablement
 strategic alliances
@@ -471,7 +506,6 @@ ip networking
 mac os x
 marketing strategy
 mobile technology
-social media marketing
 system administration
 teamwork
 windows server 2003
@@ -499,6 +533,14 @@ market research
 network management applications
 product requirements
 software product management
+attention to detail
+hardware architecture
+hardware design
+market analysis
+people management
+product planning
+soc
+swot analysis
 database design
 design patterns
 entity framework
@@ -536,7 +578,6 @@ api development
 data analysis
 elasticsearch
 logstash
-online marketing
 photoshop
 react
 s3
@@ -629,12 +670,10 @@ mobile advertising
 mobile commerce
 mobile internet
 mobile marketing
-new media
 online gaming
 payments
 sem
 television
-video
 video games
 web analytics
 youtube
@@ -647,23 +686,19 @@ predictive analytics
 quantitative analytics
 retail sales
 sales channel development
-social media
 account management
 affiliate marketing
 brand management
-creative direction
 customer acquisition
 customer insight
 digital marketing
-digital strategy
 direct marketing
 email marketing
 integrated marketing
+loyalty programs
 marketing analytics
 media planning
-media relations
 ppc
-public relations
 retail marketing
 thought leadership
 aix
@@ -745,10 +780,8 @@ intercultural communication
 international project management
 international relations
 it project & program management
-organizational development
 policy
 program development
-public speaking
 r
 recruiting
 research
@@ -760,7 +793,6 @@ data mining
 mapreduce
 spring
 mobile communications
-product planning
 m2m
 acquisition integration
 broadcast
@@ -771,7 +803,6 @@ intellij idea
 oop
 investments
 marketing management
-negotiation
 portfolio management
 microsoft technologies
 mobile payments
@@ -789,6 +820,8 @@ splunk
 watir
 weblogic
 wily introscope
+partner development
+partnerships
 ecommerce
 html/css
 iaas
@@ -811,11 +844,24 @@ budgeting
 forecasting
 logistics
 trade shows
+angel investing
+cleantech
+computer engineering
+corporate finance
+divestitures
+emerging markets
+financial modeling
+intellectual property
+investment banking
+licensing
+m&a experience
+patents
+r&d
+valuation
 eda
 fpga
 matlab
 processors
-soc
 spark
 verilog
 vhdl
@@ -833,9 +879,7 @@ performance analysis
 rf
 statistics
 wimax
-corporate communications
 crisis communications
-editing
 internal communications
 message development
 press releases
@@ -859,12 +903,16 @@ relational databases
 cisco ucs
 citrix
 hsrp
-angel investing
-corporate finance
+acquisitions
 finance
-financial modeling
-m&a experience
 strategic consulting
+competitive intelligence
+google apps
+lync
+office 365
+skype
+strategic analysis
+xmpp
 bind
 cisco 7600
 tcp
@@ -875,7 +923,6 @@ database systems
 microsoft azure
 microsoft products
 windows azure
-google apps
 cloud storage
 database management
 hbase
@@ -908,7 +955,6 @@ ucce
 ucm
 analyst relations
 communication training
-content development
 industry analyst relations
 cmdb
 it outsourcing
@@ -925,6 +971,19 @@ solutions marketing
 enterprise search
 search
 xen
+atm
+board bring-up
+broadband access
+cmts
+computer architecture
+embedded linux
+expect
+flash memory
+gigabit ethernet
+infiniband
+pcie
+powerpc
+serdes
 ccde
 go
 golang
@@ -938,12 +997,12 @@ itil certified
 tandberg
 togaf
 video conferencing
+handsets
 scada
 data center architecture
 software documentation
 agile leadership
 functional specifications
-market analysis
 cloud
 netflow
 apache zookeeper
@@ -976,7 +1035,6 @@ hardware installation
 lan/wan
 media gateways
 arm
-embedded linux
 microprocessors
 real-time operating systems (rtos)
 software development life cycle
@@ -998,7 +1056,14 @@ opnet
 r programming
 raspberry pi
 zigbee
+international sales
 user stories
+collaborative leadership
+influencer marketing
+international business
+sentiment analysis
+social media measurement
+text analytics
 coreos
 allegro
 assembly
@@ -1009,14 +1074,13 @@ design of experiments
 electronics
 engineering
 failure analysis
-hardware architecture
 manufacturing
 manufacturing engineering
+oracle agile plm
 pcb design
 power electronics
 process engineering
 product design
-r&d
 simulations
 supply chain management
 continuous delivery
@@ -1025,10 +1089,10 @@ mdm
 ux
 wireframing
 css3
-web 2.0
 bridging
 rfp
 software sales
+ui automation
 content marketing
 network monitoring tools
 emerging technologies
@@ -1039,7 +1103,6 @@ global business development
 healthcare
 google analytics
 interaction design
-publishing
 search engine optimization (seo)
 usability
 awesomeness
@@ -1060,6 +1123,7 @@ data loss prevention
 dlp
 embedded operating systems
 mobile software
+webinar development
 api
 consumer products
 facebook
@@ -1104,9 +1168,7 @@ storage management
 storage solutions
 itil v3 foundations certified
 microsoft dynamics ax
-computer architecture
 core switching
-customer support
 ic
 integrated circuit design
 integrated circuits (ic)
@@ -1119,7 +1181,6 @@ signal integrity
 traffic management
 vlsi
 channel management
-partner development
 partner programs
 captivate
 hands-on training
@@ -1147,13 +1208,11 @@ google maps
 it solutions
 solution design
 value based selling
-online publishing
 alm
 continuous integration
 it asset management
 it transformation
 itsm
-developer relations
 location based services
 mobile platforms
 mobile strategy
@@ -1179,13 +1238,15 @@ snort
 ssh
 ssl
 integrity
+checkpoint
+people development
+presenter
 ms project
 pmo
 procurement
 commercialization
 enterprise technology sales
 sales & marketing leadership
-social media measurement
 lucene
 product demonstration
 semantic web
@@ -1198,12 +1259,12 @@ lambda
 serverless
 tensorflow
 rtp
-skype
 accessibility
 concept development
 creative strategy
 design thinking
 ethnography
+industrial design
 interactive advertising
 mobile design
 mockups
@@ -1215,7 +1276,6 @@ consumer behaviour
 consumer insight
 focus groups
 interviewing
-interviews
 psychology
 qualitative research
 survey design
@@ -1233,12 +1293,8 @@ set top box
 proof of concept
 technical demonstrations
 technical sales consulting
-presenter
 surveillance
 business modeling
-international business
-patents
-business transformation
 resource management
 e-learning
 nessus
@@ -1269,7 +1325,6 @@ cgi/perl
 scheme
 bootloader
 cli
-powerpc
 real time
 socket programming
 u-boot
@@ -1282,15 +1337,12 @@ google cloud platform
 supply chain
 corporate law
 data privacy
-intellectual property
-licensing
 privacy law
 software licensing
 deep packet inspection
 avaya products
 economics
 natural language processing
-web content
 mvpn
 jdbc
 data security
@@ -1311,9 +1363,7 @@ win32 api
 windows ce
 wmi
 xaml
-lync
 lync server 2010
-office 365
 certified scrum master csm
 code generation
 linq
@@ -1334,7 +1384,6 @@ pbx
 sales support
 identity management
 cascading style sheets (css)
-copy editing
 dita
 framemaker
 manuals
@@ -1348,7 +1397,6 @@ network optimization
 nfv
 organizational leadership
 startup development
-storytelling
 pharmaceutical industry
 restructuring
 concurrent programming
@@ -1411,8 +1459,8 @@ vendor relationship management
 it governance
 operations research
 product innovation
+social enterprise
 financial accounting
-international sales
 802.1q
 802.1x
 c++11
@@ -1424,12 +1472,12 @@ openvswitch
 protobuf
 yang
 zeromq
+security operations
 information security engineering
 counterterrorism
 intelligence
 military
 physical security
-security operations
 small business
 tactics
 weapons
@@ -1437,7 +1485,6 @@ wireless communications systems
 wireless security
 enterprise solution selling
 long-term customer relationships
-relationship management
 software solution sales
 bug tracking
 customer escalation management
@@ -1456,16 +1503,19 @@ search engine marketing (sem)
 bootstrap
 ext js
 rabbitmq
+rest apis
 symmetrix
 valgrind
 vcs
 apache ant
 ejb
 enterprise javabeans (ejb)
+oauth
 cyber defense
 iso 27001
 ngn
 nms
+dell openmanage
 dell poweredge servers
 vcp 4
 protocol analysis
@@ -1511,10 +1561,8 @@ rf design
 signal processing
 brazilian portuguese
 english
-people management
 people skills
 ceh
-checkpoint
 atlassian jira
 client services
 cygwin
@@ -1530,10 +1578,14 @@ data processing
 deployment
 customer-focused service
 network function virtualization
+net promoter score
 pragmatic marketing certification
 product road mapping
 voice of the customer
 pix
+standards compliance
+strategic technology planning
+volte
 b2c marketing
 brand awareness
 cloud networking
@@ -1566,7 +1618,6 @@ qlikview
 regression models
 spss
 statistical data analysis
-text analytics
 comscore
 monetization
 authentication
@@ -1595,7 +1646,6 @@ fips 140-2
 openbsd
 samba
 zfs
-competitive intelligence
 smb
 document management
 email archiving
@@ -1615,7 +1665,6 @@ credit analysis
 data network design
 equity research
 fixed income
-valuation
 fiber optic networks
 qa engineering
 applicant tracking systems
@@ -1649,6 +1698,7 @@ hdfs
 oozie
 investigation
 audio conferencing
+voice communications
 mpls networking
 financial forecasting
 relationship building
@@ -1689,6 +1739,7 @@ remote sensing
 spatial analysis
 spatial databases
 surveying
+communication skills
 film
 bras
 cisco certified internetwork expert (ccie)
@@ -1712,6 +1763,7 @@ career counseling
 employee benefits
 hr consulting
 oracle hr
+sales recruitment
 sap hr
 volunteer management
 apache mesos
@@ -1766,6 +1818,8 @@ customer focus
 customer presentations
 proofreading
 enterprise marketing
+lean manufacturing
+supply management
 datacenter virtualization
 network assessments
 network communications
@@ -1774,7 +1828,6 @@ government procurement
 communication
 field marketing
 lead management
-executive leadership
 analog circuits
 cvd
 intel
@@ -1792,7 +1845,6 @@ diversity & inclusion
 executive-level communication
 public policy
 functional verification
-gigabit ethernet
 network operations
 otn
 product support
@@ -1820,6 +1872,9 @@ packaging
 jms
 ninja skills
 struts
+ai
+federal government
+local government
 lotus notes
 vbscript
 database development
@@ -1845,41 +1900,43 @@ npm
 webstorm
 html + css
 virtualbox
+acd
+cisco icm
+virtual teams
 prometheus
 marketing research
 selling skills
 globalization
 linguistics
+machine translation
 multilingual
 translation
 cost control
 mac os
-podcasting
 rtl design
 static timing analysis
 systemverilog
 data engineering
 scikit-learn
-xmpp
 digital tv
 mpeg
-emerging markets
 j2me
 oracle enterprise manager
 smart cards
 technology evangelist
+business architecture
+infrastructure management
+it infrastructure management
 amazon rds
 craft beer
 pre/post sales engineers
 system design
-virtual teams
 bdd
 cucumber
 compliance pci
 planning budgeting & forecasting
 regulatory compliance
 scaled agile framework
-strategic technology planning
 diameter
 analog
 college recruiting
@@ -1896,13 +1953,14 @@ special events
 microwave
 build automation
 gap analysis
+e-commerce seo
+interactive tv
 bluecoat
 cisco ise
 it security best practices
 administration
 application development
 consultancy
-ai
 cuda
 network-attached storage (nas)
 bilingual
@@ -1925,9 +1983,15 @@ bmc patrol
 installshield
 jboss eap
 networking protocol
+laravel
+mvc
+zend framework
 property management
 web services api
 demand forecasting
+entertainment
+global management
+technology
 ccda
 osgi
 service oriented architecture design
@@ -1947,19 +2011,18 @@ aop
 interpersonal communication
 interpersonal skills
 logic synthesis
-pcie
 problem analysis
 universal verification methodology (uvm)
 sourcefire
+resource allocation
 it infrastructure design
-it infrastructure management
 cabling
 network hardware
+novell netware
 scsi
 telecommunications systems
 joint ventures
 portuguese
-customer lifecycle management
 product owner
 gradle
 identity & access management (iam)
@@ -1974,10 +2037,11 @@ c++ language
 graph databases
 neo4j
 x86 assembly
+global sourcing
+sustainability
 invoicing
 cable television
 conditional access
-interactive tv
 mpeg-4
 satellite
 transcoding
@@ -1994,6 +2058,8 @@ gui test automation
 hp quality center
 test automation framework
 test automation tools
+consumer insights
+market entry
 art direction
 direct mail
 eloqua
@@ -2001,18 +2067,18 @@ global strategy
 media buying
 project coordination
 project execution
-strategic analysis
 content filtering
 directory services
 email encryption
 ssl certificates
 windows 7
-global sourcing
+technology solutions
 purchasing
 stakeholder management
 supply chain optimization
 digital transformation
 general management
+value selling
 adobe illustrator
 adobe photoshop
 bioinformatics
@@ -2022,6 +2088,7 @@ genomics
 joomla
 server administration
 business process re-engineering
+communications audits
 datacenter
 oss
 provisioning
@@ -2044,12 +2111,15 @@ hosted services
 aaa
 technology leadership
 tls
+human capital management
+taleo
+vendor relationships
+unix networking
 veterans
 ip routing
 corporate tax
 financial planning
 incident response
-investment banking
 ott
 facebook api
 google api
@@ -2059,6 +2129,7 @@ javascript libraries
 jquery mobile
 jquery ui
 sass
+website localization
 yui
 cisco wan
 computer vision
@@ -2083,6 +2154,7 @@ robotics
 solidworks
 mandarin
 code review
+fuzzing
 security audits
 security awareness
 vulnerability research
@@ -2101,7 +2173,6 @@ xbox 360
 commercials
 feature films
 film production
-partnerships
 hd video
 bitcoin
 cryptocurrency
@@ -2113,14 +2184,11 @@ feasibility studies
 i2c
 nvme
 power supplies
-serdes
-standards compliance
 x86
 distributed caching
 grid computing
 trading systems
 database marketing
-entertainment
 jsf
 spring integration
 iptables
@@ -2129,8 +2197,8 @@ openssl
 distributed databases
 product engineering
 riak
+international business development
 logistics management
-supply management
 active directory experience
 incident management
 offshoring
@@ -2143,6 +2211,10 @@ mercurial
 sqlalchemy
 vba
 vss
+gcc
+gnu tools
+latex
+open office
 analysis services
 biztalk
 microsoft office sharepoint server
@@ -2156,11 +2228,11 @@ sdk
 broadband networks
 ims
 ims db/dc
+addie
 cisco aci
 international marketing
 j2ee application development
 jpa
-mvc
 adobe premiere pro
 audio editing
 broadcast television
@@ -2201,11 +2273,15 @@ strategic thinking
 documentation
 kepner-tregoe
 java software development
+mobile application design
 molecular biology
 object oriented modeling
 solr
 rspec
 sinatra
+mme
+pgw
+sgw
 formal verification
 vmm
 atg
@@ -2231,7 +2307,6 @@ sprint planning
 electronics hardware design
 speech recognition
 prince2
-atm
 remote access
 advanced css
 indesign
@@ -2242,7 +2317,8 @@ cross-functional problem solving
 distance learning
 higher education
 software requirements
-vendor relationships
+probability theory
+virtualization technology
 aspen hysys
 chemical engineering
 energy
@@ -2276,15 +2352,18 @@ it audit
 real estate transactions
 sarbanes-oxley
 social media outreach
+avaya ip telephony
+cucm
+vmware workstation
 edi
 giac
+mcitp
 educational technology
 security+
 payment card industry data security standard (pci dss)
 weka
 antennas
-flash memory
-people development
+project management office (pmo)
 antlr
 database admin
 database administration
@@ -2294,7 +2373,6 @@ debuggers
 development tools
 mips
 business process design
-taleo
 pycharm
 rackspace
 rightscale
@@ -2317,9 +2395,9 @@ haproxy
 mrtg
 performance monitoring
 process management
-human capital management
+amazon cloud
+optical network
 workday
-acd
 data warehouse architecture
 network performance management
 network protocol design
@@ -2350,9 +2428,8 @@ meraki
 postman
 communications planning
 customer advocacy
-swot analysis
-latex
 optimizations
+music theory
 corba
 fortinet
 packet analysis
@@ -2362,7 +2439,6 @@ two-factor authentication
 pci standards
 electronic trading
 hedge funds
-oauth
 nant
 disk arrays
 ccip
@@ -2375,11 +2451,9 @@ ppp
 backhaul
 research design
 scheduling
-publications
 banking
 internal controls
 operational risk management
-lean manufacturing
 military operations
 navy
 operational planning
@@ -2394,6 +2468,7 @@ cisco catalyst switches
 rsa security
 tacacs+
 websense
+codecs
 digital image processing
 ip cameras
 video coding
@@ -2426,7 +2501,6 @@ fraud detection
 security compliance
 security information and event management (siem)
 csm
-infiniband
 ip vpn
 cisco mds san switches
 vxlan
@@ -2434,7 +2508,6 @@ exchange connectivity
 embedded software programming
 investment properties
 market development
-market entry
 backup exec
 aircraft
 aircraft maintenance
@@ -2447,6 +2520,21 @@ private pilot
 portals
 apache hadoop
 large scale deployments
+3d graphics
+3d visualization
+adobe creative cloud
+after effects
+branding
+computer animation
+flash animation
+illustration
+logo design
+maya
+motion graphics
+page layout
+storyboarding
+typography
+ui
 fttx
 customer oriented
 glassfish
@@ -2471,7 +2559,6 @@ l2tp
 rsvp
 alteryx
 business intelligence tools
-creative writing
 extract
 load (etl)
 operating budgets
@@ -2501,6 +2588,8 @@ cost reduction
 employee training
 technology development
 technology transfer
+axure rp
+invision
 brochures
 hyperion enterprise
 inbound marketing
@@ -2515,7 +2604,6 @@ multi-channel retail
 brand loyalty
 cloud foundry
 consumer behavior
-consumer insights
 apache tomcat
 software engineering practices
 sketchup
@@ -2523,7 +2611,7 @@ oracle application server
 das
 drive test
 mapinfo
-volte
+new product implementations
 cruisecontrol
 ehcache
 loadrunner
@@ -2566,6 +2654,7 @@ pim
 syslog
 vpc
 fmcg
+dispute resolution
 legal research
 legal writing
 financial markets
@@ -2582,6 +2671,7 @@ technical staff management
 innovation development
 secure network architecture
 disruptive technologies
+investor relations
 biochemistry
 biotechnology
 ip phones
@@ -2597,6 +2687,7 @@ broadcast engineering
 dark fiber
 private line
 start-up consulting
+rtcp
 thrift
 computer games
 gaming
@@ -2611,39 +2702,36 @@ electronic payments
 corporate social responsibility
 environmental policy
 smart cities
-sustainability
 ad hoc reporting
 defect tracking
 regression
 netcool
+budget process
 java swing
 security analysis
 threat analysis
-optical network
 cdma2000
 rsa securid
 siteminder
 process automation
-customer success
+applications delivery
 sparc
 juniper jncia
 srx
 lidar
 system software
-editorial
 feature articles
 news writing
 online journalism
 web content writing
+territory management
 evpn
 live video streaming
 conference speaking
 behavior-driven development (bdd)
 netbeans
 layout
-logo design
 angular 2
-axure rp
 capybara
 ecmascript
 extjs
@@ -2653,13 +2741,14 @@ selenium webdriver
 typescript
 forwarding
 conflict resolution
-project management office (pmo)
 data acquisition
 instrumentation
 labview
 mems
 oscilloscope
 rs232
+metasploit
+social engineering
 html/xml
 modbus
 spi
@@ -2680,19 +2769,15 @@ ibm tivoli
 node
 saml 2.0
 single sign-on (sso)
-federal government
 gitlab
 windows programming
 agile methodolgy
 maintenance & repair
 network management
-avaya ip telephony
-communication skills
 ipt
 high availability architecture
 routage
 agile testing
-collaborative leadership
 capital markets
 credit
 equities
@@ -2700,13 +2785,14 @@ project finance
 offshore software development
 escalations management
 reliability engineering
+cloudstack
 oracle fusion middleware
 customer facing roles
 vault
 mobile broadband
 compilers
 synchronous digital hierarchy (sdh)
-business architecture
+consolidation
 com
 facilitation
 ios-xr
@@ -2725,6 +2811,7 @@ data quality
 sql server integration services (ssis)
 sql server reporting services (ssrs)
 rmi
+velocity
 css javascript
 emr
 mahout
@@ -2733,7 +2820,6 @@ security
 physical verification
 application programming interfaces
 back-end web development
-branding
 azure
 cwna
 wireless network design
@@ -2743,6 +2829,7 @@ analog circuit design
 cadence virtuoso
 circuit design
 cmos
+educational leadership
 low-power design
 modelsim
 simulink
@@ -2755,7 +2842,6 @@ facebook marketing
 global operations
 ab initio
 autosys
-cleantech
 customer journey mapping
 lean software development
 renewable energy
@@ -2768,12 +2854,10 @@ system center
 trill
 waas
 account planning
-infrastructure management
 knockoutjs
 adsl
 ds3
 it sales
-technology solutions
 clearquest
 internet routing
 sales force development
@@ -2819,7 +2903,6 @@ internet information services (iis)
 netbackup
 jruby
 windows communication foundation (wcf)
-global management
 internet troubleshooting
 dhtml
 citrix metaframe
@@ -2830,8 +2913,10 @@ community development
 application servers
 new relic
 wikis
+creative development
 promotions
 signal transfer point (stp)
+cisco spark
 linux device drivers
 simd
 adobe acrobat
@@ -2873,6 +2958,7 @@ polycom
 team development
 technology architecture
 ipcc express
+profit
 dell switches
 f5
 vyatta
@@ -2904,13 +2990,11 @@ ddos mitigation
 salesforce
 ccie collaboration
 exchange 2010/2007/2003
-mcitp
 functional testing
 phpunit
 responsive design
 stash
 symfony
-zend framework
 fitnesse
 jprofiler
 tibco
@@ -2926,6 +3010,8 @@ situational leadership
 pppoe
 coaching & mentoring
 software integration
+procure-to-pay
+sap hana
 sun certified java programmer
 android studio
 nhibernate
@@ -2989,6 +3075,7 @@ web testing
 webdriver
 actix
 dashboard metrics
+quality auditing
 group policy
 it security policies
 mcse 2003
@@ -3027,7 +3114,6 @@ apache storm
 stream processing
 air force
 dod top secret clearance
-invision
 delphi
 amazon ebs
 music
@@ -3054,6 +3140,7 @@ gre tunnels
 ios firewall
 fraud
 altera
+ggsn
 litigation
 ajax frameworks
 d3.js
@@ -3067,19 +3154,18 @@ telemetry
 network services
 log analysis
 concurrency
+business acumen
 it consulting
 salesforce.com implementation
 strategic data analysis
 network troubleshooting
 wine
-territory management
 career development
 deferred compensation
 cme
 gatekeeper
 youth mentoring
 report writing
-divestitures
 essbase
 variance analysis
 performance measurement
@@ -3088,6 +3174,7 @@ symbian
 kibana
 packer
 saltstack
+wccp
 optics
 quartz
 spring data
@@ -3104,9 +3191,9 @@ instructional technology
 learning management
 needs analysis
 capacity management
+data center consolidation
 byod
 microsoft dynamics crm
-broadband access
 hosted voice
 drbd
 marathon
@@ -3115,6 +3202,7 @@ commissioning
 dcs
 plc
 html scripting
+web strategy
 webkit
 software defined network
 automated software testing
@@ -3126,7 +3214,6 @@ software solution architecture
 interior design
 intelligence analysis
 product life cycle
-e-commerce seo
 search engines
 api design
 greenplum
@@ -3146,17 +3233,18 @@ desktop administration
 sales prospecting
 isilon
 hipaa
+desktop application support
 wpf development
 workforce management
 openshift
 pytest
 quality engineering
-ui automation
 assembler
 sdl
 inside sales
 sfdc
 sec filings
+circuit analysis
 bsd
 cdn
 wireless mesh
@@ -3172,7 +3260,6 @@ machine vision
 motion control
 switch
 business communications
-community outreach
 mobile application development
 retail banking
 order management
@@ -3201,6 +3288,12 @@ mobility management
 apple remote desktop
 applescript
 macos
+broadcasting
+final cut pro
+cpa
+us gaap
+access control
+email
 crisis management
 grants
 grassroots organizing
@@ -3218,6 +3311,7 @@ altium designer
 construction
 construction management
 freertos
+pcb layout design
 plc programming
 systems design
 angular.js
@@ -3240,11 +3334,11 @@ lan
 optical transport network (otn)
 distributed storage
 applications
+21 cfr part 11
 executive reporting
 functional design
 version one
 apache hive
-sentiment analysis
 social network analysis
 nlp
 business support system (bss)
@@ -3280,17 +3374,17 @@ adobe experience manager
 solar energy
 customer management
 ftp
-final cut pro
 radio broadcasting
 burp suite
-metasploit
 pfsense
 emc networker
 mpls-te
+cost accounting
 remote user support
 human factors engineering
 sitecore
 technical product training
+hardware bring-up
 administrative assistance
 administrative assistants
 office management
@@ -3318,11 +3412,13 @@ elixir
 foreign languages
 growth hacking
 emv
+supplier management
 protocol buffers
 directx
 game programming
 dodaf
 enterprise it strategy
+it procurement
 sap erp
 apache 2
 huawei
@@ -3343,7 +3439,6 @@ high frequency trading
 asr9k
 fabricpath
 information graphics
-magazines
 kernel drivers
 mining
 discrete event simulation
@@ -3361,13 +3456,16 @@ hp procurve networking
 keynote
 music industry
 outside sales
-technology
 pega prpc
 military experience
 meetingplace
 unity express
 rational doors
 rational quality manager
+cq5
+data backup solutions
+linux desktop
+nis
 statistical process control (spc)
 vmware vcenter
 ip sla
@@ -3378,16 +3476,15 @@ customer intelligence
 osi model
 distributed computing
 mathematical programming
+domo
 offshore outsourcing
 cisco jabber
-cucm
 cuic
 amqp
 javase
 jmx
 mobile game development
 windows services
-3d graphics
 gpu
 ethereum
 kaizen
@@ -3399,45 +3496,40 @@ computational linguistics
 experimental design
 ofdm
 ci/cd
-pgw
 gimp
 cisco unity connection
-web strategy
 idea generation
 ps3
 client relations
 inventory control
 econometrics
-after effects
 firebug
 offshore management
 premiere
 vmware fusion
 appium
-flash animation
 pyunit
-vmware workstation
 flask
 spock
-cloudstack
 kernel-based virtual machine (kvm)
 msdp
 jersey
 wsus
+cisco prime
+hp networking
 codeigniter
 owasp
 threat modeling
 vmware certified professional
+cisco unified communications manager
 unified presence
 soccer
 hootsuite
-amazon cloud
 atoll
 microsoft crm
 dns management
 computers
 racket
-access control
 batch programming
 agilent ads
 network analyzer
@@ -3462,7 +3554,7 @@ dbms
 iwan
 openwrt
 enterprise integration
-hardware design
+drools
 trend micro
 third party vendor management
 virtual desktop infrastructure
@@ -3470,10 +3562,8 @@ sitescope
 autoit
 sensu
 3d studio max
-computer animation
-maya
-storyboarding
 iwork
+laser
 optoelectronics
 photonics
 campaign management
@@ -3486,14 +3576,12 @@ snowboarding
 acls
 segment routing
 service assurance
-hp networking
 cdp
+employment law
 oracle crm
 order to cash
-procure-to-pay
 tax compliance
 platform development
-board bring-up
 backend development
 hacking
 router
@@ -3513,8 +3601,6 @@ post-sales
 it security operations
 3d modeling
 3d rendering
-illustration
-motion graphics
 xna
 vb
 apache cassandra
@@ -3537,17 +3623,24 @@ mariadb
 a10
 apigee
 integration architecture
-3d visualization
 geophysics
 pattern recognition
 scientific computing
+802.11n
+cisco access points
+link aggregation
+wireless lan controller
+wireless site surveys
 enterprise portals
 core data
 schematic capture
+iso standards
 vmware server
 python (programming language)
 svg
+manage client relationships
 application centric infrastructure
+gd&t
 quality system
 growth strategies
 command
@@ -3557,24 +3650,22 @@ scss
 db2/sql
 sql server 2000-2008
 windows xp professional
-budget process
 chrome extensions
 primary research
 trend analysis
+dtrace
 performance benchmarking
 it security
 cloudera
 mesos
 ddd
 solution implementation
-sap hana
 springsource
 lamp administration
 zabbix
 dpdk
 certified salesforce.com developer
 salesforce.com development
-manage client relationships
 do-178b
 soldering
 telelogic doors
@@ -3583,10 +3674,11 @@ capital equipment
 clinical research
 liquibase
 it automation
+llvm
 javafx
+x86 virtualization
 nand flash
 technical presales
-drools
 google webmaster tools
 phpmyadmin
 wcf services
@@ -3595,8 +3687,10 @@ selinux
 erwin
 characterization
 photolithography
+policy and charging rules function (pcrf)
 cloudformation
 salt
+windows nt
 bladecenter
 shaders
 apache cxf
@@ -3617,8 +3711,8 @@ data storage technologies
 verification
 2008 r2
 agile development
+testing tools
 ccnp security
-802.11n
 comptia
 logic pro
 ibm bluemix
@@ -3662,7 +3756,6 @@ systems integration
 gui development
 parallel algorithms
 vxml
-gcc
 kotlin
 dicom
 bpel
@@ -3681,7 +3774,6 @@ quantitative finance
 stochastic calculus
 trading
 visual basic for applications (vba)
-gnu tools
 validation
 etl testing
 drawing
@@ -3689,10 +3781,10 @@ agile web development
 oracle database administration
 local area network
 sas programming
+i18n
 sdk development
 windbg
 seo copywriting
-cpa
 jaxb
 netscaler
 octave
@@ -3702,7 +3794,6 @@ apex programming
 razor
 soql
 openldap
-cq5
 ms excel pivot tables
 sed
 natural gas
@@ -3710,12 +3801,14 @@ xamarin
 ibatis
 mail server
 written communication
+process consulting
 opencl
 excel pivot
 pivot tables
 end user training
 erp implementations
 datastage
+banquets
 catering
 food
 food & beverage
@@ -3738,6 +3831,12 @@ juniper srx
 osx
 domain-driven design (ddd)
 dynatrace
+text editing
+ansys
+catia
+finite element analysis
+fluid dynamics
+numerical simulation
 radian6
 credit cards
 mcsa
@@ -3748,7 +3847,6 @@ technical consultation
 cloudera impala
 storage systems
 phy
-catia
 vue
 axi
 specman
@@ -3756,43 +3854,44 @@ continuous integration and continuous delivery (ci/cd)
 mct
 cctv
 refactoring
-social engineering
+adaptive streaming
 slack
 wearables
-numerical simulation
 oil & gas industry
 jcl
 vsam
 jndi
 lithography
 igmp snooping
+ddr3
 compellent
 firewall administration
+certified scrum master
 gmpls
 stata
 tacacs
 analog design
-link aggregation
 data
+bmc remedy ticketing system
 artifactory
+technical services
 image analysis
 ipc
 traffic analysis
 abap
-page layout
 posters
-typography
 design
 brocade fibre switches
 nc-verilog
 oracle coherence
+reporting
+reporting & analysis
+transition management
 ccie service provider
-sgw
 it compliance
 it security assessments
 network security implementation
 windows security
-laravel
 bpmn
 use case analysis
 transact-sql (t-sql)
@@ -3819,11 +3918,13 @@ getvpn
 gnu compiler collection (gcc)
 logic analyzer
 information extraction
+isup
 tutoring
 satcom
 c4isr
 full-stack development
 amazon cloudfront
+cicd
 arcsde
 data conversion
 interviewing skills
@@ -3832,6 +3933,7 @@ java enterprise architecture
 ethical hacker
 jncie
 symantec backup
+avaya communication manager
 sap basis
 tems investigation
 strategic brand positioning
@@ -3844,10 +3946,12 @@ survey research
 server monitoring
 business process automation
 health insurance
+802.11
 icmp
 lldp
 telnet
 tftp
+rules engines
 smalltalk
 altera quartus
 microchip pic
@@ -3859,6 +3963,7 @@ nielsen
 blackberry applications
 cloud architecture
 gerrit
+failure mode and effects analysis (fmea)
 jmp
 photovoltaics
 atlassian
@@ -3873,13 +3978,13 @@ ambari
 liferay
 nexus 1000v
 arabic
-reporting & analysis
 a+ certified
 channel account management
 revenue forecasting
 community engagement
 printers
 windows & mac operating systems
+hitachi storage
 audio post production
 hp server hardware
 telecommunication services
@@ -3903,15 +4008,17 @@ jvm
 google tag manager
 product naming
 rake
-cisco access points
+comptia a+
 smartsheet
-local government
 nonprofit organizations
 qnx
+business process outsourcing (bpo)
 video post-production
 axis2
 spring batch
 spring di
+webcasting
+oracle access manager
 qualtrics
 adp payroll
 boost
@@ -3943,22 +4050,22 @@ java database connectivity (jdbc)
 employee management
 pro tools
 minitab
+vlookup
 asset managment
 hp application lifecycle management
 ms office
 hubspot
 owl
 sparql
-cisco icm
+media gateway control protocol (mgcp)
 balsamiq
-computer engineering
 collateral
 datacentres
+international trade
 team foundation server (tfs)
 xml-rpc
 google sheets
 iphone support
-expect
 j2ee web services
 continuous process improvement
 itil process implementation
@@ -3966,10 +4073,10 @@ oracle vm
 recoverpoint
 technical project delivery
 leaflet
-cmts
+ccie data center
 avro
 mongo
-reporting
+sre
 fpga prototyping
 j2se
 scipy
@@ -3986,6 +4093,9 @@ doxygen
 h323
 postgres
 yacc
+intranet
+pardot
+salesforce.com consulting
 visualforce pages
 ionic framework
 data driven testing
@@ -3999,7 +4109,6 @@ tdma
 ollydbg
 operational efficiency
 cisco ace
-adaptive streaming
 customer segmentation strategy
 tornado
 doubleclick
@@ -4013,6 +4122,9 @@ es6
 code coverage
 aws cloudformation
 windows system administration
+pro engineer
+ptc creo
+cisco nac
 biomedical engineering
 gmp
 ossec
@@ -4041,25 +4153,22 @@ wordpress design
 appdynamics
 adult education
 ui testing
-intranet
 activerecord
 pair programming
 microarchitecture
 informix
 can bus
 lvm
-nis
 cfengine
 community organizing
 political science
 network address translation (nat)
+gulp
 ms sql server
 sigint
 celery
 nexus 5k
 panda
-ansys
-ccie data center
 multithreaded application development
 quarkxpress
 visual communication
@@ -4070,8 +4179,9 @@ cisco firepower
 firepower
 major accounts
 ospfv3
+department budgeting
+performance appraisal
 chrome os
-cisco prime
 microsoft visio
 enterprise architect
 adobe audition
@@ -4080,14 +4190,16 @@ cvp
 jdeveloper
 outstanding interpersonal communication skills
 weblogic administration
+hfss
 plsql
+microsoft cluster
 coffee
 elastic load balancing
 cpr certified
 w3c accessibility
 tax law
 jax-ws
-wireless lan controller
+call center administration
 proxmox
 port security
 prtg
@@ -4097,6 +4209,7 @@ gui testing
 low level programming
 sql server management studio
 hss
+cisco emergency responder
 ids/ips
 voice gateways
 sketch
@@ -4122,6 +4235,7 @@ object oriented software
 webgl
 xampp
 jasmine framework
+email marketing software
 ms-dos
 ccie security
 business process analysis
@@ -4138,6 +4252,7 @@ ccent
 ccna voice
 westlaw
 gulp.js
+message queue
 electricians
 sphinx
 magento
@@ -4147,20 +4262,21 @@ accurev
 nexus 9k
 java application development
 linux network administration
-cost accounting
 esl
 pxe
 geology
 manufacturing operations management
 eap
-open office
+uefi
 windows vista
 dell computers
 electromagnetics
 system center configuration manager (sccm)
 rxjava
+yourkit
 rust
 graduate recruitment
+phishing
 beer
 open vswitch
 datapower
@@ -4170,7 +4286,7 @@ micro services
 msp430
 uart
 mortgage lending
-cisco unified communications manager
+interpersonal skill
 exploratory testing
 avid
 polycom video conferencing
@@ -4182,19 +4298,19 @@ machining
 fx options
 sap netweaver business warehouse (sap bw)
 av
-llvm
 oracle application express
 back-end development
-sre
 apex
+loss prevention
 security training
 tinyos
 utran
 web2py
+sctp
 airflow
-us gaap
-bootstrapping
+inventory
 industrial engineering
+bootstrapping
 revit
 space planning
 accumulo
@@ -4203,7 +4319,6 @@ virtual router redundancy protocol (vrrp)
 toad 9.0
 mailchimp
 ida pro
-domo
 php frameworks
 fireeye
 gnu/linux
@@ -4218,14 +4333,13 @@ apex data loader
 docker swarm
 qa
 dns server
-microsoft cluster
 sublime text
 object-relational mapping (orm)
 storm
 version control tools
 atg commerce
-employment law
 microsoft power bi
+accruals
 visual studio team system
 system center suite
 8051 assembly
@@ -4236,31 +4350,26 @@ proteus
 ansi c
 atmel avr
 network simulation
+oracle r12 financials
 mantis
 cisco pix
-sctp
 synopsys primetime
+microsoft sharepoint
 cube
-isup
+a+
 store management
 cisco trustsec
 java architecture for xml binding (jaxb)
 rrc
-finite element analysis
 fluid mechanics
 pthreads
 openmpi
 cisco network devices
-broadcasting
 replication technologies
 citrix netscaler
 cooking
-cisco nac
-pro engineer
-ptc creo
 algorithm development
 netty
-yourkit
 jta
 cross selling
 radar
@@ -4268,7 +4377,6 @@ calculus
 linear algebra
 qualifying prospects
 software troubleshooting
-transition management
 robot programming
 fine art
 cobbler
@@ -4279,10 +4387,10 @@ cplex
 linear programming
 computer maintenance
 mac & pc platforms
-message queue
 computer networks
 openid
 oracle forms
+oracle general ledger
 sql*plus
 stochastic processes
 jee
@@ -4294,6 +4402,7 @@ oracle 10g
 nutrition
 laboratory
 experimentation
+redux.js
 thymeleaf
 classification
 sas e-miner
@@ -4303,13 +4412,13 @@ primavera p6
 project control
 verdi
 goal oriented
-wireless site surveys
 computer hardware troubleshooting
 electrical troubleshooting
 cisco unified presence
 autodesk inventor
 computer-aided design (cad)
 functional analysis
+nesc
 dslam
 java web services
 openvz
@@ -4325,12 +4434,15 @@ fixed assets
 ipsec vpn
 cue
 remote desktop
+aix administration
 afm
 powder x-ray diffraction
 image editing
 painting
 friendly personality
 gstreamer
+cadence spectre
+spectre
 dynamic multipoint virtual private network (dmvpn)
 fiddler
 pcr
@@ -4342,19 +4454,20 @@ technology consulting
 vaadin
 theatre
 xilinx ise
+microsoft office suite
 5s
 close attention to detail
 fast learner
+decision analysis
 desktop computers
 object oriented programming
+mongo db
 testrail
-cadence spectre
 digital ic design
 basecamp
 curl
 three.js
 express
-probability theory
 cell culture
 printer support
 mips assembly
@@ -4362,20 +4475,22 @@ web logic
 it security policies & procedures
 payment gateways
 google drive
+microstrategy reporting
 dependency injection
 avaya aura
+mathcad
+classroom
 notepad++
 stochastic modeling
+asic design
 vlsi cad
 kpi dashboards
 bower
 grunt
-nesc
 skilled multi-tasker
 openvpn
 jni
 network+
-data backup solutions
 processing
 managed print services
 data manipulation
@@ -4385,8 +4500,8 @@ scanning electron microscopy
 bloomberg terminal
 dependable team player
 linux/unix
-avaya communication manager
 homeland security
+semiconductor fabrication
 comsol
 rtc
 tomcat 5
@@ -4397,24 +4512,26 @@ eagle pcb
 windows driver development
 regression analysis
 materials
+gephi
+escalation resolution
 arena simulation software
 basics of unix
 windows 7 migration
-spectre
 wamp
 ssas 2008
 symfony framework
 pecvd
 basic html
-comptia a+
-linux desktop
 linux tools
 apple certified
 test case generation
 d3
 hardware testing
 jbehave
+management accounting
 jest
+tcp/udp
+multimeter
 tibco businessworks
 tibco ems
 asic verification
@@ -4435,9 +4552,6 @@ user datagram protocol (udp)
 remote troubleshooting
 srst
 xml publisher
-gephi
-gulp
-decision analysis
 bookkeeping
 factory
 food safety
@@ -4447,6 +4561,8 @@ p&id
 hibernate 3.1
 teradata sql
 virtual routing and forwarding (vrf)
+software testing life cycle (stlc)
+bash scripting
 synopsys vcs
 xilinx vivado
 code composer studio
@@ -4458,6 +4574,7 @@ android testing
 hot standby router protocol (hsrp)
 functional coverage
 visual merchandising
+tecnología de cisco
 afghanistan
 simplescalar
 object-oriented languages
@@ -4471,7 +4588,6 @@ hypothesis testing
 java applets
 .net core
 maple
-certified scrum master
 graph theory
 qt creator
 rethinkdb
@@ -4481,7 +4597,7 @@ html emails
 questa
 apache solr
 ni multisim
-mathcad
+cadence schematic capture
 google maps api
 c language
 codewarrior
@@ -4499,6 +4615,7 @@ zephyr
 filezilla
 winscp
 student affairs
+microsoft publisher
 comptia network+ certified
 leases
 sas base
@@ -4510,7 +4627,6 @@ ltspice
 mssql
 survival analysis
 sas certified base programmer
-bash scripting
 crm databases
 synopsys design compiler
 actuarial science
@@ -4521,13 +4637,12 @@ tetramax
 perl scripting
 vat
 packet tracer
-classroom
 phone etiquette
 force protection
 digital designs
+laboratory skills
 twilio
 windows 8.1
-circuit analysis
 node js
 computer hardware installation
 computational physics

@@ -202,7 +202,7 @@ for (x, y), n in cxy.items():
     pmi_samples[(x, y)] = data[-1]
 PMI = csc_matrix((data, (rows, cols)))
 del data, rows, cols, probabilities
-U, _, _ = svds(PMI, k=100)
+U, _, _ = svds(PMI, k=150)
 norms = np.sqrt(np.sum(np.square(U), axis=1, keepdims=True))
 U /= np.maximum(norms, 1e-9)
 np.save("/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/lda_pmi.npy", U)
@@ -315,7 +315,7 @@ for (x, y), n in cxy.items():
 PMI = csc_matrix((data, (rows, cols)))
 del data, rows, cols, probabilities
 
-U, _, _ = svds(PMI, k=100)
+U, _, _ = svds(PMI, k=150)
 norms = np.sqrt(np.sum(np.square(U), axis=1, keepdims=True))
 U /= np.maximum(norms, 1e-9)
 
