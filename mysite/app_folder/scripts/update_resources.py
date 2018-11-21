@@ -30,6 +30,22 @@ To preserve word context, text is sent_split with pattern
 
 """
 
+Parameters
+
+"""
+
+WINDOW_SIZE = 5
+WORD_VEC_SIZE = 150
+SKILL_VEC_SIZE = 100
+WORKERS = 8
+MIN_WORD_COUNT = 20
+MAX_WORD_RATIO = 0.9
+MIN_SKILL_COUNT = 20
+MAX_SKILL_RATIO = 0.9
+
+
+"""
+
 Words
 
 """
@@ -68,6 +84,7 @@ def clean(s):
     s = abbr.sub("", s)
     return s
 
+
 def filter_tokens(x):
     if x in set(string.punctuation) or x in set(string.whitespace):
         return False
@@ -81,17 +98,13 @@ def filter_tokens(x):
         return False
     return True
 
+
 def preprocess_text(x):
     from pattern.en import parsetree
 
     doc = clean(x['summary'])
     tree = parsetree(doc, tokenize=True, lemmata=True)
     doc = [sent.lemma for sent in tree]
-    # if preserve_sent is False:
-    #     pdoc = [word for sent in doc for word in sent]
-    #     pdoc = [word for word in pdoc if word not in punc]
-    #     pdoc = [word for word in pdoc if word not in stopwords]
-    # else:
     pdoc = []
     for sent in doc:
         psent = list(filter(lambda x: filter_tokens(x), sent))
@@ -111,7 +124,7 @@ if __name__ == "__main__":
     df.fillna("", inplace=True)
     start = datetime.now()
     print("Starting Resource Update")
-    df['lang'] = apply_by_multiprocessing(df, lang_detect, axis=1, workers=8)
+    df['lang'] = apply_by_multiprocessing(df, lang_detect, axis=1, workers=WORKERS)
     elapsed = datetime.now() - start
     print("Finished Language Detection in {}".format(elapsed.seconds))
     df = df.loc[df['lang'] == 'en']
@@ -120,13 +133,11 @@ if __name__ == "__main__":
     del df['lang']
     print("Preprocessing Text into Sentences")
     start = datetime.now()
-    df['sent'] = apply_by_multiprocessing(df, preprocess_text, axis=1, workers=8)
+    df['sent'] = apply_by_multiprocessing(df, preprocess_text, axis=1, workers=WORKERS)
     elapsed = datetime.now() - start
     print("Finished With Sentences in {}".format(elapsed.seconds))
     print("Flattening Doc")
-    df['flat'] = apply_by_multiprocessing(df, flatten_sents, axis=1, workers=8)
-
-
+    df['flat'] = apply_by_multiprocessing(df, flatten_sents, axis=1, workers=WORKERS)
 
 
 
@@ -138,7 +149,7 @@ start = datetime.now()
 dictionary = Dictionary([word for word in df['flat'].values.tolist() if len(word) > 2])
 print("Dictionary found {} unique tokens".format(len(dictionary)))
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-dictionary.filter_extremes(no_below=10, no_above=0.9)
+dictionary.filter_extremes(no_below=MIN_WORD_COUNT, no_above=MAX_WORD_RATIO)
 dictionary.compactify()
 dictionary.save(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/dictionary.model")
 
@@ -177,7 +188,7 @@ def stream_pairs(docs=df['sent'].values.tolist()):
             bow_sent = [b for b in bow_sent if b > -1]
             if len(bow_sent) < 3:
                 continue
-            windows = strided_windows(bow_sent, window_size=5)
+            windows = strided_windows(bow_sent, window_size=WINDOW_SIZE)
             for w in windows:
                 for x, y in map(sorted, combinations(w, 2)):
                     yield x, y
@@ -202,7 +213,7 @@ for (x, y), n in cxy.items():
     pmi_samples[(x, y)] = data[-1]
 PMI = csc_matrix((data, (rows, cols)))
 del data, rows, cols, probabilities
-U, _, _ = svds(PMI, k=150)
+U, _, _ = svds(PMI, k=WORD_VEC_SIZE)
 norms = np.sqrt(np.sum(np.square(U), axis=1, keepdims=True))
 U /= np.maximum(norms, 1e-9)
 np.save("/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/lda_pmi.npy", U)
@@ -254,7 +265,7 @@ print("Building Skills Dictionary")
 start = datetime.now()
 dictionary = Dictionary(df['skills'].values.tolist())
 print("Dictionary found {} unique tokens".format(len(dictionary)))
-dictionary.filter_extremes(no_below=10, no_above=0.9)
+dictionary.filter_extremes(no_below=MIN_SKILL_COUNT, no_above=MAX_SKILL_RATIO)
 dictionary.compactify()
 dictionary.save(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/resources/dictionary_skills.model")
 
@@ -315,7 +326,7 @@ for (x, y), n in cxy.items():
 PMI = csc_matrix((data, (rows, cols)))
 del data, rows, cols, probabilities
 
-U, _, _ = svds(PMI, k=150)
+U, _, _ = svds(PMI, k=SKILL_VEC_SIZE)
 norms = np.sqrt(np.sum(np.square(U), axis=1, keepdims=True))
 U /= np.maximum(norms, 1e-9)
 
