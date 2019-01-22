@@ -31,8 +31,6 @@ class FConfig(object):
     namesearch = os.path.join(basedir, 'resources{}namesearch.pkl').format(os.path.sep)
     namesearch_v2 = os.path.join(basedir, 'resources{}namesearch_v2.pkl').format(os.path.sep)
 
-    names_autocomplete = os.path.join(basedir, 'resources{}names_autocomplete.txt').format(os.path.sep)
-
     bot_key = load_p(os.path.join(basedir, 'resources{}bot_key.pkl'.format(os.path.sep)))
     bot_room_id = load_p(os.path.join(basedir, 'resources{}bot_room_id.pkl'.format(os.path.sep)))
     message_api_f = "https://api.ciscospark.com/v1/messages/{}"

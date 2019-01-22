@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block content %}
+{% include 'partials/helps/helps_diversity_lookup.html' %}
+{% if success == 'True' or success == 'False' %}
+{% else %}
+{% set original = "" %}
+{% endif %}
+
+<form action="/diversity_lookup" method="POST">
+    <div class="row">
+      <div class="col-lg-4 col-lg-offset-4">
+      <div class="input-group">
+      <input id="names_autocomplete" type="query" name="q" class="form-control" size="50" value="{{original}}" required>
+      <div class="input-group-btn">
+        <button type="query" name="button" value="query" class="btn btn-danger">Ask Percy</button>
+      </div>
+      </div>
+      </div>
+      </div>
+</form>
+
+{% if success == 'True' %}
+
+<div class="container-fluid text-center bg-white">
+    <h2>Likelihood</h2>
+    <table class="table">
+    <thead>
+      <tr>
+          <th class="text-center">Occurrences</th>
+          <th class="text-center">Male Occurrences</th>
+          <th class="text-center">Female Occurrences</th>
+          <th class="text-center">Probability Male</th>
+          <th class="text-center">Probability Female</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td> {{ result['total'] }} </td>
+        <td> {{ result['n_male'] }} </td>
+        <td> {{ result['n_female'] }} </td>
+        <td> {{ "{:.2%}".format(result['p_male']) }} </td>
+        <td> {{ "{:.2%}".format(result['p_female']) }} </td>
+
+      </tr>
+      </tbody>
+    </table>
+
+</div>
+{% elif success== 'False' %}
+<div class="container-fluid">
+    <h2>Oops!</h2>
+    <p>It would appear that the name <strong>{{ original }}</strong> is not in my database</p>
+</div>
+{% endif %}
+
+
+
+{% endblock %}
+{% block js_script %}
+{% include "datatables.html" %}
+{% endblock %}
+
+
