@@ -29,6 +29,7 @@ class FConfig(object):
     fingerprint_pop_occ = os.path.join(basedir, 'resources{}fingerprint_pop_occ.npy').format(os.path.sep)
 
     namesearch = os.path.join(basedir, 'resources{}namesearch.pkl').format(os.path.sep)
+    namesearch_v2 = os.path.join(basedir, 'resources{}namesearch_v2.pkl').format(os.path.sep)
 
     bot_key = load_p(os.path.join(basedir, 'resources{}bot_key.pkl'.format(os.path.sep)))
     bot_room_id = load_p(os.path.join(basedir, 'resources{}bot_room_id.pkl'.format(os.path.sep)))

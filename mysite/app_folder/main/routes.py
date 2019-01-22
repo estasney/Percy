@@ -16,6 +16,12 @@ def autocomplete_skills():
     return jsonify(terms)
 
 
+@bp.route('/autocomplete_names', methods=['GET'])
+def autocomplete_names():
+    names = autocomplete_tools.get_autocomplete(dataset="names")
+    return jsonify(names)
+
+
 @bp.route('/')
 def open_page():
     return render_template('home_page.html')
@@ -76,8 +82,21 @@ def tfidf():
         scored_tfidf = fp.fingerprint(user_input)
         return render_template('tf_idf.html', success='True', original=user_input, result=scored_tfidf)
 
+@bp.route('/diversity_lookup', methods=['GET', 'POST'])
+def lookup_name():
 
-@bp.route('/diversity', methods=['GET', 'POST'])
+    if request.method == "GET":
+        return render_template("diversity_lookup.html")
+
+    namesearch = diversity_tools.NameStats()
+    name_lookup = request.form.get('q', '')
+    result = namesearch.lookup(name_lookup)
+    if not result:
+        return render_template('diversity_lookup.html', success='False', original=name_lookup)
+    return render_template('diversity_lookup.html', success='True', original=name_lookup, result=result)
+
+
+@bp.route('/diversity_score', methods=['GET', 'POST'])
 def infer_diversity():
     if request.method == "GET":
         return render_template('diversity_score.html')

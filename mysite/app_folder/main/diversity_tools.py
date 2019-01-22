@@ -10,6 +10,31 @@ def load_ns(fp=FConfig.namesearch):
     with open(fp, 'rb') as pfile:
         return pickle.load(pfile)
 
+def load_ns2(fp=FConfig.namesearch_v2):
+    with open(fp, 'rb') as pfile:
+        return pickle.load(pfile)
+
+
+class NameStats(object):
+
+    def __init__(self):
+        self.namesearch = load_ns2()
+
+    def lookup(self, text):
+        match = self.namesearch.extract_keywords(text)
+        if not match:
+            return False
+        match = match[0]
+        n_male, n_female = match
+        total = n_male + n_female
+        if total > 0:
+            p_male = n_male / total
+            p_female = n_female / total
+        else:
+            p_male = 0
+            p_female = 0
+        return {'n_male': n_male, 'n_female': n_female, 'p_male': p_male, 'p_female': p_female, 'total': total}
+
 
 class NameData(object):
 
