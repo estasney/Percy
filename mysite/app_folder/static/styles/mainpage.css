@@ -23,6 +23,7 @@ body {
       padding: 100px 25px;
       font-family: Montserrat, sans-serif;
       margin-bottom: 0;
+      border-radius: 0;
   }
   .addition-word {
       background-color: rgba(69, 228, 57, 0.25);
