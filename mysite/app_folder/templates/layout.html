@@ -4,7 +4,7 @@
 <body id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">
 {% include "navbar.html" %}
 
-<div class="jumbtotron text-center">
+<div class="jumbotron text-center">
   <h1>Percy</h1>
   <p>Data Science + Talent Acquisition</p>
 </div>
@@ -32,4 +32,4 @@
 
 {{ moment.include_moment() }}
 </body>
-{{ % block js_script %}{% endblock %}
+{% block js_script %}{% endblock %}
