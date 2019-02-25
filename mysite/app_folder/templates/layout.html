@@ -3,12 +3,12 @@
 {% include "head.html" %}
 <body id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">
 {% include "navbar.html" %}
-
+{% block jumbotron %}
 <div class="jumbotron text-center">
   <h1>Percy</h1>
   <p>Data Science + Talent Acquisition</p>
 </div>
-
+{% endblock %}
 <div id="content">{% block content %}{% endblock %}</div>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -31,8 +31,6 @@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script>
 <!-- typeahead -->
 <script src="https://estasney.pythonanywhere.com/js/typeahead.js"></script>
-<!-- rangeslider.js -->
-<script src="https://estasney.pythonanywhere.com/js/rangeslider.js"></script>
 
 {{ moment.include_moment() }}
 </body>
