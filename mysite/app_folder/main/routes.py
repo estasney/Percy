@@ -132,7 +132,7 @@ def infer_diversity():
 def kw_data():
     raw_text = request.form.get('raw_text')
     if not raw_text:
-        abort(401)
+        abort(404)
 
     window_size = int(request.headers.get('Window-Limit', 2))
 

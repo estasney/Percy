@@ -256,3 +256,15 @@ body {
   cursor: pointer;
 }
 
+.slider-output {
+  font-size: 1.1rem;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  padding: .375rem 1rem;
+  color: #fff;
+  border-radius: .25rem;
+  background-color: #555bde;
+
+}
