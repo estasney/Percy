@@ -268,3 +268,22 @@ body {
   background-color: #555bde;
 
 }
+
+.pt-menu {
+ background-color: #ffffff;
+ border: 1px solid #aaaaaa;
+ border-radius: 4px;
+ position: relative!important;
+
+}
+
+.pt-highlight {
+ background-color: #fff707b3;
+}
+
+.pt-cursor {
+    	border: 1px solid #999999;
+	background: #dadada url(images/ui-bg_glass_75_dadada_1x400.png) 50% 50% repeat-x;
+	font-weight: normal;
+	color: #212121;
+}
