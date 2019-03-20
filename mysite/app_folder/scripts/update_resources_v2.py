@@ -8,8 +8,8 @@ import pandas as pd
 import json
 import sys
 
-sys.path.append(r"/home/eric/PycharmProjects/Percy/mysite")
-
+# sys.path.append(r"/home/eric/PycharmProjects/Percy/mysite")
+sys.path.append(r"C:\Users\estasney\PycharmProjects\webwork\mysite")
 
 
 """
@@ -34,11 +34,21 @@ MIN_WORD_COUNT = 10
 MAX_WORD_RATIO = 0.9
 MIN_SKILL_COUNT = 25
 MAX_SKILL_RATIO = 0.9
-TMP_DIR = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp"
+
+
+TMP_DIR = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp"
+LANG_FILE = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\lang\lang_id.json"
+CORPUS_FILE = r"C:\Users\estasney\PycharmProjects\FlaskAPIWeb\scripts2\corpus.csv"
+
+# LANG_FILE = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/lang/lang_id.json"
+# TMP_DIR = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp"
+# CORPUS_FILE = r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv"
+
+
 TMP_DIR_RAW = os.path.join(TMP_DIR, "raw")
 TMP_DIR_SENT = os.path.join(TMP_DIR, "sent")
 TMP_DIR_PHRASES = os.path.join(TMP_DIR, "phrases")
-LANG_FILE = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/lang/lang_id.json"
+
 
 """
 
@@ -67,13 +77,16 @@ def export_df(df, dir_out=TMP_DIR_RAW):
 if __name__ == "__main__":
     make_tmp_dirs(d_list)
 
-    df = pd.read_csv(r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv")
+    print("Starting Resource Update")
+    df = pd.read_csv(CORPUS_FILE)
+    original_count = len(df)
     df.dropna(subset=['summary'], inplace=True)
+
+    print("Dropped {} Null Records from Summary".format(original_count - len(df)))
     original_count = len(df)
     df.fillna("", inplace=True)
     start = datetime.now()
 
-    print("Starting Resource Update")
     print("Starting Language Detection")
 
     # merge in lookups if they exist
