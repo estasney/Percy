@@ -3,10 +3,14 @@ import os
 from gensim.models.phrases import Phrases, Phraser
 from mysite.app_folder.scripts.utils.streaming import DocStreamer
 import easygui
+#
+# EXCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/excluded.txt"
+# INCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/included.txt"
+# PHRASE_DUMP = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/phrase_dump.txt"
 
-EXCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/excluded.txt"
-INCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/included.txt"
-PHRASE_DUMP = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/phrase_dump.txt"
+EXCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\excluded.txt"
+INCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\included.txt"
+PHRASE_DUMP = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\phrase_dump.txt"
 
 def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, threshold):
     streamer = DocStreamer(tmp_dir_sent)
