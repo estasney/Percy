@@ -12,9 +12,21 @@ EXCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts
 INCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\included.txt"
 PHRASE_DUMP = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\phrase_dump.txt"
 
-def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, threshold):
+
+def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, threshold, max_layers=3):
     streamer = DocStreamer(tmp_dir_sent)
     phrases = Phrases(streamer, common_terms=common_words, min_count=min_count, threshold=threshold)
+
+    starting_layer, next_layer = 1, 2
+
+    while next_layer <= max_layers:
+        phrases, found_new = train_layer(streamer, phrases, starting_layer, next_layer)
+        if not found_new:
+            break
+        else:
+            starting_layer += 1
+            next_layer += 1
+
     phrases.save(os.path.join(tmp_dir_phrases, "phrases.model"))
     phrase_counts = Counter(phrases.export_phrases(streamer))
     phrase_counts = list(phrase_counts.items())
@@ -29,6 +41,42 @@ def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, thres
         for phrase, pmi, count in decoded_phrase_counts:
             tfile.write("{}, {}, {}".format(phrase.replace(" ", "_"), pmi, count))
             tfile.write("\n")
+
+
+def train_layer(text, model, starting_layer=1, ending_layer=2):
+    # layer indicates number of times to transform text
+    """
+    layer = 2
+        phrase_model[phrase_model[doc]] ==> Trigrams
+    """
+
+    # add the vocab
+
+    def phrase_once(doc, model):
+        return model[doc]
+
+    def phrase_many(doc, model, ntimes):
+        for i in range(ntimes):
+            doc = phrase_once(doc, model)
+        return doc
+
+    def stream_phrase(text, model, ntimes):
+        for doc in text:
+            doc = phrase_many(doc, model, ntimes)
+            yield doc
+
+    base_stream = stream_phrase(text, model, starting_layer)
+    model.add_vocab(base_stream)
+
+    base_stream = stream_phrase(text, model, starting_layer)
+    new_stream = stream_phrase(text, model, ending_layer)
+
+    for old, new in zip(base_stream, new_stream):
+        if old != new:
+            return model, True
+
+    return model, False
+
 
 def annotate_phrases(batch_size=100):
 
@@ -68,12 +116,6 @@ def annotate_phrases(batch_size=100):
         for phrase in included:
             tfile.write(phrase)
             tfile.write("\n")
-
-
-
-
-
-
 
 
 class MyPhraser(Phraser):
