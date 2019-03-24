@@ -1,8 +1,10 @@
 from collections import Counter
 import os
+import glob
 from gensim.models.phrases import Phrases, Phraser
-from mysite.app_folder.scripts.utils.streaming import DocStreamer
+from mysite.app_folder.scripts.utils.streaming import DocStreamer, stream_ngrams
 import easygui
+from datetime import datetime
 #
 # EXCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/excluded.txt"
 # INCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/included.txt"
@@ -13,22 +15,47 @@ INCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts
 PHRASE_DUMP = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\phrase_dump.txt"
 
 
-def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, threshold, max_layers=3):
+def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, threshold, max_layers=2):
+
+    """
+    max_layers
+        1 - bigrams
+        2 - trigrams, etc
+    """
+
+
     streamer = DocStreamer(tmp_dir_sent)
     phrases = Phrases(streamer, common_terms=common_words, min_count=min_count, threshold=threshold)
 
     starting_layer, next_layer = 1, 2
 
     while next_layer <= max_layers:
+        start_time = datetime.now()
         phrases, found_new = train_layer(streamer, phrases, starting_layer, next_layer)
+        end_time = datetime.now()
+        elasped = end_time - start_time
+        print("Finished layer {}".format(elasped.seconds))
         if not found_new:
+            print("No new phrases found at layer {}".format(next_layer))
             break
         else:
+            print("New phrases detected at layer {}".format(next_layer))
             starting_layer += 1
             next_layer += 1
 
     phrases.save(os.path.join(tmp_dir_phrases, "phrases.model"))
-    phrase_counts = Counter(phrases.export_phrases(streamer))
+    phrase_counts = Counter()
+
+    print("Exporting Phrase Counts")
+
+    current_layer = 1
+    while current_layer <= max_layers:
+        ngrams_stream = stream_ngrams(tmp_dir_sent, phrases, current_layer)
+        ngrams_export = phrases.export_phrases(ngrams_stream)
+        phrase_counts.update(ngrams_export)
+
+    print("Finished Exporting Phrase Counts")
+
     phrase_counts = list(phrase_counts.items())
     decoded_phrase_counts = []
     for word_pmi, count in phrase_counts:
@@ -43,10 +70,51 @@ def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, thres
             tfile.write("\n")
 
 
+def stream_ngrams(fp, model, layers=1):
+    files = glob.glob(os.path.join(directory, "*.json"))
+
+    def phrase_once(doc, model):
+        return model[doc]
+
+    def phrase_many(doc, model, ntimes):
+        for i in range(ntimes):
+            doc = phrase_once(doc, model)
+        return doc
+
+    for f in files:
+        with open(f, 'r') as json_file:
+            doc = json.load(json_file)
+        sentences = doc['token_summary']
+        for s in sentences:
+            if s:
+                doc = phrase_many(s, model, layers)
+                yield s
+
+def fully_phrase(doc, model, max_runs=5):
+
+    starting_doc, next_doc = doc, model[doc]
+    if starting_doc == next_doc:
+        return next_doc
+
+    phrasing=True
+    counter = 0
+    while phrasing and counter < max_runs:
+        starting_doc = next_doc
+        next_doc = model[next_doc]
+        if next_doc == starting_doc:
+            return next_doc
+        else:
+            counter += 1
+    return next_doc
+
+
+
 def train_layer(text, model, starting_layer=1, ending_layer=2):
     # layer indicates number of times to transform text
     """
-    layer = 2
+    starting_layer = 1
+        phrase_model[doc] ==> Bigrams
+    ending_layer = 2
         phrase_model[phrase_model[doc]] ==> Trigrams
     """
 

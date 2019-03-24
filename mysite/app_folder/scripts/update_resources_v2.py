@@ -8,8 +8,8 @@ import pandas as pd
 import json
 import sys
 
-# sys.path.append(r"/home/eric/PycharmProjects/Percy/mysite")
-sys.path.append(r"C:\Users\estasney\PycharmProjects\webwork\mysite")
+sys.path.append(r"/home/eric/PycharmProjects/Percy/mysite")
+# sys.path.append(r"C:\Users\estasney\PycharmProjects\webwork\mysite")
 
 
 """
@@ -36,13 +36,13 @@ MIN_SKILL_COUNT = 25
 MAX_SKILL_RATIO = 0.9
 
 
-TMP_DIR = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp"
-LANG_FILE = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\lang\lang_id.json"
-CORPUS_FILE = r"C:\Users\estasney\PycharmProjects\FlaskAPIWeb\scripts2\corpus.csv"
+# TMP_DIR = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp"
+# LANG_FILE = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\lang\lang_id.json"
+# CORPUS_FILE = r"C:\Users\estasney\PycharmProjects\FlaskAPIWeb\scripts2\corpus.csv"
 
-# LANG_FILE = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/lang/lang_id.json"
-# TMP_DIR = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp"
-# CORPUS_FILE = r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv"
+LANG_FILE = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/lang/lang_id.json"
+TMP_DIR = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp"
+CORPUS_FILE = r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv"
 
 
 TMP_DIR_RAW = os.path.join(TMP_DIR, "raw")
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     print("Detecting Phrases")
     start = datetime.now()
     detect_phrases(tmp_dir_sent=TMP_DIR_SENT, tmp_dir_phrases=TMP_DIR_PHRASES, common_words=STOPWORDS, min_count=100,
-                   threshold=30)
+                   threshold=30, max_layers=3)
     elapsed = datetime.now() - start
     print("Finished Phrase Detection in {}".format(elapsed.seconds))
 
