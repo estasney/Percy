@@ -30,7 +30,8 @@ class DocStreamer(object):
         for file in self.files:
             doc = self.load_json_(file)
             for sentence in doc:
-                yield sentence
+                if sentence:
+                    yield sentence
 
 
 def stream_tokens(files):
