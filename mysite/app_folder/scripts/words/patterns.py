@@ -2,6 +2,8 @@ from cytoolz import sliding_window
 from abc import ABC, abstractmethod
 import glob
 import random
+from functools import partial
+import string
 
 class PatternMatch(ABC):
 
@@ -171,8 +173,10 @@ class PercentagePattern(RejoinPattern):
 
 class UnTokenizePattern(object):
 
+    letters = set(string.ascii_letters)
+
     def __init__(self):
-        pass
+        self.patterns_ = None
 
     def __getitem__(self, item):
         return self.patternize(item)
@@ -180,16 +184,71 @@ class UnTokenizePattern(object):
     def rejoin_logic(self, target):
         return "".join(target)
 
+    @staticmethod
+    def pattern_factory(pattern, casing_required):
+        """
+        Convenience method for quickly generating functions that evaluate against a pattern and return a bool
+
+        :param pattern: iterable that will be evaluated
+        :param casing_required: if False, text should be lowercased
+        :return:
+        """
+
+        pc_functions = []
+
+        def f1(*args, **kwargs):
+            pc = kwargs.pop('pattern_component')
+            x = args[0]
+            return x == pc
+
+        def f2(*args, **kwargs):
+            pc = kwargs.pop('pattern_component')
+            x = args[0]
+            return x in pc
+
+        for pattern_component in pattern:
+            if isinstance(pattern_component, str):
+                fp = partial(f1, pattern_component=pattern_component)
+                pc_functions.append(fp)
+            elif isinstance(pattern_component, set):
+                fp = partial(f2, pattern_component=pattern_component)
+                pc_functions.append(fp)
+
+        def pattern_(text_window, pc_functions=pc_functions):
+            if len(text_window) < len(pc_functions):
+                return False
+
+            if not casing_required:
+                text_window = [token.lower() for token in text_window]
+
+            for f, token in zip(pc_functions, text_window):
+                r = f(token)
+
+            if all([f(token) for f, token in zip(pc_functions, text_window)]):
+                return True
+            else:
+                return False
+
+        return pattern_
+
     @property
     def patterns(self):
+
+        if self.patterns_:
+            return self.patterns_
+
         p = [
             {'pattern': ["c", "++"], 'casing_required': False},
             {'pattern': ["c", "+", "+"], 'casing_required': False},
             {'pattern': ["at", "&", "t"], 'casing_required': False},
-            {'pattern': ["p", "&", "l"], 'casing_required': False},
-            {'pattern': ["r", "&", "d"], 'casing_required': False}
+            {'pattern': [self.letters, "&", self.letters], 'casing_required': False}
             ]
-        return p
+
+        fp = [{'f': self.pattern_factory(x['pattern'], x['casing_required']),
+              'pattern': x['pattern'], 'casing_required': x['casing_required']} for x in p]
+
+        self.patterns_ = fp
+        return fp
 
     def pattern_action(self, l, match_start, match_end):
 
@@ -209,17 +268,14 @@ class UnTokenizePattern(object):
 
     def patternize(self, sentence):
         for pattern_group in self.patterns:
-            pattern, no_lower = pattern_group['pattern'], pattern_group['casing_required']
-            window_size = len(pattern)
+            f = pattern_group['f']
+            window_size = len(pattern_group['pattern'])
             if window_size > len(sentence):
                 continue
 
             matched_indices = []
             for window_i, window in enumerate(sliding_window(window_size, sentence)):
-
-                if no_lower is False:
-                    window = [word.lower() for word in window]
-                if window == pattern:
+                if f(window):
                     match_start = window_i
                     match_end = match_start + window_size
                     matched_indices.append((match_start, match_end))
@@ -232,9 +288,6 @@ class UnTokenizePattern(object):
                 continue
 
         return sentence
-
-
-
 
 
 class BulletedPattern(object):
