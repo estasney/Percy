@@ -11,7 +11,7 @@ import os
 import glob
 import numpy as np
 import multiprocessing
-from .patterns import BulletedPattern, PossessivePattern, ContractionPattern, PercentagePattern, UnTokenizePattern
+from .patterns import BulletedPattern, UnTokenizePattern
 
 STOPWORDS = set(stopwords.words('english'))
 
@@ -38,6 +38,7 @@ def preprocess_text(text):
 
 def tokenize_text(text):
     # sent tokenize the text
+    text = unicodedata.normalize("NFKD", text)
     sentences = sent_tokenize(text)
     # split on newlines as well
     s1 = chain.from_iterable([s.splitlines() for s in sentences])
@@ -48,16 +49,7 @@ def tokenize_text(text):
     s3 = chain.from_iterable([bullet_split[s] for s in s2])
     del s2
 
-
-
-    contraction = ContractionPattern()
-    possessive = PossessivePattern()
-    percentage = PercentagePattern()
     program = UnTokenizePattern()
-
-    s3 = [contraction[sentence] for sentence in s3]
-    s3 = [possessive[sentence] for sentence in s3]
-    s3 = [percentage[sentence] for sentence in s3]
     s3 = [program[sentence] for sentence in s3]
 
     punc = set(string.punctuation)

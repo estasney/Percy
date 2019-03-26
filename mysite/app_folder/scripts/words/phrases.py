@@ -6,13 +6,16 @@ from mysite.app_folder.scripts.utils.streaming import DocStreamer, stream_ngrams
 import easygui
 from datetime import datetime
 #
-# EXCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/excluded.txt"
-# INCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/included.txt"
-# PHRASE_DUMP = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/phrase_dump.txt"
+EXCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/excluded.txt"
+INCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/included.txt"
+PHRASE_DUMP = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/phrase_dump.txt"
 
-EXCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\excluded.txt"
-INCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\included.txt"
-PHRASE_DUMP = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\phrase_dump.txt"
+# EXCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\excluded.txt"
+# INCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\included.txt"
+# PHRASE_DUMP = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\phrase_dump.txt"
+
+
+
 
 
 def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, threshold, max_layers=2):
@@ -48,11 +51,12 @@ def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, thres
 
     print("Exporting Phrase Counts")
 
-    current_layer = 1
+    current_layer = 0
     while current_layer <= max_layers:
         ngrams_stream = stream_ngrams(tmp_dir_sent, phrases, current_layer)
         ngrams_export = phrases.export_phrases(ngrams_stream)
         phrase_counts.update(ngrams_export)
+        current_layer += 1
 
     print("Finished Exporting Phrase Counts")
 
@@ -70,25 +74,6 @@ def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, thres
             tfile.write("\n")
 
 
-def stream_ngrams(fp, model, layers=1):
-    files = glob.glob(os.path.join(directory, "*.json"))
-
-    def phrase_once(doc, model):
-        return model[doc]
-
-    def phrase_many(doc, model, ntimes):
-        for i in range(ntimes):
-            doc = phrase_once(doc, model)
-        return doc
-
-    for f in files:
-        with open(f, 'r') as json_file:
-            doc = json.load(json_file)
-        sentences = doc['token_summary']
-        for s in sentences:
-            if s:
-                doc = phrase_many(s, model, layers)
-                yield s
 
 def fully_phrase(doc, model, max_runs=5):
 
@@ -206,3 +191,6 @@ class MyPhraser(Phraser):
                 filtered_transformed.extend(tokens)
 
         return filtered_transformed
+
+if __name__ == "__main__":
+    annotate_phrases(50)
