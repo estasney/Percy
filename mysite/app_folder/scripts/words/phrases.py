@@ -5,6 +5,7 @@ from gensim.models.phrases import Phrases, Phraser
 from mysite.app_folder.scripts.utils.streaming import DocStreamer, stream_ngrams
 from mysite.app_folder.scripts.words.patterns import PhraseFilter
 import easygui
+import json
 from datetime import datetime
 #
 EXCLUDED = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/excluded.txt"
@@ -14,6 +15,23 @@ PHRASE_DUMP = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/p
 # EXCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\excluded.txt"
 # INCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\included.txt"
 # PHRASE_DUMP = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\phrase_dump.txt"
+
+
+def phrase_docs(tmp_dir_output, max_layers=2, sent_key='token_summary', phrase_key='phrase_summary'):
+
+    phrases = MyPhraser(r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/phrases.model",
+                        phrase_filter=PhraseFilter(), iter=max_layers)
+
+    files = glob.glob(os.path.join(tmp_dir_output, "*.json"))
+    for f in files:
+        with open(f, "r") as jfile:
+            doc = json.load(jfile)
+            doc_tokens = doc[sent_key]
+        doc_phrases = [phrases[s] for s in doc_tokens]
+        doc[phrase_key] = doc_phrases
+        with open(f, "w+") as jfile:
+            json.dump(doc, jfile)
+
 
 
 def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, threshold, max_layers=2):
@@ -151,13 +169,13 @@ def annotate_phrases(batch_size=100):
 
 class MyPhraser(Phraser):
 
-    def __init__(self, phrase_path, phrase_filter):
+    def __init__(self, phrase_path, phrase_filter, iter=2):
         phrase_model = Phrases.load(phrase_path)
         self.phrase_filter = phrase_filter
+        self.iter = iter
         super().__init__(phrase_model)
 
-    def __getitem__(self, item):
-
+    def phrase_once(self, item):
         transformed = super().__getitem__(item)
         filtered_transformed = []
         for token in transformed:
@@ -172,6 +190,13 @@ class MyPhraser(Phraser):
                     filtered_transformed.append(token)
 
         return filtered_transformed
+
+
+    def __getitem__(self, item):
+        for i in range(self.iter):
+            item = self.phrase_once(item)
+        return item
+
 
 if __name__ == "__main__":
     annotate_phrases(50)

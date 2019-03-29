@@ -1,6 +1,6 @@
 from words.lang import lang_detect, lookup_language_detection, apply_by_multiprocessing, store_language_detection
 from words.process import pool_process_text, STOPWORDS
-from words.phrases import detect_phrases
+from words.phrases import detect_phrases, phrase_docs
 from datetime import datetime
 import os
 import pandas as pd
@@ -120,6 +120,10 @@ if __name__ == "__main__":
 
     print("Phrasing Docs")
     start = datetime.now()
+    phrase_docs(TMP_DIR_OUTPUT)
+    elapsed = datetime.now() - start
+    print("Finished Phrasing Docs in {}".format(elapsed.seconds))
+
 
 
 
