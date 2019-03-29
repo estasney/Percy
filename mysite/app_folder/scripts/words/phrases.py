@@ -3,6 +3,7 @@ import os
 import glob
 from gensim.models.phrases import Phrases, Phraser
 from mysite.app_folder.scripts.utils.streaming import DocStreamer, stream_ngrams
+from mysite.app_folder.scripts.words.patterns import PhraseFilter
 import easygui
 from datetime import datetime
 #
@@ -13,9 +14,6 @@ PHRASE_DUMP = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/p
 # EXCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\excluded.txt"
 # INCLUDED = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\included.txt"
 # PHRASE_DUMP = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\phrases\phrase_dump.txt"
-
-
-
 
 
 def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, threshold, max_layers=2):
@@ -72,26 +70,6 @@ def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, thres
         for phrase, pmi, count in decoded_phrase_counts:
             tfile.write("{}, {}, {}".format(phrase.replace(" ", "_"), pmi, count))
             tfile.write("\n")
-
-
-
-def fully_phrase(doc, model, max_runs=5):
-
-    starting_doc, next_doc = doc, model[doc]
-    if starting_doc == next_doc:
-        return next_doc
-
-    phrasing=True
-    counter = 0
-    while phrasing and counter < max_runs:
-        starting_doc = next_doc
-        next_doc = model[next_doc]
-        if next_doc == starting_doc:
-            return next_doc
-        else:
-            counter += 1
-    return next_doc
-
 
 
 def train_layer(text, model, starting_layer=1, ending_layer=2):
@@ -173,9 +151,9 @@ def annotate_phrases(batch_size=100):
 
 class MyPhraser(Phraser):
 
-    def __init__(self, phrase_path, excluded_phrases):
+    def __init__(self, phrase_path, phrase_filter):
         phrase_model = Phrases.load(phrase_path)
-        self.excluded_phrases = excluded_phrases
+        self.phrase_filter = phrase_filter
         super().__init__(phrase_model)
 
     def __getitem__(self, item):
@@ -186,9 +164,12 @@ class MyPhraser(Phraser):
             if "_" not in token:
                 filtered_transformed.append(token)
                 continue
-            if token in self.excluded_phrases:
-                tokens = token.split("_")
-                filtered_transformed.extend(tokens)
+            else:
+                if token in self.phrase_filter:
+                    tokens = token.split("_")
+                    filtered_transformed.extend(tokens)
+                else:
+                    filtered_transformed.append(token)
 
         return filtered_transformed
 

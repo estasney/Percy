@@ -5,6 +5,56 @@ import random
 from functools import partial
 import string
 import types
+from pampy import match, _, HEAD, TAIL
+from collections import namedtuple
+from cytoolz import groupby
+import re
+Pattern = namedtuple('Pattern', 'pattern action default')
+
+
+def make_pattern(pattern, action=False, default=True):
+    return Pattern(pattern, action, default)
+
+
+f1 = make_pattern(["I", _])  # anything starting with i
+f2 = make_pattern(["--", _])  # --_--
+
+# 10_years, 3+_years
+f3 = make_pattern([re.compile(r"([0-9]{1,2}\+?)"),
+                   re.compile(r"(years?)")])
+
+# 15_percent 15+_percent, 55_%
+f4 = make_pattern([re.compile(r"([0-9]{1,}\+?)"),
+                   re.compile(r"(%)|(percent)")])
+
+
+phrase_patterns = [f1, f2, f3, f4]
+
+
+def filter_phrases(phrase_line, patterns=phrase_patterns):
+    temp_phrase = phrase_line[0].split("_")
+    for pattern in patterns:
+        keep_it = match(temp_phrase, pattern.pattern, pattern.action, default=pattern.default)
+        if not keep_it:
+            return False
+    return True
+
+
+class PhraseFilter(object):
+
+    def __init__(self, patterns=phrase_patterns, phrase_delim="_"):
+        self.patterns = patterns
+        self.phrase_delim = phrase_delim
+
+    def __contains__(self, item):
+        temp_phrase = item.split(self.phrase_delim)
+        for pattern in self.patterns:
+            keep_it = match(temp_phrase, pattern.pattern, pattern.action, default=pattern.default)
+            if not keep_it:
+                return True
+        return False
+
+
 
 class PatternMatch(ABC):
 
@@ -54,18 +104,38 @@ class PatternMatch(ABC):
             x = pc(x)
             return x
 
+        def f4(*args, **kwargs):
+            pc = kwargs.pop('pattern_component')
+            x = args[0]
+            return isinstance(x, pc)
+
+        def f5(*args, **kwargs):
+            pc = kwargs.pop('pattern_component')
+            x = args[0]
+            return any([x in pc, type(x) in pc])
+
         for pattern_component in pattern:
             if isinstance(pattern_component, str):
                 fp = partial(f1, pattern_component=pattern_component)
                 pc_functions.append(fp)
             elif isinstance(pattern_component, set):
+
+                # test for membership by value
                 fp = partial(f2, pattern_component=pattern_component)
                 pc_functions.append(fp)
+
+                # test for membership by value or type
+                fp = partial(f5, pattern_component=pattern_component)
+                pc_functions.append(fp)
+
             elif isinstance(pattern_component, types.BuiltinFunctionType):
                 fp = partial(f3, pattern_component=pattern_component)
                 pc_functions.append(fp)
             elif isinstance(pattern_component, types.FunctionType):
                 pc_functions.append(pattern_component)
+            elif isinstance(pattern_component, type):
+                fp = partial(f4, pattern_component=pattern_component)
+                pc_functions.append(fp)
 
         def pattern_(text_window, pc_functions=pc_functions):
             if len(text_window) < len(pc_functions):
@@ -86,7 +156,6 @@ class PatternMatch(ABC):
     def patterns(self):
         raise NotImplementedError
 
-    @property
     @abstractmethod
     def pattern_action(self, *args, **kwargs):
 
@@ -143,6 +212,7 @@ class PatternMatch(ABC):
 
         return sentence
 
+
 class UnTokenizePattern(PatternMatch):
 
     letters = set(string.ascii_letters)
@@ -193,7 +263,6 @@ class UnTokenizePattern(PatternMatch):
             l = self.pattern_action(l, match_start, matched_end)
 
         return l
-
 
 
 class BulletedPattern(object):

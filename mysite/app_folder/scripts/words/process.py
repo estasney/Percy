@@ -58,7 +58,6 @@ def tokenize_text(text):
     return s3
 
 
-
 def multiprocess_preprocess(fp, data_key_raw, data_key_out, dir_out):
 
     with open(fp, 'r') as json_file:
@@ -69,7 +68,7 @@ def multiprocess_preprocess(fp, data_key_raw, data_key_out, dir_out):
     record[data_key_out] = clean_summary
     # add clean summary to record and dump to json
     fp = os.path.join(dir_out, "{}.json".format(record['member_id']))
-    with open(fp, 'w') as json_file:
+    with open(fp, 'w+') as json_file:
         json.dump(record, json_file)
 
 
@@ -87,14 +86,14 @@ def fetch_tmp_files(d):
     return file_list
 
 
-def pool_process_text(d, workers, dir_out):
+def pool_process_text(d, workers):
     # Get the work to be done
     file_list = fetch_tmp_files(d)
 
     # Split the work based on number of workers
     file_subsets = np.array_split(file_list, workers)
 
-    process_text = partial(worker_process_text, dir_out=dir_out)
+    process_text = partial(worker_process_text, dir_out=d)
     # Open a pool
     pool = multiprocessing.Pool(processes=workers)
     pool.map(process_text, file_subsets)

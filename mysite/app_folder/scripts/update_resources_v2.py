@@ -1,4 +1,3 @@
-from utils.files import make_tmp_dirs, fetch_tmp_files
 from words.lang import lang_detect, lookup_language_detection, apply_by_multiprocessing, store_language_detection
 from words.process import pool_process_text, STOPWORDS
 from words.phrases import detect_phrases
@@ -45,7 +44,7 @@ TMP_DIR = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp"
 CORPUS_FILE = r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv"
 
 
-TMP_DIR_RAW = os.path.join(TMP_DIR, "raw")
+TMP_DIR_OUTPUT = os.path.join(TMP_DIR, "output")
 TMP_DIR_SENT = os.path.join(TMP_DIR, "sent")
 TMP_DIR_PHRASES = os.path.join(TMP_DIR, "phrases")
 
@@ -55,7 +54,7 @@ TMP_DIR_PHRASES = os.path.join(TMP_DIR, "phrases")
 SETUP
 
 """
-d_list = [TMP_DIR, TMP_DIR_SENT, TMP_DIR_RAW]
+d_list = [TMP_DIR, TMP_DIR_SENT, TMP_DIR_OUTPUT]
 script_start = datetime.now()
 
 """
@@ -65,7 +64,7 @@ Words
 """
 
 
-def export_df(df, dir_out=TMP_DIR_RAW):
+def export_df(df, dir_out=TMP_DIR_OUTPUT):
     for i, row in df.iterrows():
         file_name = "{}.json".format(row['member_id'])
         file_name = os.path.join(dir_out, file_name)
@@ -75,7 +74,6 @@ def export_df(df, dir_out=TMP_DIR_RAW):
 # files = glob.glob(os.path.join(TMP_DIR_SENT, "*.json"))
 
 if __name__ == "__main__":
-    make_tmp_dirs(d_list)
 
     print("Starting Resource Update")
     df = pd.read_csv(CORPUS_FILE)
@@ -108,16 +106,20 @@ if __name__ == "__main__":
     print("Preprocessing Text into Sentences")
     start = datetime.now()
 
-    pool_process_text(TMP_DIR_RAW, WORKERS, TMP_DIR_SENT)
+    pool_process_text(TMP_DIR_OUTPUT, WORKERS)
     elapsed = datetime.now() - start
     print("Finished Preprocessing in {}".format(elapsed.seconds))
 
     # Phrases
     print("Detecting Phrases")
     start = datetime.now()
-    detect_phrases(tmp_dir_sent=TMP_DIR_SENT, tmp_dir_phrases=TMP_DIR_PHRASES, common_words=STOPWORDS, min_count=100,
-                   threshold=30, max_layers=3)
+    detect_phrases(tmp_dir_sent=TMP_DIR_OUTPUT, tmp_dir_phrases=TMP_DIR_PHRASES, common_words=STOPWORDS, min_count=100,
+                   threshold=30, max_layers=2)
     elapsed = datetime.now() - start
     print("Finished Phrase Detection in {}".format(elapsed.seconds))
+
+    print("Phrasing Docs")
+    start = datetime.now()
+
 
 
