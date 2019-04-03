@@ -9,6 +9,38 @@ Streaming
 
 """
 
+def stream_docs(files, data_key):
+    for f in files:
+        with open(f, 'r') as json_file:
+            doc = json.load(json_file)
+        if data_key:
+            doc_text = doc[data_key]
+        else:
+            doc_text = doc
+        yield doc_text
+
+
+def add_extra(d):
+    others = ['is_alpha', 'is_ascii', 'is_digit', 'is_punct', 'is_left_punct', 'is_right_punct',
+              'is_space', 'is_bracket', 'is_quote', 'is_currency', 'like_url', 'like_num', 'like_email',
+              'is_oov', 'is_stop']
+
+    json_data = d.to_json()
+    for i, t in enumerate(d):
+        token_data = json_data['tokens'][i]
+        token_data.update({'lemma': t.lemma_, 'norm': t.norm_, 'text': t.text})
+        conjuncts = list(t.conjuncts)
+        if conjuncts:
+            conjuncts = [c.text for c in conjuncts]
+        token_data.update({'conjuncts': conjuncts})
+        for o in others:
+            token_data.update({o: getattr(t, o, None)})
+
+    # segment the tokens into sentences using the 'sents' key
+
+    return json_data
+
+
 
 class DocStreamer(object):
 
