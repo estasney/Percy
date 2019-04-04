@@ -1,17 +1,12 @@
 from datetime import datetime
 import numpy as np
 import multiprocessing
-import glob
 from functools import partial
 from collections import namedtuple
-import random
 import json
 
 Pattern = namedtuple('Pattern', 'pattern action default')
 
-
-INPUT_FOLDER = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/output2/*.json"
-PHRASE_PATH = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/phrases.model"
 
 EXCLUDED_TAGS = ['is_punct', 'is_left_punct', 'is_right_punct', 'is_space', 'is_bracket',
                  'is_quote', 'is_currency', 'like_url', 'like_email', 'is_stop']

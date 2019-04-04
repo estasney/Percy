@@ -1,11 +1,11 @@
-from pampy import match, _, HEAD, TAIL
+from pampy import match, _
 from collections import namedtuple
 from gensim.models.phrases import Phraser, Phrases
+from process.process_config import ProcessConfig
 import re
 
-Pattern = namedtuple('Pattern', 'pattern action default')
 
-PHRASE_PATH = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/phrases/phrases.model"
+Pattern = namedtuple('Pattern', 'pattern action default')
 
 
 def make_pattern(pattern, action=False, default=True):
@@ -57,7 +57,7 @@ class PhraseFilter(object):
 
 class MyPhraser(Phraser):
 
-    def __init__(self, phrase_filter=PhraseFilter(), phrase_path=PHRASE_PATH, iter=2):
+    def __init__(self, phrase_filter=PhraseFilter(), phrase_path=ProcessConfig().PHRASE_MODEL, iter=2):
         phrase_model = Phrases.load(phrase_path)
         self.phrase_filter = phrase_filter
         self.iter = iter

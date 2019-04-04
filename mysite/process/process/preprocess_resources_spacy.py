@@ -1,21 +1,23 @@
 import glob
-import en_core_web_md
 import json
-from mysite.app_folder.scripts.utils.streaming import stream_docs, add_extra
-from mysite.app_folder.scripts.utils.spacy_utils import process_phrase_tokens
-from mysite.app_folder.scripts.utils.spacy_phrases import MyPhraser
+import en_core_web_md
+from process.process.utils import stream_docs, add_extra, process_phrase_tokens, MyPhraser
 from datetime import datetime
+from process import ProcessConfig
 
-INPUT_FOLDER = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/output/*.json"
-OUTPUT_FOLDER = r"/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/output2/{}.json"
+config = ProcessConfig()
 
-# nlp = en_core_web_md.load()
+INPUT_FOLDER = config.OUTPUT1
+OUTPUT_FOLDER = config.OUTPUT2
 
 files = glob.glob(INPUT_FOLDER)
 
 
-def preprocess_docs():
+def preprocess_docs(files):
     start_time = datetime.now()
+    print("Loading spacy model")
+    nlp = en_core_web_md.load()
+    print("Model loaded")
     doc_stream = stream_docs(files=files, data_key='summary')
     for i, doc in enumerate(nlp.pipe(doc_stream, batch_size=50)):
         json_doc = add_extra(doc)
@@ -36,7 +38,7 @@ def phrase_docs():
     print(elapsed)
 
 if __name__ == "__main__":
-    # print("Running docs through spacy")
+    print("Running docs through spacy")
     # preprocess_docs()
-    print("Running docs through phraser")
-    phrase_docs()
+    # print("Running docs through phraser")
+    # phrase_docs()
