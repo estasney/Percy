@@ -39,6 +39,6 @@ def phrase_docs():
 
 if __name__ == "__main__":
     print("Running docs through spacy")
-    # preprocess_docs()
-    # print("Running docs through phraser")
-    # phrase_docs()
+    preprocess_docs()
+    print("Running docs through phraser")
+    phrase_docs()

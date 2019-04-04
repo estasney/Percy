@@ -31,7 +31,6 @@ def phrase_docs(tmp_dir_output, max_layers=2, sent_key='token_summary', phrase_k
             json.dump(doc, jfile)
 
 
-
 def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, threshold, max_layers=2):
 
     """
@@ -39,7 +38,6 @@ def detect_phrases(tmp_dir_sent, tmp_dir_phrases, common_words, min_count, thres
         1 - bigrams
         2 - trigrams, etc
     """
-
 
     streamer = DocStreamer(tmp_dir_sent)
     phrases = Phrases(streamer, common_terms=common_words, min_count=min_count, threshold=threshold)

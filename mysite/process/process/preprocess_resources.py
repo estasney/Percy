@@ -1,11 +1,14 @@
-from words.lang import lang_detect, lookup_language_detection, apply_by_multiprocessing, store_language_detection
-from words.process import pool_process_text, STOPWORDS
-from words.phrases import detect_phrases, phrase_docs
-from datetime import datetime
-import os
-import pandas as pd
 import json
+import os
 import sys
+from datetime import datetime
+
+import pandas as pd
+
+from process.process.words import lang_detect, lookup_language_detection, apply_by_multiprocessing, \
+    store_language_detection, pool_process_text, STOPWORDS, detect_phrases, phrase_docs
+
+from process.process_config import ProcessConfig
 
 sys.path.append(r"/home/eric/PycharmProjects/Percy/mysite")
 # sys.path.append(r"C:\Users\estasney\PycharmProjects\webwork\mysite")
@@ -37,16 +40,17 @@ MAX_SKILL_RATIO = 0.9
 
 # TMP_DIR = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp"
 # LANG_FILE = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\lang\lang_id.json"
-# CORPUS_FILE = r"C:\Users\estasney\PycharmProjects\FlaskAPIWeb\scripts2\corpus.csv"
-
-LANG_FILE = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/lang/lang_id.json"
-TMP_DIR = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp"
-CORPUS_FILE = r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv"
 
 
-TMP_DIR_OUTPUT = os.path.join(TMP_DIR, "output")
-TMP_DIR_SENT = os.path.join(TMP_DIR, "sent")
-TMP_DIR_PHRASES = os.path.join(TMP_DIR, "phrases")
+# LANG_FILE = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/lang/lang_id.json"
+# TMP_DIR = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp"
+# CORPUS_FILE = r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv"
+
+config = ProcessConfig()
+LANG_FILE = config.LANGUAGE_ID
+CORPUS_FILE = r"C:\Users\estasney\PycharmProjects\FlaskAPIWeb\scripts2\corpus.csv"
+TMP_DIR_OUTPUT = config.OUTPUT1
+TMP_DIR_PHRASES = config.PHRASE_FOLDER
 
 
 """
@@ -54,7 +58,6 @@ TMP_DIR_PHRASES = os.path.join(TMP_DIR, "phrases")
 SETUP
 
 """
-d_list = [TMP_DIR, TMP_DIR_SENT, TMP_DIR_OUTPUT]
 script_start = datetime.now()
 
 """
@@ -71,10 +74,8 @@ def export_df(df, dir_out=TMP_DIR_OUTPUT):
         with open(file_name, "w+") as jfile:
             json.dump(row.to_dict(), jfile)
 
-# files = glob.glob(os.path.join(TMP_DIR_SENT, "*.json"))
 
 if __name__ == "__main__":
-
     print("Starting Resource Update")
     df = pd.read_csv(CORPUS_FILE)
     original_count = len(df)
@@ -118,11 +119,11 @@ if __name__ == "__main__":
     elapsed = datetime.now() - start
     print("Finished Phrase Detection in {}".format(elapsed.seconds))
 
-    print("Phrasing Docs")
-    start = datetime.now()
-    phrase_docs(TMP_DIR_OUTPUT)
-    elapsed = datetime.now() - start
-    print("Finished Phrasing Docs in {}".format(elapsed.seconds))
+    # print("Phrasing Docs")
+    # start = datetime.now()
+    # phrase_docs(TMP_DIR_OUTPUT)
+    # elapsed = datetime.now() - start
+    # print("Finished Phrasing Docs in {}".format(elapsed.seconds))
 
 
 
