@@ -67,12 +67,15 @@ Words
 """
 
 
-def export_df(df, dir_out=TMP_DIR_OUTPUT):
+def export_df(df, prettify=True, dir_out=TMP_DIR_OUTPUT):
     for i, row in df.iterrows():
         file_name = "{}.json".format(row['member_id'])
         file_name = os.path.join(dir_out, file_name)
         with open(file_name, "w+") as jfile:
-            json.dump(row.to_dict(), jfile)
+            if prettify:
+                json.dump(row.to_dict(), jfile, indent=4)
+            else:
+                json.dump(row.to_dict(), jfile)
 
 
 if __name__ == "__main__":
@@ -103,6 +106,7 @@ if __name__ == "__main__":
 
     print("Dumping DF to JSON")
     export_df(df)
+
 
     print("Preprocessing Text into Sentences")
     start = datetime.now()
