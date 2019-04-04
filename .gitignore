@@ -6,3 +6,5 @@
 
 /mysite/app_folder/scripts/company2id.pkl
 /mysite/app_folder/scripts/id2company.pkl
+/mysite/process/data/language/lang_id.json
+/mysite/process/data/phrases/phrase_dump.txt
