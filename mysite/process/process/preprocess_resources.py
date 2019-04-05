@@ -6,7 +6,7 @@ from datetime import datetime
 import pandas as pd
 
 from process.process.words import lang_detect, lookup_language_detection, apply_by_multiprocessing, \
-    store_language_detection, pool_process_text, STOPWORDS, detect_phrases, phrase_docs
+    store_language_detection, pool_process_text, STOPWORDS, detect_phrases
 
 from process.process_config import ProcessConfig
 
@@ -48,7 +48,7 @@ MAX_SKILL_RATIO = 0.9
 
 config = ProcessConfig()
 LANG_FILE = config.LANGUAGE_ID
-CORPUS_FILE = r"C:\Users\estasney\PycharmProjects\FlaskAPIWeb\scripts2\corpus.csv"
+CORPUS_FILE = r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv"
 TMP_DIR_OUTPUT = config.OUTPUT1
 TMP_DIR_PHRASES = config.PHRASE_FOLDER
 

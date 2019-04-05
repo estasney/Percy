@@ -2,9 +2,6 @@ import os
 basedir = os.path.normpath(os.path.dirname(__file__))  # ./process
 
 
-
-
-
 class ProcessConfig(object):
 
     def __init__(self, base_dir=basedir):
