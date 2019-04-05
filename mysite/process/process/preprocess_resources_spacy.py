@@ -1,6 +1,7 @@
 import glob
 import json
-import en_core_web_md
+import en_core_web_lg
+import os
 from process.process.utils import stream_docs, add_extra, process_phrase_tokens, MyPhraser
 from datetime import datetime
 from process import ProcessConfig
@@ -22,12 +23,12 @@ def preprocess_docs(input_files, output_folder, prettify=True):
 
     start_time = datetime.now()
     print("Loading spacy model")
-    nlp = en_core_web_md.load()
+    nlp = en_core_web_lg.load()
     print("Model loaded")
     doc_stream = stream_docs(files=input_files, data_key='summary')
     for i, doc in enumerate(nlp.pipe(doc_stream, batch_size=50)):
         json_doc = add_extra(doc)
-        out_f = "{}\{}.json".format(output_folder, i)
+        out_f = os.path.join(output_folder, "{}.json".format(i))
         with open(out_f, 'w+') as json_file:
             if prettify:
                 json.dump(json_doc, json_file, indent=4)
@@ -41,7 +42,7 @@ def preprocess_docs(input_files, output_folder, prettify=True):
 def phrase_docs(target_folder):
     start_time = datetime.now()
     phraser = MyPhraser()
-    target_files_pattern = "{}\*.json".format(target_folder)
+    target_files_pattern = os.path.join(target_folder, "*.json")
     target_files = glob.glob(target_files_pattern)
     process_phrase_tokens(target_files, phraser)
     elapsed = datetime.now() - start_time
@@ -50,7 +51,8 @@ def phrase_docs(target_folder):
 
 if __name__ == "__main__":
     print("Running docs through spacy")
-    files = glob.glob("{}\*.json".format(INPUT_FOLDER))
+    input_files_path = os.path.join(INPUT_FOLDER, "*.json")
+    files = glob.glob(input_files_path)
     preprocess_docs(files, OUTPUT_FOLDER)
     print("Running docs through phraser")
     phrase_docs(OUTPUT_FOLDER)
