@@ -2,9 +2,11 @@ from pampy import match, _
 from collections import namedtuple
 from gensim.models.phrases import Phraser, Phrases
 from process.process_config import ProcessConfig
-from process.process.utils import SpacyReader
+from process.process.utils import SpacyReader, SpacyTokenFilter
+from datetime import datetime
 import re
-
+import os
+from collections import Counter
 
 Pattern = namedtuple('Pattern', 'pattern action default')
 
@@ -44,8 +46,12 @@ def detect_phrases(input_dir, phrase_dir, common_words, min_count, threshold, ma
         1 - bigrams
         2 - trigrams, etc
     """
+    fi = SpacyTokenFilter()
 
-    streamer = DocStreamer(input_dir)
+    streamer = SpacyReader(folder=input_dir,
+                         text_key="tokens",
+                         token_filter=fi)
+
     phrases = Phrases(streamer, common_terms=common_words, min_count=min_count, threshold=threshold)
 
     starting_layer, next_layer = 1, 2
@@ -65,31 +71,7 @@ def detect_phrases(input_dir, phrase_dir, common_words, min_count, threshold, ma
             next_layer += 1
 
     phrases.save(os.path.join(phrase_dir, "phrases.model"))
-    phrase_counts = Counter()
 
-    print("Exporting Phrase Counts")
-
-    current_layer = 0
-    while current_layer <= max_layers:
-        ngrams_stream = stream_ngrams(input_dir, phrases, current_layer)
-        ngrams_export = phrases.export_phrases(ngrams_stream)
-        phrase_counts.update(ngrams_export)
-        current_layer += 1
-
-    print("Finished Exporting Phrase Counts")
-
-    phrase_counts = list(phrase_counts.items())
-    decoded_phrase_counts = []
-    for word_pmi, count in phrase_counts:
-        word, pmi = word_pmi
-        word = word.decode()
-        decoded_phrase_counts.append((word, pmi, count))
-    decoded_phrase_counts.sort(key=lambda x: x[2], reverse=True)
-    del phrase_counts
-    with open(PHRASE_DUMP, 'w+', encoding='utf-8') as tfile:
-        for phrase, pmi, count in decoded_phrase_counts:
-            tfile.write("{}, {}, {}".format(phrase.replace(" ", "_"), pmi, count))
-            tfile.write("\n")
 
 
 def train_layer(text, model, starting_layer=1, ending_layer=2):
