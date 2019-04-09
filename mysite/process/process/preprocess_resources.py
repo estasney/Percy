@@ -4,15 +4,13 @@ import sys
 from datetime import datetime
 
 import pandas as pd
+from process.process.legacy.lang import lang_detect, lookup_language_detection, apply_by_multiprocessing,\
+    store_language_detection
 
-from process.process.words import lang_detect, lookup_language_detection, apply_by_multiprocessing, \
-    store_language_detection, pool_process_text, STOPWORDS, detect_phrases
+from process.process.legacy.process import pool_process_text, STOPWORDS
+from process.process.legacy.phrases import detect_phrases
 
 from process.process_config import ProcessConfig
-
-sys.path.append(r"/home/eric/PycharmProjects/Percy/mysite")
-# sys.path.append(r"C:\Users\estasney\PycharmProjects\webwork\mysite")
-
 
 """
 Resources to update
@@ -37,14 +35,6 @@ MAX_WORD_RATIO = 0.9
 MIN_SKILL_COUNT = 25
 MAX_SKILL_RATIO = 0.9
 
-
-# TMP_DIR = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp"
-# LANG_FILE = r"C:\Users\estasney\PycharmProjects\webwork\mysite\app_folder\scripts\tmp\lang\lang_id.json"
-
-
-# LANG_FILE = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp/lang/lang_id.json"
-# TMP_DIR = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp"
-# CORPUS_FILE = r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv"
 
 config = ProcessConfig()
 LANG_FILE = config.LANGUAGE_ID
