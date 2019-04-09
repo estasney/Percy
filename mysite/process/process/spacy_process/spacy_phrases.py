@@ -2,10 +2,9 @@ from pampy import match, _
 from collections import namedtuple
 from gensim.models.phrases import Phraser, Phrases
 from process.process_config import ProcessConfig
-from process.process.utils import SpacyReader, SpacyTokenFilter
+from process.process.spacy_process.streaming import SpacyReader, SpacyTokenFilter
 from datetime import datetime
 import re
-import os
 from collections import Counter
 
 Pattern = namedtuple('Pattern', 'pattern action default')
@@ -46,11 +45,8 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
         1 - bigrams
         2 - trigrams, etc
     """
-    fi = SpacyTokenFilter()
 
-    streamer = SpacyReader(folder=input_dir,
-                         text_key="tokens",
-                         token_filter=fi)
+    streamer = SpacyReader(folder=input_dir, text_key="tokens", token_filter=SpacyTokenFilter())
 
     phrases = Phrases(streamer, common_terms=common_words, min_count=min_count, threshold=threshold)
 
@@ -60,8 +56,8 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
         start_time = datetime.now()
         phrases, found_new = train_layer(streamer, phrases, starting_layer, next_layer)
         end_time = datetime.now()
-        elasped = end_time - start_time
-        print("Finished layer {} in ".format(starting_layer, elasped))
+        elapsed = end_time - start_time
+        print("Finished layer {} in {}".format(starting_layer, elapsed))
         if not found_new:
             print("No new phrases found at layer {}".format(next_layer))
             break

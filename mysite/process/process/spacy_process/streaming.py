@@ -2,6 +2,7 @@ import glob
 import os
 import json
 from nltk.corpus import stopwords
+from itertools import chain
 
 
 """
@@ -70,13 +71,13 @@ class SpacyTokenFilter(object):
 
 
 class SpacyReader(object):
-    def __init__(self, folder, text_key, token_filter, sent_tokenize=True, token_key='lemma'):
+    def __init__(self, folder, text_key, token_filter, token_key='lemma'):
         self.folder = folder
         self.files = glob.glob(os.path.join(self.folder, "*.json"))
         self.text_key = text_key
         self.token_filter = token_filter
-        self.sent_tokenize = sent_tokenize
         self.token_key = token_key
+        self.phraser = None
 
     def load_json_(self, f):
         with open(f, 'r') as json_file:
@@ -86,19 +87,12 @@ class SpacyReader(object):
         tokens = list(filter(self.token_filter.filter_token, doc))
         return tokens
 
-    def build_idx(self, tokens):
-        start2idx = {token['start']: i for i, token in enumerate(tokens)}
-        end2idx = {token['end']: i for i, token in enumerate(tokens)}
-        return start2idx, end2idx
-
     def as_sentences(self):
         for f in self.files:
             doc = self.load_json_(f)
-            tokens = doc['tokens']
-            start2idx, end2idx = self.build_idx(tokens)
-            for sent in doc['sents']:
-                sent_tokens = tokens[start2idx[sent['start']]: (end2idx[sent['end']] + 1)]
-                sent_tokens = self.filter_tokens_(sent_tokens)
+            tokens = doc[self.token_key]
+            for sent in tokens:
+                sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
                 sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
                 if not sent_tokens:
@@ -108,52 +102,50 @@ class SpacyReader(object):
     def as_documents(self):
         for f in self.files:
             doc = self.load_json_(f)
-            tokens = self.filter_tokens_(doc['tokens'])
-            tokens = [t.get(self.token_key, None) for t in tokens]
-            tokens = list(filter(lambda x: x is not None, tokens))
-            yield tokens
+            sent_tokens = doc[self.token_key]
+            doc_tokens = list(chain.from_iterable(sent_tokens))
+            doc_tokens = self.filter_tokens_(doc_tokens)
+            doc_tokens = [t.get(self.token_key, None) for t in doc_tokens]
+            doc_tokens = list(filter(lambda x: x is not None, doc_tokens))
+            yield doc_tokens
 
-    def __getitem__(self, item):
-        file = self.files[item]
-        doc = self.load_json_(file)
-        if not self.sent_tokenize:
-            tokens = self.filter_tokens_(doc['tokens'])
-            tokens = [t.get(self.token_key, None) for t in tokens]
-            tokens = list(filter(lambda x: x is not None, tokens))
-            return tokens
-        else:
-            tokens = doc['tokens']
-            start2idx, end2idx = self.build_idx(tokens)
-            output = []
-            for sent in doc['sents']:
-                sent_tokens = tokens[start2idx[sent['start']]: (end2idx[sent['end']]+1)]
-                sent_tokens = self.filter_tokens_(sent_tokens)
+    def as_phrased_sentences(self, phraser):
+        if self.phraser:
+            setattr(self, 'phraser', None)
+        setattr(self, 'phraser', phraser)
+        for f in self.files:
+            doc = self.load_json_(f)
+            tokens = doc[self.token_key]
+            for sent in tokens:
+                sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
                 sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
                 if not sent_tokens:
                     continue
-                output.append(sent_tokens)
-            return output
+                sent_tokens = self.phraser[sent_tokens]
+                yield sent_tokens
+
+    def __getitem__(self, item):
+        file = self.files[item]
+        doc = self.load_json_(file)
+        sent_tokens = doc[self.token_key]
+        doc_tokens = list(chain.from_iterable(sent_tokens))
+        doc_tokens = self.filter_tokens_(doc_tokens)
+        doc_tokens = [t.get(self.token_key, None) for t in doc_tokens]
+        doc_tokens = list(filter(lambda x: x is not None, doc_tokens))
+        return doc_tokens
 
     def __iter__(self):
         for f in self.files:
             doc = self.load_json_(f)
-            if not self.sent_tokenize:
-                tokens = self.filter_tokens_(doc['tokens'])
-                tokens = [t.get(self.token_key, None) for t in tokens]
-                tokens = list(filter(lambda x: x is not None, tokens))
-                yield tokens
-            else:
-                tokens = doc['tokens']
-                start2idx, end2idx = self.build_idx(tokens)
-                for sent in doc['sents']:
-                    sent_tokens = tokens[start2idx[sent['start']]: (end2idx[sent['end']] + 1)]
-                    sent_tokens = self.filter_tokens_(sent_tokens)
-                    sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
-                    sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
-                    if not sent_tokens:
-                        continue
-                    yield sent_tokens
+            sent_tokens = doc[self.token_key]
+            for sent in sent_tokens:
+                sent_tokens = self.filter_tokens_(sent)
+                sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
+                sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
+                if not sent_tokens:
+                    continue
+                yield sent_tokens
 
 
 

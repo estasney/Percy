@@ -7,10 +7,10 @@ from datetime import datetime
 import en_core_web_lg
 
 from process import ProcessConfig
-from process.process.spacy.streaming import stream_docs
-from process.process.spacy.spacy_utils import add_extra, STOPWORDS
-from process.process.spacy.spacy_phrases import detect_phrases
-from process.process.spacy.lang import lang_detect, lookup_language_detection, apply_by_multiprocessing,\
+from process.process.spacy_process.streaming import stream_docs
+from process.process.spacy_process.spacy_utils import add_extra, STOPWORDS
+from process.process.spacy_process.spacy_phrases import detect_phrases
+from process.process.spacy_process.lang import lang_detect, lookup_language_detection, apply_by_multiprocessing,\
     store_language_detection
 
 
@@ -96,7 +96,10 @@ def preprocess_csv(corpus_fp, n_workers, output1=OUTPUT1, prettify_output=False)
                 else:
                     json.dump(row.to_dict(), jfile)
 
+    print("Exporting DataFrame")
+    start_time = datetime.now()
     export_df(df, prettify_output, output1)
+    print("Finished Exporting DataFrame in {}".format(datetime.now() - start_time))
 
 
 if __name__ == "__main__":
@@ -105,11 +108,11 @@ if __name__ == "__main__":
     # Remove Null Records
     # Remove Non-English Records
 
-    preprocess_csv(corpus_fp=CORPUS_FP, n_workers=N_WORKERS)
+    # preprocess_csv(corpus_fp=CORPUS_FP, n_workers=N_WORKERS)
 
     # Tokenize JSON records
     spacify_docs()
 
     # Train the phraser from JSON records
-    detect_phrases(input_dir=OUTPUT2, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
-                   common_words=STOPWORDS, min_count=10, threshold=30)
+    # detect_phrases(input_dir=OUTPUT2, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
+    #                common_words=STOPWORDS, min_count=10, threshold=30)

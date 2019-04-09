@@ -4,6 +4,9 @@ import multiprocessing
 from functools import partial
 from collections import namedtuple
 import json
+from nltk.corpus import stopwords
+
+STOPWORDS = set(stopwords.words("english"))
 
 Pattern = namedtuple('Pattern', 'pattern action default')
 
@@ -135,13 +138,17 @@ def add_extra(d):
     def segment_sentences(tokens, sents):
         end2idx = {x['end']: i for i, x in enumerate(tokens)}
         start2idx = {x['start']: i for i, x in enumerate(tokens)}
-        data = []
+        sentence_output = []
         for sent in sents:
             start_idx = start2idx[sent['start']]
             end_idx = end2idx[sent['end']] + 1
             sent_tokens = tokens[start_idx:end_idx]
-            data.append(sent_tokens)
-        return data
+            if not sent_tokens:
+                continue
+            sentence_output.append(sent_tokens)
+        return sentence_output
 
     # json_data['sent_tokens'] = segment_sentences(json_data['tokens'], json_data['sents'])
+    sent_tokens = segment_sentences(json_data['tokens'], json_data['sents'])
+    json_data['tokens'] = sent_tokens
     return json_data

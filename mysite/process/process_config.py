@@ -18,6 +18,10 @@ class ProcessConfig(object):
         self.OUTPUT1 = self.smart_path(self.DATA_FOLDER, 'output1')
         self.OUTPUT2 = self.smart_path(self.DATA_FOLDER, 'output2')
 
+        self.CORPUS_FILE = self.smart_path(self.DATA_FOLDER, 'corpus', 'corpus.csv')
+
+        self.N_WORKERS = 4
+
     def smart_path(self, *args):
         start_path = self.BASE_DIR
         for a in args:
