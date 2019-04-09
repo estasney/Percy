@@ -13,7 +13,9 @@ config = ProcessConfig()
 
 INPUT_FOLDER = config.OUTPUT1
 OUTPUT_FOLDER = config.OUTPUT2
-PHRASE_FOLDER = config.PHRASE_FOLDER
+PHRASE_MODEL_FP = config.PHRASE_MODEL
+PHRASE_DUMP_FP = config.PHRASE_DUMP
+
 STOPWORDS = set(stopwords.words("english"))
 
 
@@ -21,8 +23,9 @@ def preprocess_docs(input_files, output_folder, prettify=False):
 
     """
 
-    :param files: From output1 to output2
-    :param prettify:
+    :param input_files: From output1 to output2
+    :param output_folder:
+    :param prettify: Indent JSON Files
     :return:
     """
 
@@ -51,4 +54,5 @@ if __name__ == "__main__":
     # files = glob.glob(input_files_path)
     # preprocess_docs(files, OUTPUT_FOLDER)
     print("Training phraser")
-    detect_phrases(OUTPUT_FOLDER, PHRASE_FOLDER, common_words=STOPWORDS, min_count=10, threshold=30)
+    detect_phrases(input_dir=OUTPUT_FOLDER, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
+                   common_words=STOPWORDS, min_count=10, threshold=30)

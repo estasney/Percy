@@ -39,7 +39,7 @@ def filter_phrases(phrase_line, patterns=phrase_patterns):
     return True
 
 
-def detect_phrases(input_dir, phrase_dir, common_words, min_count, threshold, max_layers=2):
+def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min_count, threshold, max_layers=2):
 
     """
     max_layers
@@ -61,7 +61,7 @@ def detect_phrases(input_dir, phrase_dir, common_words, min_count, threshold, ma
         phrases, found_new = train_layer(streamer, phrases, starting_layer, next_layer)
         end_time = datetime.now()
         elasped = end_time - start_time
-        print("Finished layer {}".format(elasped.seconds))
+        print("Finished layer {} in ".format(starting_layer, elasped))
         if not found_new:
             print("No new phrases found at layer {}".format(next_layer))
             break
@@ -70,7 +70,48 @@ def detect_phrases(input_dir, phrase_dir, common_words, min_count, threshold, ma
             starting_layer += 1
             next_layer += 1
 
-    phrases.save(os.path.join(phrase_dir, "phrases.model"))
+    phrases.save(phrase_model_fp)
+
+    print("Exporting Phrase Counts")
+    phrase_counts = Counter()
+    current_layer = 0
+    while current_layer <= max_layers:
+        ngrams_stream = stream_ngrams(input_dir, phrases, current_layer)
+        ngrams_export = phrases.export_phrases(ngrams_stream)
+        phrase_counts.update(ngrams_export)
+        current_layer += 1
+
+    print("Finished Exporting Phrase Counts")
+
+    phrase_counts = list(phrase_counts.items())
+    decoded_phrase_counts = []
+    for word_pmi, count in phrase_counts:
+        word, pmi = word_pmi
+        word = word.decode()
+        decoded_phrase_counts.append((word, pmi, count))
+    decoded_phrase_counts.sort(key=lambda x: x[2], reverse=True)
+    del phrase_counts
+    with open(phrase_dump_fp, 'w+', encoding='utf-8') as tfile:
+        for phrase, pmi, count in decoded_phrase_counts:
+            tfile.write("{}, {}, {}".format(phrase.replace(" ", "_"), pmi, count))
+            tfile.write("\n")
+
+
+def stream_ngrams(folder, text_key, model, layers=1):
+    reader = SpacyReader(folder=folder, text_key=text_key, token_filter=SpacyTokenFilter())
+
+    def phrase_once(doc, model):
+        return model[doc]
+
+    def phrase_many(doc, model, ntimes):
+        for i in range(ntimes):
+            doc = phrase_once(doc, model)
+        return doc
+
+    for sentence in reader.as_sentences():
+        if sentence:
+            doc = phrase_many(sentence, model, layers)
+            yield doc
 
 
 

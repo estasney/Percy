@@ -91,6 +91,28 @@ class SpacyReader(object):
         end2idx = {token['end']: i for i, token in enumerate(tokens)}
         return start2idx, end2idx
 
+    def as_sentences(self):
+        for f in self.files:
+            doc = self.load_json_(f)
+            tokens = doc['tokens']
+            start2idx, end2idx = self.build_idx(tokens)
+            for sent in doc['sents']:
+                sent_tokens = tokens[start2idx[sent['start']]: (end2idx[sent['end']] + 1)]
+                sent_tokens = self.filter_tokens_(sent_tokens)
+                sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
+                sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
+                if not sent_tokens:
+                    continue
+                yield sent_tokens
+
+    def as_documents(self):
+        for f in self.files:
+            doc = self.load_json_(f)
+            tokens = self.filter_tokens_(doc['tokens'])
+            tokens = [t.get(self.token_key, None) for t in tokens]
+            tokens = list(filter(lambda x: x is not None, tokens))
+            yield tokens
+
     def __getitem__(self, item):
         file = self.files[item]
         doc = self.load_json_(file)
@@ -108,6 +130,8 @@ class SpacyReader(object):
                 sent_tokens = self.filter_tokens_(sent_tokens)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
                 sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
+                if not sent_tokens:
+                    continue
                 output.append(sent_tokens)
             return output
 
@@ -127,6 +151,8 @@ class SpacyReader(object):
                     sent_tokens = self.filter_tokens_(sent_tokens)
                     sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
                     sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
+                    if not sent_tokens:
+                        continue
                     yield sent_tokens
 
 
