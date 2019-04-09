@@ -113,3 +113,35 @@ def phrase_tokens(tokens, phraser):
 def get_filtered_text(doc, excluded=EXCLUDED_TAGS):
     keeps = filter_tags(doc, excluded)
     return [t['lemma'] for t in keeps]
+
+
+def add_extra(d):
+    others = ['is_alpha', 'is_ascii', 'is_digit', 'is_punct', 'is_space', 'is_currency', 'like_url', 'like_num',
+              'like_email']
+
+    json_data = d.to_json()
+    for i, t in enumerate(d):
+        token_data = json_data['tokens'][i]
+        token_data.update({'lemma': t.lemma_, 'norm': t.norm_, 'text': t.text})
+        conjuncts = list(t.conjuncts)
+        if conjuncts:
+            conjuncts = [c.text for c in conjuncts]
+        token_data.update({'conjuncts': conjuncts})
+        for o in others:
+            token_data.update({o: getattr(t, o, None)})
+
+    # segment the tokens into sentences using the 'sents' key
+
+    def segment_sentences(tokens, sents):
+        end2idx = {x['end']: i for i, x in enumerate(tokens)}
+        start2idx = {x['start']: i for i, x in enumerate(tokens)}
+        data = []
+        for sent in sents:
+            start_idx = start2idx[sent['start']]
+            end_idx = end2idx[sent['end']] + 1
+            sent_tokens = tokens[start_idx:end_idx]
+            data.append(sent_tokens)
+        return data
+
+    # json_data['sent_tokens'] = segment_sentences(json_data['tokens'], json_data['sents'])
+    return json_data

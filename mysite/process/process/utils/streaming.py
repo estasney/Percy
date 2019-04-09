@@ -1,6 +1,7 @@
 import glob
 import os
 import json
+from nltk.corpus import stopwords
 
 
 """
@@ -19,39 +20,6 @@ def stream_docs(files, data_key):
         else:
             doc_text = doc
         yield doc_text
-
-
-def add_extra(d):
-    others = ['is_alpha', 'is_ascii', 'is_digit', 'is_punct', 'is_left_punct', 'is_right_punct',
-              'is_space', 'is_bracket', 'is_quote', 'is_currency', 'like_url', 'like_num', 'like_email',
-              'is_oov', 'is_stop']
-
-    json_data = d.to_json()
-    for i, t in enumerate(d):
-        token_data = json_data['tokens'][i]
-        token_data.update({'lemma': t.lemma_, 'norm': t.norm_, 'text': t.text})
-        conjuncts = list(t.conjuncts)
-        if conjuncts:
-            conjuncts = [c.text for c in conjuncts]
-        token_data.update({'conjuncts': conjuncts})
-        for o in others:
-            token_data.update({o: getattr(t, o, None)})
-
-    # segment the tokens into sentences using the 'sents' key
-
-    def segment_sentences(tokens, sents):
-        end2idx = {x['end']: i for i, x in enumerate(tokens)}
-        start2idx = {x['start']: i for i, x in enumerate(tokens)}
-        data = []
-        for sent in sents:
-            start_idx = start2idx[sent['start']]
-            end_idx = end2idx[sent['end']] + 1
-            sent_tokens = tokens[start_idx:end_idx]
-            data.append(sent_tokens)
-        return data
-
-    json_data['sent_tokens'] = segment_sentences(json_data['tokens'], json_data['sents'])
-    return json_data
 
 
 class DocStreamer(object):
@@ -76,6 +44,56 @@ class DocStreamer(object):
             for sentence in doc:
                 if sentence:
                     yield sentence
+
+
+class SpacyTokenFilter(object):
+
+    DEFAULT_EXCLUDED = ["is_digit", "is_punct", "is_space", "is_currency", "like_url", "like_num", "like_email"]
+    STOPWORDS = set(stopwords.words("english"))
+
+    def __init__(self, stopwords=None, excluded_attributes=None, token_key='lemma'):
+        self.stopwords = stopwords if stopwords is not None else self.STOPWORDS
+        self.token_key = token_key
+        self.excluded_attributes = excluded_attributes if excluded_attributes is not None else self.DEFAULT_EXCLUDED
+
+    def filter_token(self, token):
+        token_text = token.get(self.token_key, None)
+        if not token_text:
+            return False
+        if token_text in self.stopwords:
+            return False
+        if any([token.get(attr, False) for attr in self.excluded_attributes]):
+            return False
+        return True
+
+
+class SpacyReader(object):
+    def __init__(self, folder, text_key, token_filter, sent_tokenize=True, token_key='lemma'):
+        self.folder = folder
+        self.files = glob.glob(os.path.join(self.folder, "*.json"))
+        self.text_key = text_key
+        self.token_filter = token_filter
+        self.sent_tokenize = sent_tokenize
+        self.token_key = token_key
+
+    def load_json_(self, f):
+        with open(f, 'r') as json_file:
+            return json.load(json_file)
+
+    def filter_tokens_(self, doc):
+        tokens = list(filter(self.token_filter.filter_token, doc))
+        return tokens
+
+    def __getitem__(self, item):
+        file = self.files[item]
+        doc = self.load_json_(file)
+        if not self.sent_tokenize:
+            tokens = self.filter_tokens_(doc['tokens'])
+            tokens = [t.get("lemma", None) for t in tokens]
+            tokens = list(filter(lambda x: x is not None, tokens))
+            return tokens
+
+
 
 
 def stream_tokens(files):

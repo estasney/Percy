@@ -12,7 +12,7 @@ INPUT_FOLDER = config.OUTPUT1
 OUTPUT_FOLDER = config.OUTPUT2
 
 
-def preprocess_docs(input_files, output_folder, prettify=True):
+def preprocess_docs(input_files, output_folder, prettify=False):
 
     """
 
@@ -42,6 +42,9 @@ def preprocess_docs(input_files, output_folder, prettify=True):
 def phrase_docs(target_folder):
     start_time = datetime.now()
     phraser = MyPhraser()
+
+    # reader = SpacyReader()
+
     target_files_pattern = os.path.join(target_folder, "*.json")
     target_files = glob.glob(target_files_pattern)
     process_phrase_tokens(target_files, phraser)
@@ -54,5 +57,5 @@ if __name__ == "__main__":
     input_files_path = os.path.join(INPUT_FOLDER, "*.json")
     files = glob.glob(input_files_path)
     preprocess_docs(files, OUTPUT_FOLDER)
-    print("Running docs through phraser")
-    phrase_docs(OUTPUT_FOLDER)
+    print("Training phraser")
+    # phrase_docs(OUTPUT_FOLDER)
