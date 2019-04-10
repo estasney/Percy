@@ -27,7 +27,7 @@ CORPUS_FP = config.CORPUS_FILE
 N_WORKERS = config.N_WORKERS
 
 
-def spacify_docs(output1=OUTPUT1, output2=OUTPUT2, prettify=False):
+def spacify_docs(output1=OUTPUT1, output2=OUTPUT2, prettify=False, ignore_existing=False):
 
     """
 
@@ -43,13 +43,27 @@ def spacify_docs(output1=OUTPUT1, output2=OUTPUT2, prettify=False):
     print("Model loaded in {}".format(datetime.now() - start_time))
 
     # glob files
-    output1_files = glob.glob(os.path.join(output1, "*.json"))
+    if ignore_existing:
+        new_files = []
+        output1_files = glob.glob(os.path.join(output1, "*.json"))
+        for file in output1_files:
+            file_name = os.path.basename(file)
+            output2_file_path = os.path.join(output2, file_name)
+            if not os.path.isfile(output2_file_path):
+                new_files.append(file)
+        output1_files = new_files
+    else:
+        output1_files = glob.glob(os.path.join(output1, "*.json"))
+
+    # keep reference to member_ids from file names
+    file_names = [os.path.basename(x) for x in output1_files]
+
     print("Found {} docs".format(len(output1_files)))
 
     doc_stream = stream_docs(files=output1_files, data_key='summary')
-    for i, doc in enumerate(nlp.pipe(doc_stream, batch_size=50)):
+    for i, doc in enumerate(nlp.pipe(doc_stream, batch_size=50)):  # streams in original order
         json_doc = add_extra(doc)
-        out_f = os.path.join(output2, "{}.json".format(i))
+        out_f = os.path.join(output2, file_names[i])
         with open(out_f, 'w+') as json_file:
             if prettify:
                 json.dump(json_doc, json_file, indent=4)
