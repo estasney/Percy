@@ -53,11 +53,23 @@ class SpacyTokenFilter(object):
     STOPWORDS = set(stopwords.words("english"))
     EXTRA_STOPWORDS = ["-PRON-", "-LRB-", "-RRB-"]
 
-    def __init__(self, stopwords=None, excluded_attributes=None, token_key='lemma'):
-        self.stopwords = stopwords if stopwords is not None else self.STOPWORDS
-        self.stopwords.update(set(self.EXTRA_STOPWORDS))
+    def __init__(self, stopwords=None, excluded_attributes=None, token_key='norm'):
+        if stopwords:
+            self.stopwords = stopwords
+        elif stopwords is None:
+            self.stopwords = self.STOPWORDS
+            self.stopwords.update(set(self.EXTRA_STOPWORDS))
+        else:
+            self.stopwords = {}
+
+        if excluded_attributes:
+            self.excluded_attributes = excluded_attributes
+        elif excluded_attributes is None:
+            self.excluded_attributes = self.DEFAULT_EXCLUDED
+        else:
+            self.excluded_attributes = []
+
         self.token_key = token_key
-        self.excluded_attributes = excluded_attributes if excluded_attributes is not None else self.DEFAULT_EXCLUDED
 
     def filter_token(self, token):
         token_text = token.get(self.token_key, None)
@@ -71,7 +83,7 @@ class SpacyTokenFilter(object):
 
 
 class SpacyReader(object):
-    def __init__(self, folder, text_key, token_filter, token_key='lemma'):
+    def __init__(self, folder, text_key, token_filter, token_key='norm'):
         self.folder = folder
         self.files = glob.glob(os.path.join(self.folder, "*.json"))
         self.text_key = text_key
@@ -90,7 +102,7 @@ class SpacyReader(object):
     def as_sentences(self):
         for f in self.files:
             doc = self.load_json_(f)
-            tokens = doc[self.token_key]
+            tokens = doc[self.text_key]
             for sent in tokens:
                 sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
@@ -102,7 +114,7 @@ class SpacyReader(object):
     def as_documents(self):
         for f in self.files:
             doc = self.load_json_(f)
-            sent_tokens = doc[self.token_key]
+            sent_tokens = doc[self.text_key]
             doc_tokens = list(chain.from_iterable(sent_tokens))
             doc_tokens = self.filter_tokens_(doc_tokens)
             doc_tokens = [t.get(self.token_key, None) for t in doc_tokens]
@@ -115,7 +127,7 @@ class SpacyReader(object):
         setattr(self, 'phraser', phraser)
         for f in self.files:
             doc = self.load_json_(f)
-            tokens = doc[self.token_key]
+            tokens = doc[self.text_key]
             for sent in tokens:
                 sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
@@ -128,7 +140,7 @@ class SpacyReader(object):
     def __getitem__(self, item):
         file = self.files[item]
         doc = self.load_json_(file)
-        sent_tokens = doc[self.token_key]
+        sent_tokens = doc[self.text_key]
         doc_tokens = list(chain.from_iterable(sent_tokens))
         doc_tokens = self.filter_tokens_(doc_tokens)
         doc_tokens = [t.get(self.token_key, None) for t in doc_tokens]
@@ -138,7 +150,7 @@ class SpacyReader(object):
     def __iter__(self):
         for f in self.files:
             doc = self.load_json_(f)
-            sent_tokens = doc[self.token_key]
+            sent_tokens = doc[self.text_key]
             for sent in sent_tokens:
                 sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]

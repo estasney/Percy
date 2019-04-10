@@ -111,8 +111,8 @@ if __name__ == "__main__":
     # preprocess_csv(corpus_fp=CORPUS_FP, n_workers=N_WORKERS)
 
     # Tokenize JSON records
-    spacify_docs()
+    # spacify_docs()
 
     # Train the phraser from JSON records
-    # detect_phrases(input_dir=OUTPUT2, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
-    #                common_words=STOPWORDS, min_count=10, threshold=30)
+    detect_phrases(input_dir=OUTPUT2, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
+                   common_words=STOPWORDS, min_count=10, threshold=30)

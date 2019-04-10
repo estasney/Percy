@@ -82,9 +82,9 @@ def phrase_tokens(tokens, phraser):
         return []
 
     # pass just the strings to phraser and get the result
-    phrased_tokens = phraser[[x['lemma'] for x in original_tokens]]
+    phrased_tokens = phraser[[x['norm'] for x in original_tokens]]
 
-    if phrased_tokens == [[x['lemma'] for x in original_tokens]]:
+    if phrased_tokens == [[x['norm'] for x in original_tokens]]:
         return original_tokens
 
     # iterate through phrased tokens, looking for phrased values
@@ -107,7 +107,7 @@ def phrase_tokens(tokens, phraser):
             output_tags_ = [getattr(t, 'tag', "") for t in output]  # keep this if needed
             # make a 'custom' tag to show a phrase
             output_tag = "PHRASE"
-            output_data = {'lemma': token, 'tag_': output_tags_, 'tag': output_tag}
+            output_data = {'lemma': token, 'norm': token, 'tag_': output_tags_, 'tag': output_tag}
             token_output.append(output_data)
 
     return token_output
@@ -115,7 +115,7 @@ def phrase_tokens(tokens, phraser):
 
 def get_filtered_text(doc, excluded=EXCLUDED_TAGS):
     keeps = filter_tags(doc, excluded)
-    return [t['lemma'] for t in keeps]
+    return [t['norm'] for t in keeps]
 
 
 def add_extra(d):

@@ -5,6 +5,7 @@ from process.process_config import ProcessConfig
 from process.process.spacy_process.streaming import SpacyReader, SpacyTokenFilter
 from datetime import datetime
 import re
+import easygui
 from collections import Counter
 
 Pattern = namedtuple('Pattern', 'pattern action default')
@@ -28,6 +29,8 @@ f4 = make_pattern([re.compile(r"([0-9]{1,}\+?)"),
 
 phrase_patterns = [f1, f2, f3, f4]
 
+config = ProcessConfig()
+
 
 def filter_phrases(phrase_line, patterns=phrase_patterns):
     temp_phrase = phrase_line[0].split("_")
@@ -46,7 +49,7 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
         2 - trigrams, etc
     """
 
-    streamer = SpacyReader(folder=input_dir, text_key="tokens", token_filter=SpacyTokenFilter())
+    streamer = SpacyReader(folder=input_dir, text_key="tokens", token_filter=SpacyTokenFilter(stopwords=False))
 
     phrases = Phrases(streamer, common_terms=common_words, min_count=min_count, threshold=threshold)
 
@@ -54,7 +57,7 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
 
     while next_layer <= max_layers:
         start_time = datetime.now()
-        phrases, found_new = train_layer(streamer, phrases, starting_layer, next_layer)
+        phrases, found_new = train_layer(text=streamer, model=phrases, starting_layer=starting_layer, ending_layer=next_layer)
         end_time = datetime.now()
         elapsed = end_time - start_time
         print("Finished layer {} in {}".format(starting_layer, elapsed))
@@ -66,13 +69,15 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
             starting_layer += 1
             next_layer += 1
 
+    print("Finished training layers")
+
     phrases.save(phrase_model_fp)
 
     print("Exporting Phrase Counts")
     phrase_counts = Counter()
     current_layer = 0
     while current_layer <= max_layers:
-        ngrams_stream = stream_ngrams(input_dir, phrases, current_layer)
+        ngrams_stream = stream_ngrams(folder=input_dir, text_key=streamer.text_key, model=phrases, layers=current_layer)
         ngrams_export = phrases.export_phrases(ngrams_stream)
         phrase_counts.update(ngrams_export)
         current_layer += 1
@@ -94,7 +99,7 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
 
 
 def stream_ngrams(folder, text_key, model, layers=1):
-    reader = SpacyReader(folder=folder, text_key=text_key, token_filter=SpacyTokenFilter())
+    reader = SpacyReader(folder=folder, text_key=text_key, token_filter=SpacyTokenFilter(stopwords=False))
 
     def phrase_once(doc, model):
         return model[doc]
@@ -104,11 +109,10 @@ def stream_ngrams(folder, text_key, model, layers=1):
             doc = phrase_once(doc, model)
         return doc
 
-    for sentence in reader.as_sentences():
+    for sentence in reader:
         if sentence:
             doc = phrase_many(sentence, model, layers)
             yield doc
-
 
 
 def train_layer(text, model, starting_layer=1, ending_layer=2):
@@ -155,13 +159,13 @@ def annotate_phrases(batch_size=100):
     open excluded and included. Remove any in those files
     """
 
-    with open(EXCLUDED, "r", encoding="utf-8") as tfile:
+    with open(config.PHRASE_EXCLUDED, "r", encoding="utf-8") as tfile:
         excluded = set(tfile.read().splitlines())
 
-    with open(INCLUDED, "r", encoding="utf-8") as tfile:
+    with open(config.PHRASE_INCLUDED, "r", encoding="utf-8") as tfile:
         included = set(tfile.read().splitlines())
 
-    with open(PHRASE_DUMP, "r", encoding="utf-8") as tfile:
+    with open(config.PHRASE_DUMP, "r", encoding="utf-8") as tfile:
         pending = tfile.read().splitlines()
         pending = [x.split(", ") for x in pending]
 
@@ -173,7 +177,7 @@ def annotate_phrases(batch_size=100):
     for marked in marked_excluded:
         excluded.add(marked)
 
-    with open(EXCLUDED, "w+", encoding="utf-8") as tfile:
+    with open(config.PHRASE_EXCLUDED, "w+", encoding="utf-8") as tfile:
         for phrase in excluded:
             tfile.write(phrase)
             tfile.write("\n")
@@ -182,7 +186,7 @@ def annotate_phrases(batch_size=100):
     for phrase in not_marked:
         included.add(phrase)
 
-    with open(INCLUDED, "w+", encoding="utf-8") as tfile:
+    with open(config.PHRASE_INCLUDED, "w+", encoding="utf-8") as tfile:
         for phrase in included:
             tfile.write(phrase)
             tfile.write("\n")
@@ -232,3 +236,6 @@ class MyPhraser(Phraser):
         for i in range(self.iter):
             item = self.phrase_once(item)
         return item
+
+if __name__ == "__main__":
+    annotate_phrases()
