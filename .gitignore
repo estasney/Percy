@@ -11,9 +11,6 @@ mysite/app_folder/scripts/__pycache__/
 mysite/app_folder/scripts/tmp/
 mysite/app_folder/scripts/utils/
 mysite/app_folder/scripts/words/
-mysite/app_folder/static/keywords.js
-mysite/app_folder/static/related.js
-mysite/app_folder/static/typeahead.bundle.min.js
 mysite/process/__pycache__/
 mysite/process/data/language/
 mysite/process/data/output1/
@@ -23,3 +20,5 @@ mysite/process/process/__pycache__/
 mysite/process/process/utils/__pycache__/
 mysite/process/process/words/__pycache__/
 venv/
+/mysite/app_folder/resources/
+/mysite/process/data/corpus/corpus.csv
