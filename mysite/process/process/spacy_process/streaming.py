@@ -2,7 +2,8 @@ import glob
 import os
 import json
 from nltk.corpus import stopwords
-from itertools import chain
+from itertools import chain, combinations
+from gensim.utils import strided_windows
 
 
 """
@@ -83,7 +84,7 @@ class SpacyTokenFilter(object):
 
 
 class SpacyReader(object):
-    def __init__(self, folder, text_key, token_filter, token_key='norm'):
+    def __init__(self, folder, text_key, token_filter=SpacyTokenFilter(), token_key='norm'):
         self.folder = folder
         self.files = glob.glob(os.path.join(self.folder, "*.json"))
         self.text_key = text_key
@@ -125,6 +126,7 @@ class SpacyReader(object):
         if self.phraser:
             setattr(self, 'phraser', None)
         setattr(self, 'phraser', phraser)
+
         for f in self.files:
             doc = self.load_json_(f)
             tokens = doc[self.text_key]
@@ -148,6 +150,7 @@ class SpacyReader(object):
         return doc_tokens
 
     def __iter__(self):
+
         for f in self.files:
             doc = self.load_json_(f)
             sent_tokens = doc[self.text_key]
@@ -159,6 +162,27 @@ class SpacyReader(object):
                     continue
                 yield sent_tokens
 
+
+def stream_skills(folder):
+    files = glob.glob(os.path.join(folder, "*.json"))
+    for f in files:
+        with open(f, "r") as json_file:
+            doc = json.load(json_file)
+        skills = doc['skills']
+        if skills:
+            yield
+
+
+def stream_pairs(docs, dictionary, window_size):
+    for doc in docs:
+        bow_sent = dictionary.doc2idx(doc)
+        bow_sent = [x for x in bow_sent if x > -1]
+        if len(bow_sent) < 3:
+            continue
+        windows = strided_windows(bow_sent, window_size=window_size)
+        for w in windows:
+            for x, y in map(sorted(combinations(w, 2))):
+                yield x, y
 
 
 def stream_tokens(files):

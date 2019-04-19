@@ -5,7 +5,7 @@ from datetime import datetime
 
 import easygui
 from gensim.models.phrases import Phraser, Phrases
-from pampy import match, _
+from pampy import match, _, TAIL
 
 from process.process.spacy_process.streaming import SpacyReader, SpacyTokenFilter
 from process.process_config import ProcessConfig
@@ -21,12 +21,13 @@ f1 = make_pattern(["I", _])  # anything starting with i
 f2 = make_pattern(["--", _])  # --_--
 
 # 10_years, 3+_years
-f3 = make_pattern([re.compile(r"([0-9]{1,2}\+?)"),
+f3 = make_pattern([re.compile(r"([0-9+]{1,2}\+?)"),
                    re.compile(r"(years?)")])
 
 # 15_percent 15+_percent, 55_%
 f4 = make_pattern([re.compile(r"([0-9]{1,}\+?)"),
-                   re.compile(r"(%)|(percent)")])
+                   re.compile(r"(%)|(percent)|(\+)"),
+                   TAIL])
 
 phrase_patterns = [f1, f2, f3, f4]
 
@@ -197,6 +198,41 @@ def annotate_phrases(batch_size=100):
             tfile.write("\n")
 
 
+def evaluate_filters():
+    with open(config.PHRASE_EXCLUDED, "r", encoding="utf-8") as tfile:
+        excluded = set(tfile.read().splitlines())
+
+    with open(config.PHRASE_INCLUDED, "r", encoding="utf-8") as tfile:
+        included = set(tfile.read().splitlines())
+
+    my_phraser = MyPhraser()
+    excluded_tokens = [x.split("_") for x in excluded]
+    included_tokens = [x.split("_") for x in included]
+
+    excluded_output = {"Fail": [], "Pass": []}
+    for tokens in excluded_tokens:
+        output = my_phraser[tokens]
+        if any(["_" in x for x in output]):
+            excluded_output["Fail"].append(output)
+        else:
+            excluded_output["Pass"].append(output)
+
+    included_output = {"Fail": [], "Pass": []}
+    for tokens in included_tokens:
+        output = my_phraser[tokens]
+        if not any(["_" in x for x in output]):
+            included_output["Fail"].append(output)
+        else:
+            included_output["Pass"].append(output)
+
+    print("Excluded Results".center(80, "="))
+    print("")
+    print("Fails".center(60, "*"))
+    for f in excluded_output["Fail"]:
+        print(f)
+    print("")
+
+
 class PhraseFilter(object):
 
     def __init__(self, patterns=phrase_patterns, phrase_delim="_"):
@@ -243,4 +279,5 @@ class MyPhraser(Phraser):
 
 
 if __name__ == "__main__":
-    annotate_phrases()
+    # annotate_phrases()
+    evaluate_filters()

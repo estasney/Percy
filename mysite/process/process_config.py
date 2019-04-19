@@ -17,10 +17,32 @@ class ProcessConfig(object):
 
         self.OUTPUT1 = self.smart_path(self.DATA_FOLDER, 'output1')
         self.OUTPUT2 = self.smart_path(self.DATA_FOLDER, 'output2')
+        self.RESOURCES = self.smart_path(self.DATA_FOLDER, 'resources')
+        self.RESOURCES_DICTIONARY_TOKENS = self.smart_path(self.RESOURCES, 'dictionary_tokens.model')
+        self.RESOURCES_DICTIONARY_AUTOCOMPLETE_TOKENS = self.smart_path(self.RESOURCES, 'dictionary_autocomplete_tokens.txt')
+        self.RESOURCES_DICTIONARY_SKILLS = self.smart_path(self.RESOURCES, 'dictionary_skills.model')
+        self.RESOURCES_DICTIONARY_AUTOCOMPLETE_SKILLS = self.smart_path(self.RESOURCES,
+                                                                        'dictionary_autocomplete_skills.txt')
+        self.RESOURCES_CX_TOKENS = self.smart_path(self.RESOURCES, 'cx_tokens.pkl')
+        self.RESOURCES_CXP_TOKENS = self.smart_path(self.RESOURCES, 'cxp_tokens.pkl')
+        self.RESOURCES_CXY_TOKENS = self.smart_path(self.RESOURCES, 'cxy_tokens.pkl')
+        self.RESOURCES_CXYP_TOKENS = self.smart_path(self.RESOURCES, 'cxyp_tokens.pkl')
+
+        self.RESOURCES_LDA_PMI_TOKENS = self.smart_path(self.RESOURCES, 'lda_pmi_tokens.npy')
+        self.RESOURCES_LDA_PMI_SKILLS = self.smart_path(self.RESOURCES, 'lda_pmi_skills.npy')
+
+        self.RESOURCES_CX_SKILLS = self.smart_path(self.RESOURCES, 'cx_skills.pkl')
+        self.RESOURCES_CXP_SKILLS = self.smart_path(self.RESOURCES, 'cxp_skills.pkl')
+        self.RESOURCES_CXY_SKILLS = self.smart_path(self.RESOURCES, 'cxy_skills.pkl')
+        self.RESOURCES_CXYP_SKILLS = self.smart_path(self.RESOURCES, 'cxyp_skills.pkl')
+
+        self.RESOURCES_FINGERPRINT_TOKENS = self.smart_path(self.RESOURCES, 'fingerprint_tokens.npy')
+        self.RESOURCES_FINGERPRINT_VEC_TOKENS = self.smart_path(self.RESOURCES, 'fingerprint_vec_tokens.pkl')
 
         self.CORPUS_FILE = self.smart_path(self.DATA_FOLDER, 'corpus', 'corpus.csv')
 
         self.N_WORKERS = 4
+
 
     def smart_path(self, *args):
         start_path = self.BASE_DIR
