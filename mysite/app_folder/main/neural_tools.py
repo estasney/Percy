@@ -3,6 +3,7 @@ from gensim.corpora import Dictionary
 from app_folder.site_config import FConfig
 from app_folder.main.text_tools import parse_form_text
 
+fconfig = FConfig()
 
 def word_math(request):
     pwords = request.form.get('pwords')
@@ -68,8 +69,8 @@ def word_sims(user_query, query_scope):
 class WordSims(object):
 
     def __init__(self):
-        self.array = np.load(FConfig.lda_pmi)
-        self.idx = Dictionary.load(FConfig.dictionary)
+        self.array = np.load(fconfig.LDA_PMI_TOKENS)
+        self.idx = Dictionary.load(fconfig.DICTIONARY_TOKENS)
 
     def find_similar(self, word):
         try:
@@ -125,8 +126,8 @@ class WordSims(object):
 class SkillSims(object):
 
     def __init__(self):
-        self.array = np.load(FConfig.lda_pmi_skills)
-        self.idx = Dictionary.load(FConfig.dictionary_skills)
+        self.array = np.load(fconfig.LDA_PMI_SKILLS)
+        self.idx = Dictionary.load(fconfig.DICTIONARY_SKILLS)
 
     def find_similar(self, word):
         try:

@@ -2,17 +2,18 @@ import requests
 from app_folder.site_config import FConfig
 from datetime import datetime
 
+fconfig = FConfig()
 
 def request_message_details(message_id):
     s = requests.session()
-    s.headers.update({'Authorization': FConfig.bot_key})
+    s.headers.update({'Authorization': fconfig.BOT_KEY})
     s.headers.update({'Content-type': 'application/json; charset=utf-8'})
-    message_details = s.get(FConfig.message_api_f.format(message_id))
+    message_details = s.get(fconfig.MESSAGE_API_F.format(message_id))
 
     # Get sender's display name
     # TODO Cache this
     sender_id = message_details.json()['personId']
-    sender_details = s.get(FConfig.person_details_api_f.format(sender_id))
+    sender_details = s.get(fconfig.PERSON_DETAILS_API_F.format(sender_id))
 
     return parse_message(message_details.json(), sender_details.json())
 
@@ -43,13 +44,13 @@ def parse_message(message_details, sender_details):
 
 def make_reply(message_text, room_type, message_details):
     s = requests.session()
-    s.headers.update({'Authorization': FConfig.bot_key})
+    s.headers.update({'Authorization': fconfig.BOT_KEY})
     s.headers.update({'Content-type': 'application/json; charset=utf-8'})
 
     if room_type == 'group':
 
         request_params = {
-            'roomId': FConfig.bot_room_id,
+            'roomId': fconfig.BOT_ROOM_ID,
             'markdown': message_text
         }
 
@@ -59,7 +60,7 @@ def make_reply(message_text, room_type, message_details):
             'markdown': message_text
         }
 
-    s.post(FConfig.message_api, json=request_params)
+    s.post(fconfig.MESSAGE_API, json=request_params)
 
 def make_error_response():
     return "Sorry I didn't understand that"

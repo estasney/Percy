@@ -1,8 +1,9 @@
 from app_folder.site_config import FConfig
 
+fconfig = FConfig()
 
-def get_autocomplete(dataset, words=FConfig.dictionary_autocomplete, skills=FConfig.dictionary_skills_autocomplete,
-                     ):
+
+def get_autocomplete(dataset, words=fconfig.AUTOCOMPLETE_TOKENS, skills=fconfig.AUTOCOMPLETE_SKILLS):
 
     if dataset == 'words':
         with open(words, 'r') as tfile:
