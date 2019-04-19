@@ -19,9 +19,9 @@ class ProcessConfig(object):
         self.OUTPUT2 = self.smart_path(self.DATA_FOLDER, 'output2')
         self.RESOURCES = self.smart_path(self.DATA_FOLDER, 'resources')
         self.RESOURCES_DICTIONARY_TOKENS = self.smart_path(self.RESOURCES, 'dictionary_tokens.model')
-        self.RESOURCES_DICTIONARY_AUTOCOMPLETE_TOKENS = self.smart_path(self.RESOURCES, 'dictionary_autocomplete_tokens.txt')
+        self.RESOURCES_AUTOCOMPLETE_TOKENS = self.smart_path(self.RESOURCES, 'dictionary_autocomplete_tokens.txt')
         self.RESOURCES_DICTIONARY_SKILLS = self.smart_path(self.RESOURCES, 'dictionary_skills.model')
-        self.RESOURCES_DICTIONARY_AUTOCOMPLETE_SKILLS = self.smart_path(self.RESOURCES,
+        self.RESOURCES_AUTOCOMPLETE_SKILLS = self.smart_path(self.RESOURCES,
                                                                         'dictionary_autocomplete_skills.txt')
         self.RESOURCES_CX_TOKENS = self.smart_path(self.RESOURCES, 'cx_tokens.pkl')
         self.RESOURCES_CXP_TOKENS = self.smart_path(self.RESOURCES, 'cxp_tokens.pkl')
@@ -37,7 +37,7 @@ class ProcessConfig(object):
         self.RESOURCES_CXYP_SKILLS = self.smart_path(self.RESOURCES, 'cxyp_skills.pkl')
 
         self.RESOURCES_FINGERPRINT_TOKENS = self.smart_path(self.RESOURCES, 'fingerprint_tokens.npy')
-        self.RESOURCES_FINGERPRINT_VEC_TOKENS = self.smart_path(self.RESOURCES, 'fingerprint_vec_tokens.pkl')
+        self.RESOURCES_FINGERPRINT_VEC_TOKENS = self.smart_path(self.RESOURCES, 'fingerprint_tokens_vec.pkl')
 
         self.CORPUS_FILE = self.smart_path(self.DATA_FOLDER, 'corpus', 'corpus.csv')
 

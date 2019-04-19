@@ -8,6 +8,8 @@ def load_p(fn):
     return p
 
 
+
+
 class Config(object):
     DEBUG = True
     DEBUG_TB_TEMPLATE_EDITOR_ENABLED = True
@@ -16,27 +18,40 @@ class Config(object):
 
 
 class FConfig(object):
-    lda_pmi = os.path.join(basedir, 'resources{}lda_pmi.npy').format(os.path.sep)
-    dictionary = os.path.join(basedir, 'resources{}dictionary.model').format(os.path.sep)
-    dictionary_autocomplete = os.path.join(basedir, 'resources{}dictionary_autocomplete.txt').format(os.path.sep)
 
-    lda_pmi_skills = os.path.join(basedir, 'resources{}lda_pmi_skills.npy').format(os.path.sep)
-    dictionary_skills = os.path.join(basedir, 'resources{}dictionary_skills.model').format(os.path.sep)
-    dictionary_skills_autocomplete = os.path.join(basedir, 'resources{}dictionary_skills_autocomplete.txt').format(os.path.sep)
+    def __init__(self, base_dir=basedir):
+        self.BASE_DIR = base_dir
+        self.RESOURCES = self.smart_path("resources")
 
-    phraser = os.path.join(basedir, 'resources{}phrases.model').format(os.path.sep)
-    fingerprint_vec = os.path.join(basedir, 'resources{}fingerprint_vec.pkl').format(os.path.sep)
-    fingerprint_pop_occ = os.path.join(basedir, 'resources{}fingerprint_pop_occ.npy').format(os.path.sep)
+        self.LDA_PMI_TOKENS = self.smart_path(self.RESOURCES, "lda_pmi_tokens.npy")
+        self.LDA_PMI_SKILLS = self.smart_path(self.RESOURCES, "lda_pmi_skills.npy")
 
-    namesearch = os.path.join(basedir, 'resources{}namesearch.pkl').format(os.path.sep)
-    namesearch_v2 = os.path.join(basedir, 'resources{}namesearch_v2.pkl').format(os.path.sep)
+        self.DICTIONARY_TOKENS = self.smart_path(self.RESOURCES, "dictionary_tokens.model")
+        self.DICTIONARY_SKILLS = self.smart_path(self.RESOURCES, "dictionary_skills.model")
 
-    bot_key = load_p(os.path.join(basedir, 'resources{}bot_key.pkl'.format(os.path.sep)))
-    bot_room_id = load_p(os.path.join(basedir, 'resources{}bot_room_id.pkl'.format(os.path.sep)))
-    message_api_f = "https://api.ciscospark.com/v1/messages/{}"
-    message_api = "https://api.ciscospark.com/v1/messages"
-    person_details_api_f = "https://api.ciscospark.com/v1/people/{}"
-    person_details = "https://api.ciscospark.com/v1/people"
+        self.AUTOCOMPLETE_TOKENS = self.smart_path(self.RESOURCES, "dictionary_autocomplete_tokens.txt")
+        self.AUTOCOMPLETE_SKILLS = self.smart_path(self.RESOURCES, "dictionary_autocomplete_skills.txt")
 
+        self.PHRASE_MODEL = self.smart_path(self.RESOURCES, "phrases.model")
+
+        self.FINGERPRINT_TOKENS = self.smart_path(self.RESOURCES, "fingerprint_tokens.npy")
+        self.FINGERPRINT_SKILLS = self.smart_path(self.RESOURCES, "fingerprint_skills.npy")
+        self.FINGERPRINT_TOKENS_VEC = self.smart_path(self.RESOURCES, "fingerprint_tokens_vec.pkl")
+
+        self.NAMESEARCH = self.smart_path(self.RESOURCES, "namesearch.pkl")
+        self.NAMESEARCH_V2 = self.smart_path(self.RESOURCES, "namesearch_v2.pkl")
+
+        self.BOT_KEY = load_p(self.smart_path(self.RESOURCES, "bot_key.pkl"))
+        self.BOT_ROOM_ID = load_p(self.smart_path(self.RESOURCES, "bot_room_id.pkl"))
+        self.MESSAGE_API_F = "https://api.ciscospark.com/v1/messages/{}"
+        self.MESSAGE_API = "https://api.ciscospark.com/v1/messages"
+        self.PERSON_DETAILS_API_F = "https://api.ciscospark.com/v1/people/{}"
+        self.PERSON_DETAILS = "https://api.ciscospark.com/v1/people"
+
+    def smart_path(self, *args):
+        start_path = self.BASE_DIR
+        for a in args:
+            start_path = os.path.join(start_path, a)
+        return start_path
 
 

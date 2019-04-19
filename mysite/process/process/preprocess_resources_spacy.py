@@ -169,7 +169,7 @@ def make_token_dictionary(folder=OUTPUT2):
     dictionary.filter_extremes(no_below=MIN_WORD_COUNT, no_above=MAX_WORD_RATIO)
     dictionary.compactify()
     dictionary.save(config.RESOURCES_DICTIONARY_TOKENS)
-    with open(config.RESOURCES_DICTIONARY_AUTOCOMPLETE_TOKENS, "w+", encoding="utf-8") as tfile:
+    with open(config.RESOURCES_AUTOCOMPLETE_TOKENS, "w+", encoding="utf-8") as tfile:
         for term in dictionary.values():
             term += "\n"
             tfile.write(term)
@@ -183,7 +183,7 @@ def make_skills_dictionary(folder=OUTPUT2):
     dictionary.filter_extremes(no_below=MIN_WORD_COUNT, no_above=MAX_WORD_RATIO)
     dictionary.compactify()
     dictionary.save(config.RESOURCES_DICTIONARY_SKILLS)
-    with open(config.RESOURCES_DICTIONARY_AUTOCOMPLETE_SKILLS, "w+", encoding="utf-8") as tfile:
+    with open(config.RESOURCES_AUTOCOMPLETE_SKILLS, "w+", encoding="utf-8") as tfile:
         for term in dictionary.values():
             term += "\n"
             tfile.write(term)
