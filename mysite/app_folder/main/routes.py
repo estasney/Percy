@@ -138,7 +138,7 @@ def kw_data():
 
     # Get data-type : req_pill or paste_pill
     data_type = request.headers.get('Data-Type')
-    if data_type == "req_pill":
+    if data_type == "v-pills-cisco-tab":
         raw_text = web_tools.get_job_posting(raw_text)
         if not raw_text:
             return jsonify({'data': []})
