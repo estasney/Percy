@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  {% if config is defined %}
+     {% if config['DEBUG'] == True %}
+       {% set offline_mode = True %}
+     {% else %}
+       {% set offline_mode = False %}
+     {% endif %}
+   {% else %}
+     {% set offline_mode = False %}
+   {% endif %}
+   {% if offline_mode == False %}
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132355416-2"></script>
   <script>
@@ -10,6 +20,8 @@
 
     gtag('config', 'UA-132355416-2');
   </script>
+  {% else %}
+  {% endif %}
 
     <title>Percy</title>
   <meta charset="utf-8">
