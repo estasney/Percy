@@ -7,8 +7,8 @@ import easygui
 from gensim.models.phrases import Phraser, Phrases
 from pampy import match, _, TAIL
 
-from process.process.spacy_process.streaming import SpacyReader, SpacyTokenFilter
-from process.process_config import ProcessConfig
+from mysite.process.process.spacy_process.streaming import SpacyReader, SpacyTokenFilter
+from mysite.process.process_config import ProcessConfig
 
 Pattern = namedtuple('Pattern', 'pattern action default')
 
@@ -251,7 +251,8 @@ class PhraseFilter(object):
 class MyPhraser(Phraser):
 
     def __init__(self, phrase_filter=PhraseFilter(), phrase_path=ProcessConfig().PHRASE_MODEL, iter=2):
-        phrase_model = Phrases.load(phrase_path)
+        # phrase_model = Phrases.load(phrase_path)
+        phrase_model = Phraser.load(phrase_path)
         self.phrase_filter = phrase_filter
         self.iter = iter
         super().__init__(phrase_model)

@@ -52,7 +52,7 @@ class SpacyTokenFilter(object):
 
     DEFAULT_EXCLUDED = ["is_digit", "is_punct", "is_space", "is_currency", "like_url", "like_num", "like_email"]
     STOPWORDS = set(stopwords.words("english"))
-    EXTRA_STOPWORDS = ["-PRON-", "-LRB-", "-RRB-"]
+    EXTRA_STOPWORDS = ["-PRON-", "-LRB-", "-RRB-", "'s", "7/"]
 
     def __init__(self, stopwords=None, excluded_attributes=None, token_key='norm'):
         if stopwords:
@@ -139,6 +139,27 @@ class SpacyReader(object):
                 sent_tokens = self.phraser[sent_tokens]
                 yield sent_tokens
 
+    def as_phrased_documents(self, phraser, flatten=False):
+        if self.phraser:
+            setattr(self, 'phraser', None)
+        setattr(self, 'phraser', phraser)
+
+        for f in self.files:
+            doc = self.load_json_(f)
+            tokens = doc[self.text_key]
+            doc_output = []
+            for sent in tokens:
+                sent_tokens = self.filter_tokens_(sent)
+                sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
+                sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
+                if not sent_tokens:
+                    continue
+                sent_tokens = self.phraser[sent_tokens]
+                if flatten:
+                    doc_output.extend(sent_tokens)
+                else:
+                    doc_output.append(sent_tokens)
+
     def __getitem__(self, item):
         file = self.files[item]
         doc = self.load_json_(file)
@@ -163,6 +184,36 @@ class SpacyReader(object):
                 yield sent_tokens
 
 
+class SpacyBowReader(SpacyReader):
+
+    def __init__(self, **kwargs):
+        phraser = kwargs.pop('phraser')
+        dictionary = kwargs.pop('dictionary')
+        super().__init__(**kwargs)
+        self.phraser = phraser
+        self.dictionary = dictionary
+
+    def __iter__(self):
+        for f in self.files:
+            doc = self.load_json_(f)
+            tokens = doc[self.text_key]
+            for sent in tokens:
+                sent_tokens = self.filter_tokens_(sent)
+                sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
+                sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
+                if not sent_tokens:
+                    continue
+                sent_tokens = self.phraser[sent_tokens]
+                bow_tokens = self.dictionary.doc2bow(sent_tokens)
+                yield bow_tokens
+
+    def __len__(self):
+        return len(self.files)
+
+
+
+
+
 def stream_skills(folder):
     files = glob.glob(os.path.join(folder, "*.json"))
     for f in files:
@@ -170,7 +221,7 @@ def stream_skills(folder):
             doc = json.load(json_file)
         skills = doc['skills']
         if skills:
-            yield
+            yield skills
 
 
 def stream_pairs(docs, dictionary, window_size):
@@ -181,7 +232,7 @@ def stream_pairs(docs, dictionary, window_size):
             continue
         windows = strided_windows(bow_sent, window_size=window_size)
         for w in windows:
-            for x, y in map(sorted(combinations(w, 2))):
+            for x, y in map(sorted, combinations(w, 2)):
                 yield x, y
 
 
