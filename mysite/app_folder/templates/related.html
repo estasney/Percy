@@ -52,11 +52,11 @@
 <div class="container bg-grey">
   <h2 class="text-center"> {{title_h2}} </h2>
   <p class="text-center">According to my calculations...</p>
-  <table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-pagination="true" data-page-size="25" data-search="true">
+  <table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="10" data-striped="true" data-pagination="true" data-search="true">
     <thead>
       <tr>
         <th data-field="word" data-sortable="true">Word</th>
-        <th data-field="score" data-sortable="true">{{title_th}}</th>
+        <th data-field="score" data-sortable="true" data-formatter="int2progress">{{title_th}}</th>
       </tr>
     </thead>
     <tbody>
