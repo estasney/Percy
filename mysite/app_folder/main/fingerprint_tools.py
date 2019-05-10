@@ -3,10 +3,12 @@ from app_folder.main.text_tools import preprocess_text
 import pickle
 import numpy as np
 
+fconfig = FConfig()
+
 
 class Fingerprint(object):
 
-    def __init__(self, vec=FConfig.fingerprint_vec, pop_occ=FConfig.fingerprint_pop_occ):
+    def __init__(self, vec=fconfig.FINGERPRINT_TOKENS_VEC, pop_occ=fconfig.FINGERPRINT_TOKENS):
         self.vec = self._load_pickled(vec)
         self.pop_occ = np.load(pop_occ)
         self.id2term = self._make_id2term()

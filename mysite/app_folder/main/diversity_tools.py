@@ -5,12 +5,15 @@ import pickle
 import numpy as np
 from scipy.stats import t
 
+fconfig = FConfig()
 
-def load_ns(fp=FConfig.namesearch):
+
+def load_ns(fp=fconfig.NAMESEARCH):
     with open(fp, 'rb') as pfile:
         return pickle.load(pfile)
 
-def load_ns2(fp=FConfig.namesearch_v2):
+
+def load_ns2(fp=fconfig.NAMESEARCH_V2):
     with open(fp, 'rb') as pfile:
         return pickle.load(pfile)
 

@@ -132,13 +132,13 @@ def infer_diversity():
 def kw_data():
     raw_text = request.form.get('raw_text')
     if not raw_text:
-        abort(401)
+        abort(404)
 
     window_size = int(request.headers.get('Window-Limit', 2))
 
     # Get data-type : req_pill or paste_pill
     data_type = request.headers.get('Data-Type')
-    if data_type == "req_pill":
+    if data_type == "v-pills-cisco-tab":
         raw_text = web_tools.get_job_posting(raw_text)
         if not raw_text:
             return jsonify({'data': []})

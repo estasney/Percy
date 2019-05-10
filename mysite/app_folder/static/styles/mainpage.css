@@ -17,13 +17,23 @@ body {
       margin-bottom: 30px;
   }
 
-  .jumbotron {
+  .jumbotron-landing {
       background-color: #555bde;
       color: #fff;
       padding: 100px 25px;
       font-family: Montserrat, sans-serif;
       margin-bottom: 0;
+      border-radius: 0;
   }
+
+  .jumbotron {
+      background-color: #555bde;
+      color: #fff;
+      font-family: Montserrat, sans-serif;
+      margin-bottom: 0;
+      border-radius: 0;
+  }
+
   .addition-word {
       background-color: rgba(69, 228, 57, 0.25);
   }
@@ -207,3 +217,73 @@ body {
       opacity: 0.2;
       stroke-width: 2.0px;
     }
+
+  .slidecontainer {
+  width: 100%;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 0px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 40%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider-output {
+  font-size: 1.1rem;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  padding: .375rem 1rem;
+  color: #fff;
+  border-radius: .25rem;
+  background-color: #555bde;
+
+}
+
+.pt-menu {
+ background-color: #ffffff;
+ border: 1px solid #aaaaaa;
+ border-radius: 4px;
+ position: relative!important;
+
+}
+
+.pt-highlight {
+ background-color: #fff707b3;
+}
+
+.pt-cursor {
+    	border: 1px solid #999999;
+	background: #dadada url(images/ui-bg_glass_75_dadada_1x400.png) 50% 50% repeat-x;
+	font-weight: normal;
+	color: #212121;
+}

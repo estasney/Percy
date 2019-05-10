@@ -1,4 +1,5 @@
 import logging
+import glob
 import multiprocessing
 import pickle
 import string
@@ -7,9 +8,11 @@ from datetime import datetime
 from itertools import combinations
 from math import log
 import re
+import os
 import unicodedata
 import numpy as np
 import pandas as pd
+import json
 from gensim.corpora.dictionary import Dictionary
 from gensim.models.phrases import Phrases, Phraser
 from gensim.utils import strided_windows
@@ -17,6 +20,7 @@ from langdetect import detect
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import svds
 from sklearn.feature_extraction.text import TfidfVectorizer
+from pattern.en import parsetree
 
 from app_folder.main.text_tools import STOPWORDS
 
@@ -35,14 +39,30 @@ Parameters
 """
 
 WINDOW_SIZE = 5
-WORD_VEC_SIZE = 150
+WORD_VEC_SIZE = 200
 SKILL_VEC_SIZE = 100
-WORKERS = 8
-MIN_WORD_COUNT = 20
+WORKERS = 4
+MIN_WORD_COUNT = 10
 MAX_WORD_RATIO = 0.9
-MIN_SKILL_COUNT = 20
+MIN_SKILL_COUNT = 25
 MAX_SKILL_RATIO = 0.9
+TMP_DIR = "/home/eric/PycharmProjects/Percy/mysite/app_folder/scripts/tmp"
 
+"""
+
+SETUP
+
+"""
+
+def make_tmp_dir():
+    if not os.path.isdir(TMP_DIR):
+        os.mkdir(TMP_DIR)
+    else:
+        existing_files = os.listdir(TMP_DIR)
+        for f in existing_files:
+            f = os.path.join(TMP_DIR, f)
+            if os.path.isfile(f):
+                os.remove(f)
 
 """
 
@@ -64,6 +84,11 @@ def apply_by_multiprocessing(df, func, **kwargs):
     pool.close()
     result = sorted(result, key=lambda x: x[0])
     return pd.concat([i[1] for i in result])
+
+def do_by_multiprocessing(files, func, **kwargs):
+    workers = kwargs.pop('workers')
+    pool = multiprocessing.Pool(processes=workers)
+    result = pool.map(multiprocess_preprocess, )
 
 
 def lang_detect(x):
@@ -99,10 +124,9 @@ def filter_tokens(x):
     return True
 
 
-def preprocess_text(x):
-    from pattern.en import parsetree
+def preprocess_text(text):
 
-    doc = clean(x['summary'])
+    doc = clean(text)
     tree = parsetree(doc, tokenize=True, lemmata=True)
     doc = [sent.lemma for sent in tree]
     pdoc = []
@@ -111,13 +135,78 @@ def preprocess_text(x):
         pdoc.append(psent)
     return pdoc
 
+def multiprocess_preprocess(fp, data_key_raw, data_key_out, prefix_out):
+
+    with open(fp, 'r') as json_file:
+        record = json.load(json_file)
+
+    raw_summary = record[data_key_raw]
+    clean_summary = preprocess_text(raw_summary)
+    record[data_key_out] = clean_summary
+    # add clean summary to record and dump to json
+    fp = os.path.join(TMP_DIR, "{}_{}.json".format(prefix_out, record['member_id']))
+    with open(fp, 'w') as json_file:
+        json.dump(record, json_file)
+
+def fetch_tmp_files(prefix):
+    file_pattern = "{}_*.json".format(prefix)
+    file_pattern = os.path.join(TMP_DIR, file_pattern)
+    file_list = glob.glob(file_pattern)
+    return file_list
+
+
+def worker_process_text(files, data_key_raw='summary', data_key_out='clean_summary', prefix_out='clean'):
+    for f in files:
+        multiprocess_preprocess(f, data_key_raw, data_key_out, prefix_out)
+
+
+def pool_process_text(prefix):
+    # Get the work to be done
+    file_list = fetch_tmp_files(prefix)
+
+    # Split the work based on number of workers
+    file_subsets = np.array_split(file_list, WORKERS)
+
+    # Open a pool
+    pool = multiprocessing.Pool(processes=WORKERS)
+    pool.map(worker_process_text, file_subsets)
+    pool.close()
+
+
+
+
+
 
 def flatten_sents(x):
     doc = x['sent']
     return [clean(word) for sent in doc for word in sent]
 
 
+def export_df(df, prefix, fp=TMP_DIR):
+    for i, row in df.iterrows():
+        file_name = "{}_{}.json".format(prefix, row['member_id'])
+        file_name = os.path.join(fp, file_name)
+        with open(file_name, "w+") as jfile:
+            json.dump(row.to_dict(), jfile)
+
+def make_target_file_list(n_workers=WORKERS):
+
+    json_files = glob.glob("{}/*.json".format(TMP_DIR))
+    return np.array_split(json_files, n_workers)
+
+
+def stream_data(data_key, files):
+    for f in files:
+        with open(f, 'r') as json_file:
+            record = json.load(json_file)
+        yield record[data_key]
+
+
+
+
+
 if __name__ == "__main__":
+    make_tmp_dir()
     df = pd.read_csv(r"/home/eric/PycharmProjects/FlaskAPI/scripts2/corpus.csv")
     df.dropna(subset=['summary'], inplace=True)
     original_count = len(df)
@@ -131,13 +220,23 @@ if __name__ == "__main__":
     print("Corpus loaded with {} records".format(original_count))
     print("Dropping {} non english records".format(original_count - len(df)))
     del df['lang']
+
+    print("Dumping DF to JSON")
+    export_df(df, prefix="raw")
+
     print("Preprocessing Text into Sentences")
     start = datetime.now()
+    pool_process_text("raw")
+
+
+
     df['sent'] = apply_by_multiprocessing(df, preprocess_text, axis=1, workers=WORKERS)
     elapsed = datetime.now() - start
     print("Finished With Sentences in {}".format(elapsed.seconds))
     print("Flattening Doc")
     df['flat'] = apply_by_multiprocessing(df, flatten_sents, axis=1, workers=WORKERS)
+    export_df(df)
+    del df
 
 
 
@@ -146,6 +245,7 @@ DICTIONARY - Words
 """
 print("Building Dictionary")
 start = datetime.now()
+doc_stream = stream_data('summary')
 dictionary = Dictionary([word for word in df['flat'].values.tolist() if len(word) > 2])
 print("Dictionary found {} unique tokens".format(len(dictionary)))
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
