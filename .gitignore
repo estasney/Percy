@@ -1,8 +1,3 @@
-/mysite/app_folder/resources/bot_key.pkl
-/mysite/app_folder/resources/bot_room_id.pkl
-/mysite/app_folder/resources/bot_room_id_test.pkl
-/mysite/process/data/phrases/phrase_dump.txt
-/mysite/process/data/phrases/phrases.model
 .idea/
 mysite/app_folder/__pycache__/
 mysite/app_folder/api/__pycache__/
@@ -12,13 +7,11 @@ mysite/app_folder/scripts/tmp/
 mysite/app_folder/scripts/utils/
 mysite/app_folder/scripts/words/
 mysite/process/__pycache__/
-mysite/process/data/language/
-mysite/process/data/output1/
-mysite/process/data/output2/
-mysite/process/data/phrases/phrases.model
 mysite/process/process/__pycache__/
 mysite/process/process/utils/__pycache__/
 mysite/process/process/words/__pycache__/
 venv/
 /mysite/app_folder/resources/
-/mysite/process/data/corpus/corpus.csv
+/mysite/process/data/
+/mysite/app_folder/scripts/company2id.pkl
+/mysite/app_folder/scripts/id2company.pkl
