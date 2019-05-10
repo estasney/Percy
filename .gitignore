@@ -15,3 +15,6 @@ venv/
 /mysite/process/data/
 /mysite/app_folder/scripts/company2id.pkl
 /mysite/app_folder/scripts/id2company.pkl
+!/mysite/process/data/phrases/patterns.py
+!/mysite/process/data/phrases/excluded.txt
+!/mysite/process/data/phrases/included.txt
