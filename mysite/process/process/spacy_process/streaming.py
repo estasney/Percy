@@ -159,6 +159,7 @@ class SpacyReader(object):
                     doc_output.extend(sent_tokens)
                 else:
                     doc_output.append(sent_tokens)
+            yield doc_output
 
     def __getitem__(self, item):
         file = self.files[item]
@@ -197,6 +198,7 @@ class SpacyBowReader(SpacyReader):
         for f in self.files:
             doc = self.load_json_(f)
             tokens = doc[self.text_key]
+            doc_output = []
             for sent in tokens:
                 sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
@@ -205,10 +207,9 @@ class SpacyBowReader(SpacyReader):
                     continue
                 sent_tokens = self.phraser[sent_tokens]
                 bow_tokens = self.dictionary.doc2bow(sent_tokens)
-                yield bow_tokens
+                doc_output.extend(bow_tokens)
+            yield doc_output
 
-    def __len__(self):
-        return len(self.files)
 
 
 
