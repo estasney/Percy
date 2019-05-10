@@ -1,1 +1,1 @@
-from process.process_config import ProcessConfig
+from mysite.process.process_config import ProcessConfig
