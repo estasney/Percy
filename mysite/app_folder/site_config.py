@@ -1,13 +1,13 @@
 import os
 import pickle
+
 basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 def load_p(fn):
     with open(fn, "rb") as pfile:
         p = pickle.load(pfile)
     return p
-
-
 
 
 class Config(object):
@@ -53,5 +53,3 @@ class FConfig(object):
         for a in args:
             start_path = os.path.join(start_path, a)
         return start_path
-
-
