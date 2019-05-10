@@ -44,9 +44,9 @@ MAX_WORD_RATIO = 0.9
 MIN_SKILL_COUNT = 25
 MAX_SKILL_RATIO = 0.9
 
-WINDOW_SIZE = 5
+WINDOW_SIZE = 3
 
-WORD_VEC_SIZE = 150
+WORD_VEC_SIZE = 100
 SKILL_VEC_SIZE = 100
 
 
@@ -383,8 +383,6 @@ if __name__ == "__main__":
     #                common_words=STOPWORDS, min_count=10, threshold=30)
     # make_token_dictionary()
     # make_skills_dictionary()
-    get_token_probabilities()
-    get_skill_probabilities()
     get_pmi_tokens()
     get_pmi_skills()
     get_fingerprint_tokens()
