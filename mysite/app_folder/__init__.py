@@ -19,4 +19,11 @@ def create_app(config_class=Config):
 
     from app_folder.api import bp as api_bp
     app_run.register_blueprint(api_bp, url_prefix='/api/v1')
+
+    from app_folder.words import bp as words_bp
+    app_run.register_blueprint(words_bp)
+
+    from app_folder.autocomplete import bp as autocomplete_bp
+    app_run.register_blueprint(autocomplete_bp, url_prefix='/autocomplete')
+
     return app_run

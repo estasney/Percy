@@ -216,8 +216,6 @@ $(document).ready(function() {
       .attr("y", 10)
       .attr("dy", ".35em")
       .style("fill", "#333")
-      .style("font", "13px")
-      .style("font-family", "OpenSans")
       .text(function(d) {
         return d.node_text;
       });

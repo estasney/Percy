@@ -1,7 +1,7 @@
 import numpy as np
 from gensim.corpora import Dictionary
 from app_folder.site_config import FConfig
-from app_folder.main.text_tools import parse_form_text
+from app_folder.tools.text_tools import parse_form_text
 
 fconfig = FConfig()
 
