@@ -173,6 +173,7 @@ label {
   -webkit-transition: .2s;
   transition: opacity .2s;
   padding: 0.25rem !important;
+}
 
   .slider-output {
     font-size: 1.1rem;
@@ -184,4 +185,48 @@ label {
     color: #fff;
     border-radius: .25rem;
     background-color: #555bde;
+  }
+
+
+  .centerMe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+  }
+
+  .loading {
+
+    display: inline-block;
+    padding: 0.5rem;
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    border: 15px solid #2c3e50;
+    border-top-color: #2980b9;
+    -webkit-animation: spin 1s infinite linear;
+            animation: spin 1s infinite linear;
+  }
+
+  @-webkit-keyframes spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+              transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+              transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+              transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+              transform: rotate(360deg);
+    }
   }
