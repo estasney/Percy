@@ -269,6 +269,18 @@ body {
 
 }
 
+.slider-output-light {
+  font-size: 1.1rem;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid gray;
+  padding: .375rem 1rem;
+  margin-top: .375rem;
+  color: black;
+  border-radius: .25rem;
+}
+
 .pt-menu {
  background-color: #ffffff;
  border: 1px solid #aaaaaa;
