@@ -1,5 +1,5 @@
 from app_folder.site_config import FConfig
-from app_folder.main.text_tools import preprocess_text
+from app_folder.tools.text_tools import preprocess_text
 import pickle
 import numpy as np
 

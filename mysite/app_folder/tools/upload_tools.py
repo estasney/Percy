@@ -106,7 +106,6 @@ class UploadManager(object):
 
         :return: pd.DataFrame() or False if fail to open
         """
-        print(self.uploaded_filename)
         file_ext = self.find_file_ext(self.uploaded_filename)
         try_encodings = self.try_encodings
         if file_ext == '.csv':

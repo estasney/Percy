@@ -22,7 +22,7 @@ from scipy.sparse.linalg import svds
 from sklearn.feature_extraction.text import TfidfVectorizer
 from pattern.en import parsetree
 
-from app_folder.main.text_tools import STOPWORDS
+from app_folder.tools.text_tools import STOPWORDS
 
 """
 Resources to update

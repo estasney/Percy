@@ -41,6 +41,9 @@ class FConfig(object):
         self.NAMESEARCH = self.smart_path(self.RESOURCES, "namesearch.pkl")
         self.NAMESEARCH_V2 = self.smart_path(self.RESOURCES, "namesearch_v2.pkl")
 
+        self.JOB_TITLE_SYNONYMS_FP = self.smart_path(self.RESOURCES, 'my_title_synonyms.json')
+        self.JOB_TITLE_SYNONYMS2_FP = self.smart_path(self.RESOURCES, 'synonym_job_titles_for_search.json')
+
         self.BOT_KEY = load_p(self.smart_path(self.RESOURCES, "bot_key.pkl"))
         self.BOT_ROOM_ID = load_p(self.smart_path(self.RESOURCES, "bot_room_id.pkl"))
         self.MESSAGE_API_F = "https://api.ciscospark.com/v1/messages/{}"

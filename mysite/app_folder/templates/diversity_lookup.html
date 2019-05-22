@@ -6,13 +6,13 @@
 {% set original = "" %}
 {% endif %}
 
-<form action="/diversity_lookup" method="POST">
+<form action="/diversity_lookup" method="POST" class="pt-2 pb-2">
     <div class="row">
       <div class="mx-auto">
       <div class="input-group">
       <input id="names_autocomplete" type="query" name="q" class="form-control" size="50" value="{{original}}" required>
       <div class="input-group-btn">
-        <button type="query" name="button" value="query" class="btn btn-danger">Ask Percy</button>
+        <button type="query" name="button" value="query" class="btn btn-danger">Lookup</button>
       </div>
       </div>
       </div>
@@ -22,24 +22,20 @@
 {% if success == 'True' %}
 
 <div class="container text-center bg-white">
-    <h2>Likelihood</h2>
+    <h2>Results for {{original}}</h2>
     <table class="table">
     <thead>
       <tr>
           <th class="text-center">Occurrences</th>
           <th class="text-center">Male Occurrences</th>
           <th class="text-center">Female Occurrences</th>
-          <th class="text-center">Probability Male</th>
-          <th class="text-center">Probability Female</th>
       </tr>
     </thead>
     <tbody>
     <tr>
-        <td> {{ result['total'] }} </td>
+        <td> {{ result['n_male'] + result['n_female'] }} </td>
         <td> {{ result['n_male'] }} </td>
         <td> {{ result['n_female'] }} </td>
-        <td> {{ "{:.2%}".format(result['p_male']) }} </td>
-        <td> {{ "{:.2%}".format(result['p_female']) }} </td>
 
       </tr>
       </tbody>

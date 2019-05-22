@@ -108,7 +108,6 @@ def normalize_n_edges(edge_dict):
     scaler = MinMaxScaler(feature_range=(1, 5))
     edges = scaler.fit_transform(edges.reshape(-1, 1))
     normed_dict = {node: float(edge_value) for node, edge_value in zip(list(edge_dict.keys()), edges)}
-    print(normed_dict)
     return normed_dict
 
 def bright_color():

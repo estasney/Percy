@@ -1,5 +1,5 @@
-from app_folder.main.neural_tools import word_sims
-from app_folder.main.text_tools import parse_form_text
+from app_folder.tools.sims_tools import word_sims
+from app_folder.tools.text_tools import parse_form_text
 import nltk
 
 

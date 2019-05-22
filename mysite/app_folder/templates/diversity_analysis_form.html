@@ -1,0 +1,53 @@
+{% macro make_ms_form() %}
+<form id="msform" method="POST" enctype="multipart/form-data">
+    <!-- progressbar -->
+    <ul id="progressbar">
+      <li class="active">Upload</li>
+      <li>Background</li>
+      <li>Parameters</li>
+    </ul>
+    <!-- fieldsets -->
+    <fieldset>
+      <h2 class="fs-title">Upload Your Spreadsheet</h2>
+      <input type="file" id="file" name="file" required size="50" accept=".csv,.xls,.xlsx"/>
+      <div class="form-group">
+        <label>Which column has the first names?</label>
+        <input type="text" id="header_name" name="header_name" placeholder="First Name" />
+      </div>
+      <input type="button" name="next" class="next action-button" value="Next" />
+    </fieldset>
+    <fieldset>
+      <h2 class="fs-title">Background</h2>
+      <h3 class="fs-subtitle">Share what you know</h3>
+      <div class="form-group">
+        <label>Estimated Percentage of Females in Population</label>
+        <input id="female_range" type="range" name="female_range" min="0" max="100" value="50" class="slider" />
+        <span class="slider-output-light">50%</span>
+      </div>
+      <input type="button" name="previous" class="previous action-button" value="Previous" />
+      <input type="button" name="next" class="next action-button" value="Next" />
+    </fieldset>
+    <fieldset>
+      <h2 class="fs-title">Parameters</h2>
+      <h3 class="fs-subtitle">Advanced</h3>
+      <div class="form-group">
+        <label>Minimum Sample Size for Name</label>
+        <input type="number" name="sample_min_size" id="sample_min_size" placeholder="30" value="30" />
+
+      </div>
+      <div class="form-group">
+        <label>Minimum Sample Size for Uniform Records</label>
+        <input type="number" name="sample_min_size_uniform" id="sample_min_size_uniform" placeholder="100" value="100" />
+
+      </div>
+      <input type="button" name="previous" class="load-hide previous action-button" value="Previous" />
+      <input type="submit" name="submit" class="load-hide submit action-button" value="Submit" />
+        <div id="loading-icon" class="form-group" style="display: none;">
+            <div class="loading">
+
+            </div>
+        </div>
+    </fieldset>
+  </form>
+
+{%- endmacro %}
