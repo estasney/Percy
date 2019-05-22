@@ -73,7 +73,7 @@
     d3.select("#hist")
         .datum({{result.trial_means}})
       .call(histogramChart()
-        .bins(d3.scale.linear().ticks(20))
+        .bins(d3.scale.linear().domain([{{result.trial_means_min}}, {{result.trial_means_max}}]).ticks(20))
         .tickFormat(d3.format(".02%")));
 
 

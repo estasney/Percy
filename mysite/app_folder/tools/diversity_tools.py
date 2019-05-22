@@ -106,10 +106,12 @@ class NameSearch(object):
         m1, m3 = stats.norm.interval(alpha=sample_confidence, loc=trial_mu, scale=trial_scale)
         m1, m3 = max([0, m1]), min([1, m3])
 
+        trial_means_list = list(trial_means)
+
         return {'n_names': n_names, 'n_known': n_known, 'n_unknown': n_unknown, 'trial_mean': trial_mu,
                 'trial_scale': trial_scale, 'trial_min': m1, 'trial_max': m3, 'n_name_samples': n_name_samples,
-                'name_confidence': name_confidence, 'sample_confidence': sample_confidence, 'trial_means':list(trial_means),
-                'n_trials': n_name_samples}
+                'name_confidence': name_confidence, 'sample_confidence': sample_confidence, 'trial_means':trial_means_list,
+                'n_trials': n_name_samples, 'trial_means_min':min(trial_means_list), 'trial_means_max': max(trial_means_list)}
 
     def load_fp(self, fp):
         with open(fp, "rb") as p:
