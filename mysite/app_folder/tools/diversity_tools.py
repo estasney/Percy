@@ -1,8 +1,11 @@
-from app_folder.site_config import FConfig
 import pickle
+
 import numpy as np
-from scipy import stats
 from cytoolz import groupby
+from scipy import stats
+from app_folder.tools.decorators import log_performance, memoized
+
+from app_folder.site_config import FConfig
 
 fconfig = FConfig()
 
@@ -16,7 +19,6 @@ def get_name_count(name, fp=fconfig.NAMESEARCH_V2):
     else:
         male, female = kw.get_keyword(name)
         return {'n_male': male, 'n_female': female}
-
 
 
 class NameSearch(object):
@@ -45,17 +47,24 @@ class NameSearch(object):
         population_array = self.make_array(n_male, n_female)
         return population_array.std()
 
+    @memoized
     def make_array(self, n_male, n_female):
-        return np.concatenate([np.zeros(n_male), np.ones(n_female)])
+        m = np.zeros(n_male)
+        f = np.ones(n_female)
+        return np.concatenate([m, f])
 
     def make_sigma_scale(self, arr):
         if arr.size < self.sample_min_size:
             return self.population_std / np.sqrt(arr.size)
-        if np.unique(arr).size == 1 and arr.size < self.sample_min_size_uniform:
+
+        arr_mean = arr.mean()
+
+        if arr_mean == 0 or arr_mean == 1 and arr.size < self.sample_min_size_uniform:
             return self.population_std / np.sqrt(arr.size)
         else:
             return arr.std(ddof=1) / np.sqrt(arr.size)
 
+    @memoized
     def get_interval(self, n_male, n_female, confidence):
 
         sample = self.make_array(n_male, n_female)
@@ -72,12 +81,17 @@ class NameSearch(object):
         m1, m3 = max([m1, 0]), min([1, m3])
         return m1, m3
 
-    def make_name_sample(self, name, n_name_samples, name_confidence):
+    @memoized
+    def get_name_probality_interval(self, name, name_confidence):
         counts = self.kw.extract_keywords(name)
-        # Possible that multiple names detected. Take the one with the most samples
         n_male, n_female = max(counts, key=lambda x: sum(x))
         name_mean_min, name_mean_max = self.get_interval(n_male, n_female, name_confidence)
+        return name_mean_min, name_mean_max
 
+    def make_name_sample(self, name_probability_interval, n_name_samples):
+        # Possible that multiple names detected. Take the one with the most samples
+
+        name_mean_min, name_mean_max = name_probability_interval
         min_array = np.random.binomial(1, name_mean_min, n_name_samples // 2)
         max_array = np.random.binomial(1, name_mean_max, n_name_samples // 2)
         prob_array = np.concatenate([min_array, max_array])
@@ -86,10 +100,12 @@ class NameSearch(object):
         return prob_array
 
     def trial_names(self, names, n_name_samples, name_confidence):
-        name_samples = np.vstack([self.make_name_sample(name, n_name_samples, name_confidence) for name in names])
+        name_probability_intervals = [self.get_name_probality_interval(name, name_confidence) for name in names]
+        name_samples = np.vstack(
+            [self.make_name_sample(interval, n_name_samples) for interval in name_probability_intervals])
         return name_samples.mean(axis=0)
 
-    def summarize_gender(self, names, n_name_samples=1000, name_confidence=0.95, sample_confidence=0.95):
+    def summarize_gender(self, names, n_name_samples=100, name_confidence=0.95, sample_confidence=0.95):
 
         # Groupby if we have counts for a name
         grouped_names = groupby(lambda x: len(self.kw.extract_keywords(x)) > 0, names)
@@ -110,12 +126,11 @@ class NameSearch(object):
 
         return {'n_names': n_names, 'n_known': n_known, 'n_unknown': n_unknown, 'trial_mean': trial_mu,
                 'trial_scale': trial_scale, 'trial_min': m1, 'trial_max': m3, 'n_name_samples': n_name_samples,
-                'name_confidence': name_confidence, 'sample_confidence': sample_confidence, 'trial_means':trial_means_list,
-                'n_trials': n_name_samples, 'trial_means_min':min(trial_means_list), 'trial_means_max': max(trial_means_list)}
+                'name_confidence': name_confidence, 'sample_confidence': sample_confidence,
+                'trial_means': trial_means_list,
+                'n_trials': n_name_samples, 'trial_means_min': min(trial_means_list),
+                'trial_means_max': max(trial_means_list)}
 
     def load_fp(self, fp):
         with open(fp, "rb") as p:
             return pickle.load(p)
-
-
-
