@@ -105,8 +105,8 @@ class NameSearch(object):
             [self.make_name_sample(interval, n_name_samples) for interval in name_probability_intervals])
         return name_samples.mean(axis=0)
 
-    def summarize_gender(self, names, n_name_samples=100, name_confidence=0.95, sample_confidence=0.95):
-
+    def summarize_gender(self, names, random_seed, n_name_samples=100, name_confidence=0.95, sample_confidence=0.95):
+        np.random.seed(random_seed)
         # Groupby if we have counts for a name
         grouped_names = groupby(lambda x: len(self.kw.extract_keywords(x)) > 0, names)
         known_names, unknown_names = grouped_names.get(True, []), grouped_names.get(False, [])

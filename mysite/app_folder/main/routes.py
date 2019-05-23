@@ -42,12 +42,15 @@ def infer_diversity():
         ratio_female = int(form['female_range']) / 100
         sample_min_size = int(form['sample_min_size'])
         sample_min_size_uniform = int(form['sample_min_size_uniform'])
+        random_seed = int(form['random_seed'])
+        n_trials = min([abs(int(form['n_trials'])), 1000])
+
     except ValueError:
         return render_template('diversity_analysis.html', success='False', error_message="Invalid Parameters Passed")
 
     searcher = diversity_tools.NameSearch(ratio_female=ratio_female, sample_min_size=sample_min_size,
                                           sample_min_size_uniform=sample_min_size_uniform)
 
-    result = searcher.summarize_gender(names_list)
+    result = searcher.summarize_gender(names_list, n_name_samples=n_trials, random_seed=random_seed)
 
     return render_template('diversity_analysis.html', result=result)

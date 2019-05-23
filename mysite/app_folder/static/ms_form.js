@@ -10,12 +10,27 @@ $(document).ready(function() {
     }
   });
 
+  var allow_next = false;
   var current_fs, next_fs, previous_fs; //fieldsets
   var left, opacity, scale; //fieldset properties which we will animate
   var animating; //flag to prevent quick multi-click glitches
   var form = $("#msform");
 
   form.on('submit', function() {
+    var prevent_submit = false;
+    current_fs = $(".submit").parent();
+    current_fs_elements = current_fs.find("input:not(.action-button)");
+    current_fs_elements.each(function(i, e){
+      if (validator.element(e) == false) {
+        prevent_submit = true;
+      }
+    })
+
+    if(prevent_submit == true) {
+      return false;
+    }
+
+
     var btns = $(".load-hide");
     btns.each(function(i, e) {
       $(e).hide(500);
@@ -40,16 +55,26 @@ $(document).ready(function() {
         required: true
       },
       sample_min_size: {
-        required: true
+        required: true,
+        min: 1
       },
       sample_min_size_uniform: {
-        required: true
+        required: true,
+        min: 1
+      },
+      n_trials : {
+        required: true,
+        range: [1, 1000]
+      },
+      random_seed: {
+        required: true,
+        digits: true
       }
     }
   });
 
   $(".next").click(function(){
-    var allow_next = true;
+
   	if(animating) return false;
 
     current_fs = $(this).parent();
@@ -67,6 +92,7 @@ $(document).ready(function() {
     if (allow_next == false) {
       return false;
     }
+    var allow_next = true;
 
 
   	animating = true;
