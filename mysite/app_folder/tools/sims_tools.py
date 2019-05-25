@@ -1,5 +1,6 @@
 import numpy as np
 from gensim.corpora import Dictionary
+from operator import itemgetter
 from app_folder.site_config import FConfig
 from app_folder.tools.text_tools import parse_form_text
 
@@ -95,7 +96,7 @@ class WordSims(object):
 
         # Remove None Id2Word
         sim_scores = list(filter(lambda x: x[0] is not None, sim_scores))
-        sim_scores.sort(key=lambda x: x[1], reverse=True)
+        sim_scores.sort(key=itemgetter(1), reverse=True)
         return True, sim_scores
 
     def word_math_vec_(self, positive_words, negative_words=None):

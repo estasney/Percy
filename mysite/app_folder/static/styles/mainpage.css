@@ -285,7 +285,7 @@ body {
  background-color: #ffffff;
  border: 1px solid #aaaaaa;
  border-radius: 4px;
- position: relative!important;
+
 
 }
 
@@ -298,4 +298,13 @@ body {
 	background: #dadada url(images/ui-bg_glass_75_dadada_1x400.png) 50% 50% repeat-x;
 	font-weight: normal;
 	color: #212121;
+}
+
+label.btn.tgl-btn {
+  background: #e3e3e3;
+}
+
+label.btn.tgl-btn.active {
+  background: #0069d9;
+  color:white;
 }
