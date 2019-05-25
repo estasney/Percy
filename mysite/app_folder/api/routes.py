@@ -1,7 +1,8 @@
-from flask import request
+from flask import request, jsonify
 from app_folder.api import bp
 from app_folder.api.utils import request_message_details, make_reply
 from app_folder.api.nlp import SynonymParser
+from app_folder.tools import sims_tools
 
 
 @bp.route('/spark', methods=['GET', 'POST'])
@@ -26,3 +27,23 @@ def listen_webhook():
     make_reply(answer, room_type, message_details)
     return ""
 
+
+@bp.route('/related', methods=['GET', 'POST'])
+def related():
+    if request.method == 'GET':
+        if not request.args:
+            return jsonify({'message': 'empty query'}), 422
+        else:
+            user_query, query_scope = request.args.get('q', None), request.args.get('scope', None)
+    else:
+        user_query, query_scope = request.json.get('q', None), request.json.get('scope', None)
+        print(request.json)
+
+    if not all([user_query, query_scope]):
+        return jsonify({'message': 'missing one or more parameters'}), 422
+
+    result_success, result = sims_tools.word_sims(user_query, query_scope)
+    if result_success:
+        return jsonify({'items': [{'word': word, 'score': score} for word, score in result], 'query': user_query, 'scope': query_scope}), 201
+    else:
+        return jsonify({'message': 'query error', 'query': user_query, 'scope': query_scope}), 404
