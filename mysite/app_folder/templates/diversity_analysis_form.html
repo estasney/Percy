@@ -1,12 +1,36 @@
-{% macro make_ms_form() %}
-<form id="msform" method="POST" enctype="multipart/form-data">
+{% macro make_ms_form_select() %}
+<div id="select" class="container text-center qq p-4">
+<h3>
+  Choose how to upload your names
+  </h3>
+
+
+  <button id='select-upload' class="btn btn-primary">
+  Upload
+  </button>
+
+  <button id='select-paste' class="btn btn-primary">
+  Paste
+  </button>
+
+</div>
+{%- endmacro %}
+
+
+
+{% macro make_ms_form(input_type) %}
+
+<form id="msform_{{input_type}}" data-selected="false" style="display:none;" method="POST" enctype="multipart/form-data">
     <!-- progressbar -->
-    <ul id="progressbar">
+    <ul id="progressbar_{{input_type}}">
         <li class="active">Upload</li>
         <li>Background</li>
         <li>Parameters</li>
     </ul>
     <!-- fieldsets -->
+
+    {% if input_type == 'spreadsheet' %}
+
     <fieldset>
         <h2 class="fs-title">Upload Your Spreadsheet</h2>
         <input type="file" id="file" name="file" required size="50" accept=".csv,.xls,.xlsx"/>
@@ -14,14 +38,28 @@
             <label>Which column has the first names?</label>
             <input type="text" id="header_name" name="header_name" placeholder="First Name"/>
         </div>
+        <input type="button" name="cancel" class="previous action-button" value="Cancel"/>
         <input type="button" name="next" class="next action-button" value="Next"/>
     </fieldset>
+
+    {% else %}
+
+    <fieldset>
+        <h2 class="fs-title">Paste Your Names</h2>
+        <textarea rows="3" name="paste_names" id="paste_names"></textarea>
+        <input type="button" name="cancel" class="previous action-button" value="Cancel"/>
+        <input type="button" name="next" class="next action-button" value="Next"/>
+    </fieldset>
+
+    {% endif %}
+
+
     <fieldset>
         <h2 class="fs-title">Background</h2>
         <h3 class="fs-subtitle">Share what you know</h3>
         <div class="form-group">
             <label>Estimated Percentage of Females in Population</label>
-            <input id="female_range" type="range" name="female_range" min="0" max="100" value="50" class="slider"/>
+            <input id="female_range_{{input_type}}" type="range" name="female_range" min="0" max="100" value="50" class="slider"/>
             <span class="slider-output-light">50%</span>
         </div>
         <input type="button" name="previous" class="previous action-button" value="Previous"/>
@@ -32,24 +70,24 @@
         <h3 class="fs-subtitle">Advanced users may modify defaults</h3>
         <div class="form-group">
             <label>Minimum Sample Size for Name</label>
-            <input type="number" name="sample_min_size" id="sample_min_size" placeholder="30" value="30"/>
+            <input type="number" name="sample_min_size" id="sample_min_size_{{input_type}}" placeholder="30" value="30"/>
 
         </div>
         <div class="form-group">
             <label>Minimum Sample Size for Uniform Records</label>
-            <input type="number" name="sample_min_size_uniform" id="sample_min_size_uniform" placeholder="100"
+            <input type="number" name="sample_min_size_uniform" id="sample_min_size_uniform_{{input_type}}" placeholder="100"
                    value="100"/>
 
         </div>
         <div class="form-group">
             <label>Number of Trials</label>
-            <input type="number" name="n_trials" id="n_trials" placeholder="100"
+            <input type="number" name="n_trials" id="n_trials_{{input_type}}" placeholder="100"
                    value="100"/>
 
         </div>
         <div class="form-group">
             <label>Random Seed</label>
-            <input type="number" name="random_seed" id="random_seed" placeholder="1337"
+            <input type="number" name="random_seed" id="random_seed_{{input_type}}" placeholder="1337"
                    value="1337"/>
 
         </div>
@@ -57,7 +95,7 @@
 
         <input type="button" name="previous" class="load-hide previous action-button" value="Previous"/>
         <input type="submit" name="submit" class="load-hide submit action-button" value="Submit"/>
-        <div id="loading-icon" class="form-group" style="display: none;">
+        <div id="loading_icon_{{input_type}}" class="form-group" style="display: none;">
             <div class="loading">
 
             </div>
