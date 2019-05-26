@@ -14,6 +14,16 @@ function histogramChart(range_min, range_max) {
       // Compute the histogram.
       data = histogram(data);
 
+      // Get bin counts
+      data_bin_counts = {};
+      data.forEach(function(d, i){
+        var current_count = data_bin_counts[i] || 0;
+        current_count += d.length;
+        data_bin_counts[i] = current_count;
+      });
+
+
+
       // Update the x-scale.
       x   .domain(data.map(function(d) { return d.x; }))
           .rangeRoundBands([0, width - margin.left - margin.right], .1);
@@ -40,7 +50,9 @@ function histogramChart(range_min, range_max) {
 
       // Update the bars.
       var bar = svg.select(".bars").selectAll(".bar").data(data);
-      bar.enter().append("rect");
+      bar.enter().append("rect")
+        .append("svg:title")
+        .text(function(d,i ){console.log(i); return "Occurred " + (data_bin_counts[i] || 0) + " times";});
       bar.exit().remove();
       bar .attr("width", x.rangeBand())
           .attr("x", function(d) { return x(d.x); })
@@ -52,7 +64,7 @@ function histogramChart(range_min, range_max) {
       g.select(".x.axis")
           .attr("transform", "translate(0," + y.range()[0] + ")")
           .call(xAxis);
-    });
+    })
   }
 
   chart.margin = function(_) {
