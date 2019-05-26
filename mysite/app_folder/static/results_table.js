@@ -3,10 +3,11 @@
 
 var $table;
 
+
 function int2progress(value, row, index, field){
   var num = (value * 100).toFixed(2);
   var html = render({n:num});
-  return html
+  return html;
 }
 
 function render(data, options) {
@@ -20,12 +21,12 @@ function render(data, options) {
     filter(get("n"));
     write("%</div>\n</div>");
     return $.render();
-  })(runtime(data, options))
+  })(runtime(data, options));
 }
 
 function runSearch() {
   $table.bootstrapTable('showLoading');
-  var query = $("#related_autocomplete")[0].value;;
+  var query = $("#related_autocomplete")[0].value;
   var scope = $(".btn.active input")[0].id.split("_")[1];
   var xhttp;
   var json_data = {

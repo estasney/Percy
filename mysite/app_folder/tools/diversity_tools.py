@@ -116,6 +116,10 @@ class NameSearch(object):
         n_known = len(known_names)
         n_unknown = len(unknown_names)
 
+        if not known_names:
+            return None
+
+
         trial_means = self.trial_names(known_names, n_name_samples, name_confidence)
         trial_mu = trial_means.mean()
         trial_scale = self.make_sigma_scale(trial_means)

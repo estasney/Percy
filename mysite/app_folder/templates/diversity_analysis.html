@@ -54,10 +54,14 @@
 <h2>{{error_message}}</h2>
 </div>
 <div class="container-fluid text-center">
-{{forms.make_ms_form()}}
+{{forms.make_ms_form_select()}}
+{{forms.make_ms_form('spreadsheet')}}
+{{forms.make_ms_form('paste')}}
  </div>
 {% else %}
-{{forms.make_ms_form()}}
+{{forms.make_ms_form_select()}}
+{{forms.make_ms_form('spreadsheet')}}
+{{forms.make_ms_form('paste')}}
 {% endif %}
 
 
