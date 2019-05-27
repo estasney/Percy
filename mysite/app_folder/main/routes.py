@@ -49,6 +49,7 @@ def infer_diversity():
         sample_min_size_uniform = int(request.form['sample_min_size_uniform'])
         random_seed = int(request.form['random_seed'])
         n_trials = min([abs(int(request.form['n_trials'])), 1000])
+        n_trials = max([2, n_trials])
 
     except ValueError or IndexError:
         return render_template('diversity_analysis.html', success='False', error_message="Invalid Parameters Passed")
