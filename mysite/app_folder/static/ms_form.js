@@ -10,6 +10,40 @@ $(document).ready(function() {
   var validator;
   var animating;
 
+  $paste_form.on('submit', function(e) {
+    var prevent_submit = false;
+    current_fs = $("#submit_paste").parent();
+    current_fs_elements = current_fs.find("input:not(.action-button)");
+    current_fs_elements.each(function(i, e){
+      if(validator.element(e) == false){
+        prevent_submit = true;
+      }
+    });
+
+    if(prevent_submit == true) {
+      $("#loading_icon_paste").show();
+      return false;
+    }
+
+  });
+
+  $upload_form.on('submit', function(e) {
+    var prevent_submit = false;
+    current_fs = $("#submit_upload").parent();
+    current_fs_elements = current_fs.find("input:not(.action-button)");
+    current_fs_elements.each(function(i, e){
+      if(validator.element(e) == false){
+        prevent_submit = true;
+      }
+    });
+
+    if(prevent_submit == true) {
+      $("#loading_icon_spreadsheet").show();
+      return false;
+    }
+
+  });
+
   $.validator.addMethod("minlength_list", function(value, element, params) {
     if (this.optional(element) == true) {
       return true;
@@ -186,7 +220,7 @@ $(document).ready(function() {
         },
         n_trials: {
           required: true,
-          range: [1, 1000]
+          range: [2, 1000]
         },
         random_seed: {
           required: true,
@@ -229,7 +263,7 @@ $(document).ready(function() {
         },
         n_trials: {
           required: true,
-          range: [1, 1000]
+          range: [2, 1000]
         },
         random_seed: {
           required: true,
