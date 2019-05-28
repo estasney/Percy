@@ -26,31 +26,39 @@ def infer_diversity():
     if request.method == "GET":
         return render_template('diversity_analysis.html')
 
-    file_upload = upload_tools.UploadManager(request)
+    if request.files.get('file', None):
+        file_upload = upload_tools.UploadManager(request)
+        if not file_upload.status:
+            return render_template('diversity_analysis.html', success='False')
+        names_list = file_upload.file_data()
+        if not names_list:
+            return render_template('diversity_analysis.html', success='False', error_message=file_upload.status)
+    else:
+        names_list = request.form.get('paste_names', '')
+        if not names_list:
+            return render_template('diversity_analysis.html', success='False', error_message="Unable to analyze names")
+        else:
+            names_list_lines = names_list.splitlines()
+            names_list_commas = names_list.split(",")
+            names_list = max([names_list_lines, names_list_commas], key=lambda x: len(x))
+            del names_list_lines, names_list_commas
 
-    if not file_upload.status:
-        return render_template('diversity_analysis.html', success='False')
-
-    names_list = file_upload.file_data()
-    print("Finished Loading")
-
-    if not names_list or names_list is False:
-        return render_template('diversity_analysis.html', success='False', error_message=file_upload.status)
-
-    form = request.form
     try:
-        ratio_female = int(form['female_range']) / 100
-        sample_min_size = int(form['sample_min_size'])
-        sample_min_size_uniform = int(form['sample_min_size_uniform'])
-        random_seed = int(form['random_seed'])
-        n_trials = min([abs(int(form['n_trials'])), 1000])
+        ratio_female = int(request.form['female_range']) / 100
+        sample_min_size = int(request.form['sample_min_size'])
+        sample_min_size_uniform = int(request.form['sample_min_size_uniform'])
+        random_seed = int(request.form['random_seed'])
+        n_trials = min([abs(int(request.form['n_trials'])), 1000])
 
-    except ValueError:
+    except ValueError or IndexError:
         return render_template('diversity_analysis.html', success='False', error_message="Invalid Parameters Passed")
 
     searcher = diversity_tools.NameSearch(ratio_female=ratio_female, sample_min_size=sample_min_size,
                                           sample_min_size_uniform=sample_min_size_uniform)
 
     result = searcher.summarize_gender(names_list, n_name_samples=n_trials, random_seed=random_seed)
+
+    if not result:
+        return render_template("diversity_analysis.html", success='False', error_message='No names recognized')
 
     return render_template('diversity_analysis.html', result=result)
