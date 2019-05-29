@@ -10,6 +10,13 @@ $(document).ready(function() {
   var validator;
   var animating;
 
+  // ensure sliders and output are same value in case of using backbutton
+  $("[id*='female_range_']").each(function(i, e) {
+    var $e = $(e);
+    var output = $e.siblings('span');
+    output.text($e.val() + "%");
+  })
+
   $paste_form.on('submit', function(e) {
     var prevent_submit = false;
     current_fs = $("#submit_paste").parent();
