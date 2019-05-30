@@ -3,7 +3,8 @@ import pickle
 import numpy as np
 from cytoolz import groupby
 from scipy import stats
-from app_folder.tools.decorators import log_performance, memoized
+import math
+from app_folder.tools.decorators import memoized
 
 from app_folder.site_config import FConfig
 
@@ -38,12 +39,14 @@ class NameSearch(object):
         """
 
         self.kw = self.load_fp(flashtext_fp)
-        self.population_std = self.get_population_std_from_ratio(ratio_female, n_male)
+        self.population_std = self.get_population_std_from_ratio(ratio_female)
         self.sample_min_size = sample_min_size
         self.sample_min_size_uniform = sample_min_size_uniform
 
-    def get_population_std_from_ratio(self, ratio_female, n_male=100000):
-        n_female = int(round(n_male * ratio_female))
+    def get_population_std_from_ratio(self, ratio_female):
+        pop_size = 100
+        n_female = int(math.ceil(pop_size* ratio_female))
+        n_male = pop_size - n_female
         population_array = self.make_array(n_male, n_female)
         return population_array.std()
 
