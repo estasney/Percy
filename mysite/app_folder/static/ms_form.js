@@ -27,8 +27,11 @@ $(document).ready(function() {
       }
     });
 
-    if(prevent_submit == true) {
+    if(prevent_submit == false) {
+      current_fs.find(".load-hide").hide();
       $("#loading_icon_paste").show();
+      return true;
+    } else {
       return false;
     }
 
@@ -44,8 +47,11 @@ $(document).ready(function() {
       }
     });
 
-    if(prevent_submit == true) {
+    if(prevent_submit == false) {
+      current_fs.find(".load-hide").hide();
       $("#loading_icon_spreadsheet").show();
+      return true;
+    } else{
       return false;
     }
 
@@ -221,9 +227,10 @@ $(document).ready(function() {
           required: true,
           min: 1
         },
-        sample_min_size_uniform: {
+        sample_maximum_name_certainty: {
           required: true,
-          min: 1
+          range: [0.5, 1],
+          step: 0.001
         },
         n_trials: {
           required: true,
@@ -264,9 +271,10 @@ $(document).ready(function() {
           required: true,
           min: 1
         },
-        sample_min_size_uniform: {
+        sample_maximum_name_certainty: {
           required: true,
-          min: 1
+          range: [0.5, 1],
+          step: 0.001
         },
         n_trials: {
           required: true,

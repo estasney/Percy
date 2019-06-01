@@ -3,6 +3,7 @@ import pickle
 import math
 import numpy as np
 from cytoolz import groupby
+from app_folder.tools.decorators import memoized
 from scipy import stats
 
 from app_folder.site_config import FConfig
@@ -24,27 +25,20 @@ def get_name_count(name, fp=fconfig.NAMESEARCH_V2):
 class NameSearch(object):
 
     def __init__(self, ratio_female, flashtext_fp=fconfig.NAMESEARCH_V2, sample_min_size=30,
-                 sample_min_size_uniform=100, name_confidence=0.95, sample_confidence=0.95, noise_factor=0.0001):
+                 name_confidence=0.95, sample_confidence=0.95,
+                 maximum_name_certainty=.995):
 
         """
 
-        :param ratio_female: expected ratio of females in a population.
-        :param n_male: number of males from which to calculate number of females
-        :param flashtext_fp: flashtext file path
-        :param sample_min_size: The minimum size required in order to treat a sample as its own population.
-        I.e. whether to use the sample's standard deviation or the population's
-        :param sample_min_size_uniform: The minimum size required in order to treat a sample as its own population if
-        it's samples are one-sided. E.g. Male : 50, Female: 0
         """
 
         self.kw = self.load_fp(flashtext_fp)
-        self.noise_factor = noise_factor
+        self.maximum_name_certainty = maximum_name_certainty
         self.population_female = ratio_female
         self.mod_female = ratio_female / 0.5
         self.mod_male = (1 - ratio_female) / 0.5
         self.population_std = self.get_population_std_from_ratio(ratio_female)
         self.sample_min_size = sample_min_size
-        self.sample_min_size_uniform = sample_min_size_uniform
         self.name_confidence = name_confidence
         self.sample_confidence = sample_confidence
 
@@ -55,9 +49,36 @@ class NameSearch(object):
         population_array = self.make_array(n_male, n_female, calibrate=False)
         return population_array.std()
 
+    def limit_certainty(self, n_male, n_female):
+
+        if n_male == n_female:
+            return n_male, n_female
+
+        count_max = max([n_male, n_female])
+        count_min = min([n_male, n_female])
+
+        skew = count_max / (count_max + count_min)
+        if skew <= self.maximum_name_certainty:
+            return n_male, n_female
+
+        if count_min == 0:
+            count_min = math.ceil(count_max * (1 - self.maximum_name_certainty))
+            if count_max == n_male:
+                return n_male, count_min
+            else:
+                return count_min, n_female
+
+        scale = (count_max - (self.maximum_name_certainty * count_max)) / (self.maximum_name_certainty * count_min)
+        count_min_scaled = math.ceil(count_min * scale)
+
+        if count_max == n_male:
+            return n_male, count_min_scaled
+        else:
+            return count_min_scaled, n_female
+
     def calibrate(self, n_male, n_female):
-        scaled_noise = math.ceil(max([n_male, n_female]) * self.noise_factor)
-        n_male, n_female = max([n_male, scaled_noise]), max([n_female, scaled_noise])
+
+        n_male, n_female = self.limit_certainty(n_male, n_female)
 
         n_male_mod = int(math.ceil(n_male * self.mod_male))
         n_female_mod = int(math.ceil(n_female * self.mod_female))
@@ -77,11 +98,12 @@ class NameSearch(object):
 
         arr_mean = arr.mean()
 
-        if arr_mean == 0 or arr_mean == 1 and arr.size < self.sample_min_size_uniform:
+        if arr_mean == 0 or arr_mean == 1:
             return self.population_std / np.sqrt(arr.size)
         else:
             return arr.std(ddof=1) / np.sqrt(arr.size)
 
+    @memoized
     def get_interval(self, n_male, n_female):
 
         sample = self.make_array(n_male, n_female)
@@ -126,8 +148,10 @@ class NameSearch(object):
             if not result:
                 data.append(None)
                 continue
-            result = max(result, key=lambda x: sum(x))
-            data.append(result)
+            n_male = sum([x[0] for x in result])
+            n_female = sum([x[1] for x in result])
+
+            data.append((n_male, n_female))
 
         return data
 
