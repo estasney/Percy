@@ -92,6 +92,13 @@ class NameSearch(object):
         f = np.ones(n_female)
         return np.concatenate([m, f])
 
+    def make_beta(self, n_male, n_female, calibrate=True):
+        if calibrate:
+            n_male, n_female = self.calibrate(n_male, n_female)
+        n_male += 1
+        n_female += 1
+        return stats.beta(a=n_female, b=n_male)
+
     def make_sigma_scale(self, arr):
         if arr.size < self.sample_min_size:
             return self.population_std / np.sqrt(arr.size)
@@ -106,18 +113,8 @@ class NameSearch(object):
     @memoized
     def get_interval(self, n_male, n_female):
 
-        sample = self.make_array(n_male, n_female)
-        mu = sample.mean()
-        scale = self.make_sigma_scale(sample)
-
-        if scale == 0:  # Prevents nan
-            return 0, 0
-
-        # Min and max of interval
-        m1, m3 = stats.norm.interval(alpha=self.name_confidence, loc=mu, scale=scale)
-
-        # # Truncate negative values and values > 1
-        m1, m3 = max([m1, 0]), min([1, m3])
+        beta = self.make_beta(n_male, n_female)
+        m1, m3 = beta.interval(self.name_confidence)
         return m1, m3
 
     def make_name_sample(self, name_probability_interval, n_name_samples):
