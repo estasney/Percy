@@ -235,7 +235,7 @@ $(document).ready(function() {
         },
         n_trials: {
           required: true,
-          range: [2, 1000]
+          range: [2, 50000]
         },
         random_seed: {
           required: true,
@@ -280,7 +280,7 @@ $(document).ready(function() {
         },
         n_trials: {
           required: true,
-          range: [2, 1000]
+          range: [2, 50000]
         },
         random_seed: {
           required: true,

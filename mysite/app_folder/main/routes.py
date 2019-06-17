@@ -48,7 +48,7 @@ def infer_diversity():
         beta_interval = max([float(request.form['beta_interval']), 0.01])
         maximum_name_certainty = float(request.form['sample_maximum_name_certainty'])
         random_seed = int(request.form['random_seed'])
-        n_trials = min([abs(int(request.form['n_trials'])), 1000])
+        n_trials = min([abs(int(request.form['n_trials'])), 50000])
         n_trials = max([2, n_trials])
 
     except ValueError or IndexError:
