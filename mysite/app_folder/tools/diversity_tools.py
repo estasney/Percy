@@ -182,6 +182,7 @@ class NameSearch(object):
         # the output from the min and max will be interleaved
 
         flat_results = results.reshape(1, -1)[0]
+        np.random.shuffle(flat_results)
 
         return flat_results
 
