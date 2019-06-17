@@ -69,14 +69,15 @@
         <h2 class="fs-title">Parameters</h2>
         <h3 class="fs-subtitle">Advanced users may modify defaults</h3>
         <div class="form-group">
-            <label>Minimum Sample Size for Name</label>
-            <input type="number" name="sample_min_size" id="sample_min_size_{{input_type}}" placeholder="30" value="30"/>
+            <label>Beta Interval</label>
+            <input type="number" name="beta_interval" id="beta_interval_{{input_type}}" placeholder="0.95"
+                   value="0.95" step="0.01"/>
 
         </div>
         <div class="form-group">
             <label>Maximum Allowed Certainty for Name</label>
-            <input type="number" name="sample_maximum_name_certainty" id="sample_maximum_name_certainty_{{input_type}}" placeholder="0.995"
-                   value="0.995" step="0.001"/>
+            <input type="number" name="sample_maximum_name_certainty" id="sample_maximum_name_certainty_{{input_type}}" placeholder="0.99"
+                   value="0.99" step="0.001"/>
 
         </div>
         <div class="form-group">
@@ -87,8 +88,8 @@
         </div>
         <div class="form-group">
             <label>Random Seed</label>
-            <input type="number" name="random_seed" id="random_seed_{{input_type}}" placeholder="1337"
-                   value="1337"/>
+            <input type="number" name="random_seed" id="random_seed_{{input_type}}" placeholder="42"
+                   value="42"/>
 
         </div>
 

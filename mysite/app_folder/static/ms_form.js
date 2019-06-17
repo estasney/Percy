@@ -223,9 +223,10 @@ $(document).ready(function() {
         female_range: {
           required: true
         },
-        sample_min_size: {
+        beta_interval: {
           required: true,
-          min: 1
+          range: [0.01, 0.99],
+          step: 0.01
         },
         sample_maximum_name_certainty: {
           required: true,
@@ -267,9 +268,10 @@ $(document).ready(function() {
         female_range: {
           required: true
         },
-        sample_min_size: {
+        beta_interval: {
           required: true,
-          min: 1
+          range: [0.01, 0.99],
+          step: 0.01
         },
         sample_maximum_name_certainty: {
           required: true,
