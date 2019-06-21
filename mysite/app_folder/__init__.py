@@ -2,9 +2,14 @@ from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
 from app_folder.site_config import Config, FConfig
 from flask_moment import Moment
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
 
 toolbar = DebugToolbarExtension()
 moment = Moment()
+db = SQLAlchemy()
+migrate = Migrate()
 
 
 def create_app(config_class=Config):
@@ -13,6 +18,8 @@ def create_app(config_class=Config):
 
     toolbar.init_app(app_run)
     moment.init_app(app_run)
+    db.init_app(app_run)
+    migrate.init_app(app_run, db)
 
     from app_folder.main import bp as main_bp
     app_run.register_blueprint(main_bp)
