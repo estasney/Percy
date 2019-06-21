@@ -4,6 +4,7 @@ import math
 import numpy as np
 from cytoolz import groupby
 from app_folder.tools.decorators import memoized
+from app_folder.models import Name
 from scipy import stats
 
 from app_folder.site_config import FConfig
@@ -11,13 +12,13 @@ from app_folder.site_config import FConfig
 fconfig = FConfig()
 
 
-def get_name_count(name, fp=fconfig.NAMESEARCH_V2):
-    with open(fp, "rb") as p:
-        kw = pickle.load(p)
-    if name not in kw:
+def get_name_count(name):
+    name = name.lower()
+    name_kw = Name.query.get(name)
+    if not name_kw:
         return None
     else:
-        male, female = kw.get_keyword(name)
+        male, female = name_kw.male_count, name_kw.female_count
         return {'n_male': male, 'n_female': female}
 
 
