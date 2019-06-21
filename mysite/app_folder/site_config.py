@@ -15,6 +15,9 @@ class Config(object):
     DEBUG_TB_TEMPLATE_EDITOR_ENABLED = True
     UPLOAD_FOLDER = os.path.join(basedir, 'resources{}uploads').format(os.path.sep)
     SECRET_KEY = 'never-guess-this'
+    SQLALCHEMY_DATABASE_URI = 'mysql://estasney:password@localhost:3306/names_db?charset=utf8mb4'
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_POOL_RECYCLE = 299
 
 
 class FConfig(object):
