@@ -24,12 +24,13 @@ def get_name_count(name):
 
 class NameSearch(object):
 
-    def __init__(self, ratio_female, flashtext_fp=fconfig.NAMESEARCH_V2, beta_interval=0.95, sample_confidence=0.95,
+    def __init__(self, prior=None, flashtext_fp=fconfig.NAMESEARCH_V2, beta_interval=0.95, sample_confidence=0.95,
                  maximum_name_certainty=.99):
 
         """
 
-        :param ratio_female: float, between 0 and 1. The prior belief of the ratio of females in the group
+        :param prior: Tuple, or None (default). When passed, indicates prior knowledge of probability. Passing None, will set self.alpha and self.beta to 1, 1.
+        Otherwise, the closest estimation will be found from existing calculations
         :param flashtext_fp: the filepath to the flashtext pickle file
         :param beta_interval:
         :param sample_confidence:
@@ -38,12 +39,38 @@ class NameSearch(object):
 
         self.kw = self.load_fp(flashtext_fp)
         self.maximum_name_certainty = maximum_name_certainty
-        self.population_female = ratio_female
-        self.mod_female = ratio_female / 0.5
-        self.mod_male = (1 - ratio_female) / 0.5
-        self.population_std = self.get_population_std_from_ratio(ratio_female)
+        self.prior = prior
+        self.alpha = None
+        self.beta = None
         self.beta_interval = beta_interval
         self.sample_confidence = sample_confidence
+        self.get_beta_params()
+
+    def get_beta_params(self):
+        if not self.prior:
+            self.alpha = 1
+            self.beta = 1
+            return
+
+        with open(fconfig.BETA_PARAMS, "rb") as fp:
+            beta_params = np.load(fconfig.BETA_PARAMS)
+
+        # beta params is of form
+        # a, b, ci_95_min, ci_95_max
+        # find closest parameters to passed prior
+
+        ci_array = np.asarray(beta_params[:, 2:])
+        val_array = np.array([*self.prior]).reshape(1, 2)
+
+        idx_2d = np.abs(ci_array - val_array)
+
+        # sum the differences
+        idx = idx_2d.sum(axis=1)
+        alpha, beta, ci_95_min, ci_95_max = beta_params[idx.argmin()]
+        self.alpha = alpha
+        self.beta = beta
+        return
+
 
     def summarize_gender(self, names, random_seed, n_name_samples=100):
         np.random.seed(random_seed)
