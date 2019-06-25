@@ -58,9 +58,15 @@
         <h2 class="fs-title">Background</h2>
         <h3 class="fs-subtitle">Share what you know</h3>
         <div class="form-group">
-            <label>Estimated Percentage of Females in Population</label>
-            <input id="female_range_{{input_type}}" type="range" name="female_range" min="1" max="99" value="50" class="slider"/>
-            <span class="slider-output-light">50%</span>
+            <p>
+                <label for="female_range_{{ input_type }}">Estimated Percentage of Females in Population</label>
+                <input id="female_range_{{ input_type }}" type="text" readonly name="female_range" value="Unknown"
+                       class="slider"/>
+                <input id="bool_female_range_unknown_{{ input_type }}" type="checkbox" name="female_range_skipped"
+                       style="display: none" checked/>
+            </p>
+            <div id="female_slider_{{ input_type }}"></div>
+
         </div>
         <input type="button" name="previous" class="previous action-button" value="Previous"/>
         <input type="button" name="next" class="next action-button" value="Next"/>

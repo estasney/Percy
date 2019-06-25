@@ -71,7 +71,6 @@ class NameSearch(object):
         self.beta = beta
         return
 
-
     def summarize_gender(self, names, random_seed, n_name_samples=100):
         np.random.seed(random_seed)
 
@@ -90,25 +89,21 @@ class NameSearch(object):
 
         trial_means = self.trial_names(known_names, n_name_samples)
         trial_mu = trial_means.mean()
-        trial_scale = self.make_sigma_scale(trial_means)
-        m1, m3 = stats.norm.interval(alpha=self.sample_confidence, loc=trial_mu, scale=trial_scale)
+        trial_std = trial_means.std(ddof=1)
+        trial_sigma = trial_std / np.sqrt(trial_means.size)
+        m1, m3 = stats.t.interval(alpha=self.sample_confidence, df=trial_means.size, loc=trial_mu, scale=trial_sigma)
         m1, m3 = max([0, m1]), min([1, m3])
 
         trial_means_list = list(trial_means)
 
-        return {'n_names': n_names, 'n_known': n_known, 'n_unknown': n_unknown, 'trial_mean': trial_mu,
-                'trial_scale': trial_scale, 'trial_min': m1, 'trial_max': m3, 'n_name_samples': n_name_samples,
-                'beta_interval': self.beta_interval, 'sample_confidence': self.sample_confidence,
-                'trial_means': trial_means_list,
-                'n_trials': n_name_samples, 'trial_means_min': min(trial_means_list),
-                'trial_means_max': max(trial_means_list)}
-
-    def get_population_std_from_ratio(self, ratio_female):
-        pop_size = 100
-        n_female = int(math.ceil(pop_size * ratio_female))
-        n_male = pop_size - n_female
-        population_array = self.make_array(n_male, n_female, calibrate=False)
-        return population_array.std()
+        return {
+            'n_names':         n_names, 'n_known': n_known, 'n_unknown': n_unknown, 'trial_mean': trial_mu,
+            'trial_scale':     trial_sigma, 'trial_min': m1, 'trial_max': m3, 'n_name_samples': n_name_samples,
+            'beta_interval':   self.beta_interval, 'sample_confidence': self.sample_confidence,
+            'trial_means':     trial_means_list,
+            'n_trials':        n_name_samples, 'trial_means_min': min(trial_means_list),
+            'trial_means_max': max(trial_means_list)
+            }
 
     def limit_certainty(self, n_male, n_female):
 
@@ -141,10 +136,7 @@ class NameSearch(object):
 
         n_male, n_female = self.limit_certainty(n_male, n_female)
 
-        n_male_mod = int(math.ceil(n_male * self.mod_male))
-        n_female_mod = int(math.ceil(n_female * self.mod_female))
-
-        return n_male_mod, n_female_mod
+        return n_male, n_female
 
     def make_array(self, n_male, n_female, calibrate=True):
         if calibrate:
@@ -156,20 +148,9 @@ class NameSearch(object):
     def make_beta(self, n_male, n_female, calibrate=True):
         if calibrate:
             n_male, n_female = self.calibrate(n_male, n_female)
-        n_male += 1
-        n_female += 1
+        n_male += self.beta
+        n_female += self.alpha
         return stats.beta(a=n_female, b=n_male)
-
-    def make_sigma_scale(self, arr):
-        if arr.size < 30:
-            return self.population_std / np.sqrt(arr.size)
-
-        arr_mean = arr.mean()
-
-        if arr_mean == 0 or arr_mean == 1:
-            return self.population_std / np.sqrt(arr.size)
-        else:
-            return arr.std(ddof=1) / np.sqrt(arr.size)
 
     @memoized
     def get_interval(self, n_male, n_female):
@@ -204,7 +185,7 @@ class NameSearch(object):
 
         name_mean_min, name_mean_max = name_probability_interval
 
-        results = np.random.binomial((1, 1), (name_mean_min, name_mean_max), (n_name_samples//2, 1, 2))
+        results = np.random.binomial((1, 1), (name_mean_min, name_mean_max), (n_name_samples // 2, 1, 2))
 
         # we want to reshape the output so it is flat
         # the output from the min and max will be interleaved
@@ -230,7 +211,7 @@ class NameSearch(object):
 
         name_probability_intervals = [self.get_interval(*count) for count in name_data]
         name_samples = np.vstack(
-            [self.make_name_sample(interval, n_name_samples) for interval in name_probability_intervals])
+                [self.make_name_sample(interval, n_name_samples) for interval in name_probability_intervals])
         return name_samples.mean(axis=0)
 
     def extract_names(self, names):
