@@ -1,5 +1,5 @@
 from flask import render_template, request, jsonify, redirect, url_for
-
+import re
 from app_folder.main import bp
 from app_folder.tools import upload_tools, diversity_tools
 
@@ -44,7 +44,14 @@ def infer_diversity():
             del names_list_lines, names_list_commas
 
     try:
-        ratio_female = int(request.form['female_range']) / 100
+        if 'female_range_skipped' in request.form:
+            prior = None
+        else:
+            female_range = request.form['female_range']
+            low, high = re.findall(r"([0-9]{1,2})", female_range)
+            low, high = int(low) / 100, int(high) / 100
+            prior = (low, high)
+
         beta_interval = max([float(request.form['beta_interval']), 0.01])
         maximum_name_certainty = float(request.form['sample_maximum_name_certainty'])
         random_seed = int(request.form['random_seed'])
@@ -54,7 +61,7 @@ def infer_diversity():
     except ValueError or IndexError:
         return render_template('diversity_analysis.html', success='False', error_message="Invalid Parameters Passed")
 
-    searcher = diversity_tools.NameSearch(ratio_female=ratio_female, maximum_name_certainty=maximum_name_certainty,
+    searcher = diversity_tools.NameSearch(prior=prior, maximum_name_certainty=maximum_name_certainty,
                                           beta_interval=beta_interval)
 
     result = searcher.summarize_gender(names_list, n_name_samples=n_trials, random_seed=random_seed)

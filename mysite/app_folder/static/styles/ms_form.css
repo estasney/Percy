@@ -81,6 +81,7 @@ form[id*='msform'] .action-button:hover, form[id*='msform'] .action-button:focus
   overflow: hidden;
   /*CSS counters to number the steps*/
   counter-reset: step;
+  padding-inline-start: 0;
 }
 
 [id*='progressbar'] li {

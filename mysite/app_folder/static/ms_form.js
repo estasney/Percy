@@ -34,6 +34,8 @@ $(document).ready(function () {
         }
     });
 
+    $(".slider-help").tooltip({});
+
 
     $paste_form.on('submit', function (e) {
         var prevent_submit = false;
