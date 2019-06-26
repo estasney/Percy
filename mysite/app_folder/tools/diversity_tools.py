@@ -168,11 +168,11 @@ class NameSearch(object):
         m1, m3 = beta.interval(self.beta_interval)
         return m1, m3
 
-    def make_name_sample(self, name_probability_interval, n_name_samples):
+    def make_name_simulation(self, name_probability_interval, n_trials):
 
         """
         :param name_probability_interval: tuple, min and max probability
-        :param n_name_samples:
+        :param n_trials:
         :return:
 
         Given an estimation of the probability of a name returning female, we proceed to run the simulation.
@@ -185,7 +185,7 @@ class NameSearch(object):
 
         name_mean_min, name_mean_max = name_probability_interval
 
-        results = np.random.binomial((1, 1), (name_mean_min, name_mean_max), (n_name_samples // 2, 1, 2))
+        results = np.random.binomial((1, 1), (name_mean_min, name_mean_max), (n_trials // 2, 1, 2))
 
         # we want to reshape the output so it is flat
         # the output from the min and max will be interleaved
@@ -211,7 +211,7 @@ class NameSearch(object):
 
         name_probability_intervals = [self.get_interval(*count) for count in name_data]
         name_samples = np.vstack(
-                [self.make_name_sample(interval, n_name_samples) for interval in name_probability_intervals])
+                [self.make_name_simulation(interval, n_name_samples) for interval in name_probability_intervals])
         return name_samples.mean(axis=0)
 
     def extract_names(self, names):
