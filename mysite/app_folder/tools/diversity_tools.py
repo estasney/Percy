@@ -24,8 +24,7 @@ def get_name_count(name):
 
 class NameSearch(object):
 
-    def __init__(self, prior=None, flashtext_fp=fconfig.NAMESEARCH_V2, beta_interval=0.95, sample_confidence=0.95,
-                 maximum_name_certainty=.99):
+    def __init__(self, prior=None, flashtext_fp=fconfig.NAMESEARCH_V2, beta_interval=0.95, sample_confidence=0.95):
 
         """
 
@@ -34,11 +33,9 @@ class NameSearch(object):
         :param flashtext_fp: the filepath to the flashtext pickle file
         :param beta_interval:
         :param sample_confidence:
-        :param maximum_name_certainty:
         """
 
         self.kw = self.load_fp(flashtext_fp)
-        self.maximum_name_certainty = maximum_name_certainty
         self.prior = prior
         self.alpha = None
         self.beta = None
@@ -105,49 +102,12 @@ class NameSearch(object):
             'trial_means_max': max(trial_means_list)
             }
 
-    def limit_certainty(self, n_male, n_female):
-
-        if n_male == n_female:
-            return n_male, n_female
-
-        count_max = max([n_male, n_female])
-        count_min = min([n_male, n_female])
-
-        skew = count_max / (count_max + count_min)
-        if skew <= self.maximum_name_certainty:
-            return n_male, n_female
-
-        if count_min == 0:
-            count_min = math.ceil(count_max * (1 - self.maximum_name_certainty))
-            if count_max == n_male:
-                return n_male, count_min
-            else:
-                return count_min, n_female
-
-        scale = (count_max - (self.maximum_name_certainty * count_max)) / (self.maximum_name_certainty * count_min)
-        count_min_scaled = math.ceil(count_min * scale)
-
-        if count_max == n_male:
-            return n_male, count_min_scaled
-        else:
-            return count_min_scaled, n_female
-
-    def calibrate(self, n_male, n_female):
-
-        n_male, n_female = self.limit_certainty(n_male, n_female)
-
-        return n_male, n_female
-
-    def make_array(self, n_male, n_female, calibrate=True):
-        if calibrate:
-            n_male, n_female = self.calibrate(n_male, n_female)
+    def make_array(self, n_male, n_female):
         m = np.zeros(n_male)
         f = np.ones(n_female)
         return np.concatenate([m, f])
 
-    def make_beta(self, n_male, n_female, calibrate=True):
-        if calibrate:
-            n_male, n_female = self.calibrate(n_male, n_female)
+    def make_beta(self, n_male, n_female):
         n_male += self.beta
         n_female += self.alpha
         return stats.beta(a=n_female, b=n_male)
@@ -210,8 +170,8 @@ class NameSearch(object):
         """
 
         name_probability_intervals = [self.get_interval(*count) for count in name_data]
-        name_samples = np.vstack(
-                [self.make_name_simulation(interval, n_name_samples) for interval in name_probability_intervals])
+        outcomes = [self.make_name_simulation(interval, n_name_samples) for interval in name_probability_intervals]
+        name_samples = np.vstack(outcomes)
         return name_samples.mean(axis=0)
 
     def extract_names(self, names):

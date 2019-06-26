@@ -10,6 +10,13 @@ $(document).ready(function () {
     var validator;
     var animating;
 
+    // reset slider if user navigates back
+    $("#bool_female_range_unknown_paste").prop("checked", true);
+    $("#female_range_paste").val("Unknown");
+    $("#bool_female_range_unknown_spreadsheet").prop("checked", true);
+    $("#female_range_paste").val("Unknown");
+
+
     $slider_paste.slider({
         range: true,
         min: 0.05,
@@ -244,14 +251,9 @@ $(document).ready(function () {
                     range: [0.01, 0.99],
                     step: 0.01
                 },
-                sample_maximum_name_certainty: {
-                    required: true,
-                    range: [0.5, 1],
-                    step: 0.001
-                },
                 n_trials: {
                     required: true,
-                    range: [2, 50000]
+                    range: [1000, 50000]
                 },
                 random_seed: {
                     required: true,
@@ -286,14 +288,9 @@ $(document).ready(function () {
                     range: [0.01, 0.99],
                     step: 0.01
                 },
-                sample_maximum_name_certainty: {
-                    required: true,
-                    range: [0.5, 1],
-                    step: 0.001
-                },
                 n_trials: {
                     required: true,
-                    range: [2, 50000]
+                    range: [1000, 50000]
                 },
                 random_seed: {
                     required: true,

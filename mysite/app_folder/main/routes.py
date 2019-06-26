@@ -53,16 +53,14 @@ def infer_diversity():
             prior = (low, high)
 
         beta_interval = max([float(request.form['beta_interval']), 0.01])
-        maximum_name_certainty = float(request.form['sample_maximum_name_certainty'])
         random_seed = int(request.form['random_seed'])
         n_trials = min([abs(int(request.form['n_trials'])), 50000])
-        n_trials = max([2, n_trials])
+        n_trials = max([1000, n_trials])
 
     except ValueError or IndexError:
         return render_template('diversity_analysis.html', success='False', error_message="Invalid Parameters Passed")
 
-    searcher = diversity_tools.NameSearch(prior=prior, maximum_name_certainty=maximum_name_certainty,
-                                          beta_interval=beta_interval)
+    searcher = diversity_tools.NameSearch(prior=prior, beta_interval=beta_interval)
 
     result = searcher.summarize_gender(names_list, n_name_samples=n_trials, random_seed=random_seed)
 
