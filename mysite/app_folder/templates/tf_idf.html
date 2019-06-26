@@ -49,14 +49,6 @@
     <p>Something went wrong.</p>
     <p>{{error_message}}</p>
 </div>{% else %} {% endif %}
-<script>
-    $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();
-});
-
-
-</script>
-{% endblock %}
 {% block js_script %}
 {% include "datatables.html" %}
 {% endblock %}
