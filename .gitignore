@@ -19,3 +19,4 @@ venv/
 !/mysite/process/data/phrases/excluded.txt
 !/mysite/process/data/phrases/included.txt
 /mysite/notebooks/data/beta_params.npy
+/mysite/notebooks/
