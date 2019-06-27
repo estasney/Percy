@@ -68,12 +68,21 @@ class NameSearch(object):
         self.beta = beta
         return
 
+    def estimate_pop_std(self):
+        # create a simulated population based on self.prior
+        # calculate standard deviation
+        population_beta = stats.beta(self.alpha, self.beta)
+        population_prob = population_beta.interval(0.95)
+        result = self.make_name_simulation(population_prob, n_trials=100000)
+        return result.std()
+
+
     def summarize_gender(self, names, random_seed, n_name_samples=100):
         np.random.seed(random_seed)
 
         # Extract names from the input and separate into known and unknown
         name_data = self.extract_names(names)
-        grouped_names = groupby(lambda x: x is not None, name_data)
+        grouped_names = groupby(lambda x: sum(x) == 0, name_data)
         known_names, unknown_names = grouped_names.get(True, []), grouped_names.get(False, [])
         del grouped_names
 
@@ -81,14 +90,14 @@ class NameSearch(object):
         n_known = len(known_names)
         n_unknown = len(unknown_names)
 
-        if not known_names:
-            return None
+        del known_names, unknown_names
 
-        trial_means = self.trial_names(known_names, n_name_samples)
+        trial_means = self.trial_names(name_data, n_name_samples)
         trial_mu = trial_means.mean()
         trial_std = trial_means.std(ddof=1)
         trial_sigma = trial_std / np.sqrt(trial_means.size)
-        m1, m3 = stats.t.interval(alpha=self.sample_confidence, df=trial_means.size, loc=trial_mu, scale=trial_sigma)
+        m1, m3 = stats.t.interval(alpha=self.sample_confidence, df=(trial_means.size - 1), loc=trial_mu,
+                                  scale=trial_sigma)
         m1, m3 = max([0, m1]), min([1, m3])
 
         trial_means_list = list(trial_means)
@@ -179,7 +188,7 @@ class NameSearch(object):
         for n in names:
             result = self.kw.extract_keywords(n)
             if not result:
-                data.append(None)
+                data.append((0, 0))
                 continue
             n_male = sum([x[0] for x in result])
             n_female = sum([x[1] for x in result])
