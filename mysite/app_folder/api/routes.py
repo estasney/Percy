@@ -35,6 +35,7 @@ def related():
             return jsonify({'message': 'empty query'}), 422
         else:
             user_query, query_scope = request.args.get('q', None), request.args.get('scope', None)
+            format_input = request.args.get('format_input', True)
     else:
         user_query = request.json.get('q', None)
         query_scope = request.json.get('scope', None)
