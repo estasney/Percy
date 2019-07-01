@@ -79,8 +79,6 @@ class NameSearch(object):
 
     def summarize_gender(self, names, random_seed, n_name_samples=100):
         np.random.seed(random_seed)
-
-        # Extract names from the input and separate into known and unknown
         name_data = self.extract_names(names)
         grouped_names = groupby(lambda x: sum(x) == 0, name_data)
         known_names, unknown_names = grouped_names.get(True, []), grouped_names.get(False, [])
