@@ -1,5 +1,7 @@
 import os
+import glob
 import pickle
+from datetime import datetime
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -56,8 +58,60 @@ class FConfig(object):
         self.PERSON_DETAILS_API_F = "https://api.ciscospark.com/v1/people/{}"
         self.PERSON_DETAILS = "https://api.ciscospark.com/v1/people"
 
+        self.STATIC_FOLDER = self.smart_path("static")
+        self.STYLES_FOLDER = self.smart_path(self.STATIC_FOLDER, "styles")
+        self.STATIC_IDENTIFIERS = self.smart_path(self.STATIC_FOLDER, "identifiers.pkl")
+
     def smart_path(self, *args):
         start_path = self.BASE_DIR
         for a in args:
             start_path = os.path.join(start_path, a)
         return start_path
+
+    def add_modified_to_fp(self, fp):
+        epoch_time = os.path.getmtime(fp)
+        ts = datetime.fromtimestamp(epoch_time).strftime("%Y%m%d%H%M%S")
+
+        dir, filename_ext = os.path.split(fp)
+        filename, file_ext = os.path.splitext(filename_ext)
+        filename += ts
+        filename += file_ext
+
+        return os.path.join(dir, filename)
+
+    def versionize_static(self):
+        static_files = glob.glob(r"{}\*.*".format(self.STATIC_FOLDER))
+        static_files.extend(glob.glob(r"*{}.*".format(self.STYLES_FOLDER)))
+
+        for fp in static_files:
+            fp_new = self.add_modified_to_fp(fp)
+            if fp != fp_new:
+                os.rename(fp, fp_new)
+
+    def versioned_file(self, fp):
+        if fp.startswith('styles'):
+            _, filename = os.path.split(fp)
+            filename, ext = os.path.splitext(filename)
+            search = "{}{}{}*{}".format(self.STYLES_FOLDER, os.path.sep, filename, ext)
+            found = glob.glob(search)[0]
+            found = os.path.split(found)[1]
+            return "styles/{}".format(found)
+
+        else:
+            _, filename = os.path.split(fp)
+            filename, ext = os.path.splitext(filename)
+            search = "{}{}{}*{}".format(self.STATIC_FOLDER, os.path.sep, filename, ext)
+
+        found = glob.glob(search)[0]
+        return os.path.split(found)[1]
+
+
+def versioned_file(fp):
+    fconfig = FConfig()
+    return fconfig.versioned_file(fp)
+
+
+if __name__ == "__main__":
+    f = FConfig()
+    # f.versionize_static()
+    print(f.versioned_file(r"C:\Users\estasney\PycharmProjects\Percy\mysite\app_folder\static\d3_hist.js"))

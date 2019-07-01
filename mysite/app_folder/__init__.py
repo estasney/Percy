@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
-from app_folder.site_config import Config, FConfig
+from app_folder.site_config import Config, FConfig, versioned_file
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -32,5 +32,7 @@ def create_app(config_class=Config):
 
     from app_folder.autocomplete import bp as autocomplete_bp
     app_run.register_blueprint(autocomplete_bp, url_prefix='/autocomplete')
+
+    app_run.jinja_env.filters['versioned'] = versioned_file
 
     return app_run

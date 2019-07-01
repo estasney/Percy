@@ -9,6 +9,9 @@ def open_page():
     return render_template('home_page.html')
 
 
+@bp.route('/latest')
+
+
 @bp.route('/diversity_lookup', methods=['GET', 'POST'])
 def lookup_name():
     if request.method == "GET":

@@ -27,8 +27,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico'|versioned) }}" type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico'|versioned) }}" type="image/x-icon">
   <!-- Bootstrap 4 CSS-->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <!-- Bootstrap 4 / Selectize Shim -->
@@ -39,14 +39,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.14.2/bootstrap-table.min.css">
 
   <!-- Mainpage CSS-->
-  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mainpage.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/mainpage.css'|versioned) }}">
   <!-- jQueryUI CSS-->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
   <!-- Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-  <link href="{{url_for('static', filename='styles/ms_form.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='styles/ms_form.css'|versioned) }}" rel="stylesheet" type="text/css">
 
     {% block headscript %} {% endblock %}
     {% block style %} {% endblock %}
