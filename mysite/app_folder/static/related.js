@@ -1,23 +1,20 @@
 window.addEventListener("load", function() {
 
-  var substringMatcher = function(strs) {
+  let substringMatcher = function (strs) {
     return function findMatches(q, cb) {
-      var matches, substringRegex;
-
       // an array that will be populated with substring matches
-      matches = [];
+      let matches = [];
 
       // regex used to determine if a string contains the substring `q`
-      substrRegex = new RegExp(q, 'i');
+      let substringRegex = new RegExp(q, 'i');
 
       // iterate through the pool of strings and for any string that
       // contains the substring `q`, add it to the `matches` array
       $.each(strs, function(i, str) {
-        if (substrRegex.test(str)) {
+        if (substringRegex.test(str)) {
           matches.push(str);
         }
       });
-
       cb(matches);
     };
   };
@@ -29,7 +26,7 @@ window.addEventListener("load", function() {
     $('.typeahead').typeahead({
       hint: true,
       highlight: true,
-      minLength: 1,
+      minLength: 2,
       classNames: {
         menu: 'pt-menu',
         suggestion: 'pt-suggestion',
@@ -45,16 +42,23 @@ window.addEventListener("load", function() {
 
 
   function radioClicked(e) {
-    var radioId = e.target.id;
-    if (radioId == 'skillsradio') {
+    let $e = $(e.target);
+    let radioId = $e.children().first().prop('id');
+
+    // clear inputs
+    $(".twitter-typeahead input").each(function (i, e) {
+      $(e).val("");
+    });
+
+    if (radioId === 'scope_skills') {
       $(".typeahead").typeahead("destroy");
       $.ajax({
-        url: '/autocomplete_skills'
+        url: '/autocomplete/skills'
       }).done(function(data) {
         $('.typeahead').typeahead({
           hint: true,
           highlight: true,
-          minLength: 1,
+          minLength: 2,
           classNames: {
             menu: 'pt-menu',
             suggestion: 'pt-suggestion',
@@ -75,7 +79,7 @@ window.addEventListener("load", function() {
         $('.typeahead').typeahead({
           hint: true,
           highlight: true,
-          minLength: 1,
+          minLength: 2,
           classNames: {
             menu: 'pt-menu',
             suggestion: 'pt-suggestion',
@@ -91,7 +95,6 @@ window.addEventListener("load", function() {
     }
   }
 
-  $("#skillsradio").on('click', radioClicked);
-  $("#wordsradio").on('click', radioClicked);
+  $(".btn-group.btn-group-toggle > label").on('click', radioClicked);
 
 });

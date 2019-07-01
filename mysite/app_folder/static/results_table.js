@@ -31,7 +31,8 @@ function runSearch() {
   var xhttp;
   var json_data = {
     q: query,
-    scope: scope
+    scope: scope,
+    format_input: false
     };
 
   xhttp = new XMLHttpRequest();

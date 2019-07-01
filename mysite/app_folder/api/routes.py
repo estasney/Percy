@@ -36,13 +36,14 @@ def related():
         else:
             user_query, query_scope = request.args.get('q', None), request.args.get('scope', None)
     else:
-        user_query, query_scope = request.json.get('q', None), request.json.get('scope', None)
-        print(request.json)
+        user_query = request.json.get('q', None)
+        query_scope = request.json.get('scope', None)
+        format_input = request.json.get('format_input', True)
 
     if not all([user_query, query_scope]):
         return jsonify({'message': 'missing one or more parameters'}), 422
 
-    result_success, result = sims_tools.word_sims(user_query, query_scope)
+    result_success, result = sims_tools.word_sims(user_query, query_scope, process_input=format_input)
     if result_success:
         return jsonify({'items': [{'word': word, 'score': score} for word, score in result], 'query': user_query, 'scope': query_scope}), 201
     else:

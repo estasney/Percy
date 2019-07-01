@@ -54,15 +54,18 @@ def word_math(request):
     return sims_success, sims
 
 
-def word_sims(user_query, query_scope):
+def word_sims(user_query, query_scope, process_input=True):
     if query_scope == 'words':
         ws = WordSims()
     else:
         ws = SkillSims()
-    query = parse_form_text(user_query)
+    if process_input:
+        query = parse_form_text(user_query)[0]
+    else:
+        query = user_query
     if not query:
         return False, None
-    query = query[0]  # Selecting the first word
+
     sims = ws.find_similar(query)
     return sims
 
