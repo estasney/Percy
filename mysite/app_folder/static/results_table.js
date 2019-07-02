@@ -43,6 +43,11 @@ function runSearch() {
             $table.bootstrapTable('hideLoading');
             $table.show();
             $table.bootstrapTable('load', response_msg.items);
+        } else if (this.readyState === 4 && this.status === 404) {
+            $table.bootstrapTable('removeAll');
+            $table.bootstrapTable('hideLoading');
+            $table.show();
+            $table.bootstrapTable('load', {});
         }
     };
     xhttp.open("POST", '/api/v1/related', true);
