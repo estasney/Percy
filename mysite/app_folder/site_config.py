@@ -22,7 +22,7 @@ class Config(object):
 
 
 class FConfig(object):
-    STATIC_VERSION_ID = 1  # Increment to force loading cached static files
+    STATIC_VERSION_ID = 2  # Increment to force loading cached static files
 
     def __init__(self, base_dir=basedir):
         self.BASE_DIR = base_dir
