@@ -34,7 +34,7 @@ def create_app(config_class=Config):
     app_run.register_blueprint(autocomplete_bp, url_prefix='/autocomplete')
 
     @app_run.context_processor
-    def static_vid():
+    def static_version():
         return {'static_version': FConfig.STATIC_VERSION_ID}
 
     return app_run
