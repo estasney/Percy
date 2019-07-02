@@ -18,10 +18,11 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'mysql://estasney:password@localhost:3306/names_db?charset=utf8mb4'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_POOL_RECYCLE = 299
-    STATIC_VERSION_ID = 1  # Increment to force loading cached static files
+
 
 
 class FConfig(object):
+    STATIC_VERSION_ID = 1  # Increment to force loading cached static files
 
     def __init__(self, base_dir=basedir):
         self.BASE_DIR = base_dir
