@@ -81,7 +81,7 @@ class NameSearch(object):
         np.random.seed(random_seed)
         name_data = self.extract_names(names)
         grouped_names = groupby(lambda x: sum(x) == 0, name_data)
-        known_names, unknown_names = grouped_names.get(True, []), grouped_names.get(False, [])
+        known_names, unknown_names = grouped_names.get(False, []), grouped_names.get(True, [])
         del grouped_names
 
         n_names = len(names)
