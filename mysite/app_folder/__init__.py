@@ -1,15 +1,18 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_debugtoolbar import DebugToolbarExtension
 from app_folder.site_config import Config, FConfig
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-
 toolbar = DebugToolbarExtension()
 moment = Moment()
 db = SQLAlchemy()
 migrate = Migrate()
+
+
+def server_error_page(e):
+    return render_template("500.html"), 500
 
 
 def create_app(config_class=Config):
@@ -37,4 +40,5 @@ def create_app(config_class=Config):
     def static_version():
         return {'static_version': FConfig.STATIC_VERSION_ID}
 
+    app_run.register_error_handler(500, server_error_page)
     return app_run
