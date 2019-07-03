@@ -91,12 +91,12 @@ class NameSearch(object):
         del known_names, unknown_names
 
         trial_means = self.trial_names(name_data, n_name_samples)
+
+        m1, m3 = stats.t(*stats.t.fit(trial_means, f0=trial_means.size)).interval(self.sample_confidence)
+
         trial_mu = trial_means.mean()
-        trial_std = trial_means.std(ddof=1)
+        trial_std = trial_means.std(ddof=(trial_means.size - 1))
         trial_sigma = trial_std / np.sqrt(trial_means.size)
-        m1, m3 = stats.t.interval(alpha=self.sample_confidence, df=(trial_means.size - 1), loc=trial_mu,
-                                  scale=trial_sigma)
-        m1, m3 = max([0, m1]), min([1, m3])
 
         trial_means_list = list(trial_means)
 
