@@ -44,7 +44,7 @@ class FConfig(object):
         self.FINGERPRINT_TOKENS_VEC = self.smart_path(self.RESOURCES, "fingerprint_tokens_vec.pkl")
 
         self.NAMESEARCH = self.smart_path(self.RESOURCES, "namesearch.pkl")
-        self.NAMESEARCH_V2 = self.smart_path(self.RESOURCES, "namesearch_6_11_2019.pkl")
+        self.NAMESEARCH_V2 = self.smart_path(self.RESOURCES, "namesearch_7_10_2019.pkl")
 
         self.JOB_TITLE_SYNONYMS_FP = self.smart_path(self.RESOURCES, 'my_title_synonyms.json')
         self.JOB_TITLE_SYNONYMS2_FP = self.smart_path(self.RESOURCES, 'synonym_job_titles_for_search.json')
