@@ -63,7 +63,7 @@ def infer_diversity():
     except ValueError or IndexError:
         return render_template('diversity_analysis.html', success='False', error_message="Invalid Parameters Passed")
 
-    searcher = diversity_tools.NameSearch(prior=prior, beta_interval=beta_interval)
+    searcher = diversity_tools.AppNameSearch(prior=prior, beta_interval=beta_interval)
 
     result = searcher.summarize_gender(names_list, n_name_samples=n_trials, random_seed=random_seed)
 
