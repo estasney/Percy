@@ -20,7 +20,10 @@ def stream_docs(files, data_key):
         with open(f, 'r') as json_file:
             doc = json.load(json_file)
         if data_key:
-            doc_text = doc[data_key]
+            if isinstance(data_key, str):
+                doc_text = doc[data_key]
+            elif isinstance(data_key, list):
+                doc_text = {k: v for k, v in doc.items() if k in data_key}
         else:
             doc_text = doc
         yield doc_text
