@@ -1,6 +1,8 @@
 import glob
 import os
 import json
+import re
+
 from nltk.corpus import stopwords
 from itertools import chain, combinations
 from gensim.utils import strided_windows
@@ -53,6 +55,7 @@ class SpacyTokenFilter(object):
     DEFAULT_EXCLUDED = ["is_digit", "is_punct", "is_space", "is_currency", "like_url", "like_num", "like_email"]
     STOPWORDS = set(stopwords.words("english"))
     EXTRA_STOPWORDS = ["-PRON-", "-LRB-", "-RRB-", "'s", "7/"]
+    CHAR_FILTER = "([^A-z0-9!#%\'()*+,-./:?@\[\]_~])"
 
     def __init__(self, stopwords=None, excluded_attributes=None, token_key='norm'):
         if stopwords:
@@ -71,10 +74,13 @@ class SpacyTokenFilter(object):
             self.excluded_attributes = []
 
         self.token_key = token_key
+        self.char_filter = re.compile(self.CHAR_FILTER)
 
     def filter_token(self, token):
         token_text = token.get(self.token_key, None)
         if not token_text:
+            return False
+        if not self.char_filter.sub("", token_text):  # Empty string after removing special chars
             return False
         if token_text in self.stopwords:
             return False
