@@ -373,16 +373,16 @@ if __name__ == "__main__":
     # Remove Null Records
     # Remove Non-English Records
 
-    # preprocess_csv(corpus_fp=CORPUS_FP, n_workers=N_WORKERS)
-    #
-    # # Tokenize JSON records
-    # spacify_docs(ignore_existing=False)
+    preprocess_csv(corpus_fp=CORPUS_FP, n_workers=N_WORKERS)
+
+    # Tokenize JSON records
+    spacify_docs(ignore_existing=True)
     #
     # # Train the phraser from JSON records
-    # detect_phrases(input_dir=OUTPUT2, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
-    #                common_words=STOPWORDS, min_count=10, threshold=30)
-    # make_token_dictionary()
+    detect_phrases(input_dir=OUTPUT2, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
+                   common_words=STOPWORDS, min_count=10, threshold=30)
+    make_token_dictionary()
     # make_skills_dictionary()
-    get_pmi_tokens()
+    # get_pmi_tokens()
     # get_pmi_skills()
     # get_fingerprint_tokens()
