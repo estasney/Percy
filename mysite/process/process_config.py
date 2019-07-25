@@ -40,6 +40,7 @@ class ProcessConfig(object):
         self.RESOURCES_FINGERPRINT_VEC_TOKENS = self.smart_path(self.RESOURCES, 'fingerprint_tokens_vec.pkl')
 
         self.CORPUS_FILE = self.smart_path(self.DATA_FOLDER, 'corpus', 'corpus.csv')
+        self.CORPUS_FILE_2 = self.smart_path(self.DATA_FOLDER, 'corpus', 'corpus2.csv')
 
         self.N_WORKERS = 4
 

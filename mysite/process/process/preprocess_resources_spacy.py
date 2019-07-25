@@ -18,6 +18,7 @@ import logging
 from gensim.corpora.dictionary import Dictionary
 
 from process import ProcessConfig
+from process.process.spacy_process.spacy_doc_piper import SpacyDocPiper
 from process.process.spacy_process.streaming import stream_docs, stream_skills, stream_pairs
 from process.process.spacy_process.spacy_utils import add_extra, STOPWORDS
 from process.process.spacy_process.spacy_phrases import detect_phrases, MyPhraser
@@ -77,6 +78,7 @@ def spacify_docs(output1=OUTPUT1, output2=OUTPUT2, prettify=False, ignore_existi
     print("Loading spacy model")
     nlp = en_core_web_lg.load()
     print("Model loaded in {}".format(datetime.now() - start_time))
+    piper = SpacyDocPiper(nlp=nlp, doc_keys=['summary', 'jobs'], doc_func=add_extra)
 
     # glob files
     if ignore_existing:
@@ -96,22 +98,19 @@ def spacify_docs(output1=OUTPUT1, output2=OUTPUT2, prettify=False, ignore_existi
 
     print("Found {} docs".format(len(output1_files)))
 
-    doc_stream = stream_docs(files=output1_files, data_key='summary')
-    skills_stream = stream_docs(files=output1_files, data_key='skills')
-    for i, doc in enumerate(nlp.pipe(doc_stream, batch_size=50)):  # streams in original order
-        json_doc = add_extra(doc)
-        doc_skills = next(skills_stream)
-        if doc_skills:
-            doc_skills = doc_skills.split(", ")
-        else:
-            doc_skills = []
-        json_doc['skills'] = doc_skills
+    doc_stream = stream_docs(files=output1_files, data_key=None)  # As dict
+    for i, doc in enumerate(doc_stream):
+        doc.update({'skills': doc.get('skills', "").split(", ")})
+        doc.update({'titles': doc.get('titles', "").split("<__sep__>")})
+        doc.update({'jobs': doc.get('jobs', "").split("<__sep__>")})
+        nlp_doc = piper.pipe(doc)
         out_f = os.path.join(output2, file_names[i])
         with open(out_f, 'w+') as json_file:
             if prettify:
-                json.dump(json_doc, json_file, indent=4)
+                json.dump(nlp_doc, json_file, indent=4)
             else:
-                json.dump(json_doc, json_file)
+                json.dump(nlp_doc, json_file)
+
         if i % 1000 == 0:
             elapsed = datetime.now() - start_time
             print("Now on {} after {} elapsed".format(i, elapsed))
@@ -122,9 +121,9 @@ def preprocess_csv(corpus_fp, n_workers, output1=OUTPUT1, prettify_output=False)
     print("Filtering CSV")
     df = pd.read_csv(corpus_fp)
     original_count = len(df)
-    df.dropna(subset=['summary'], inplace=True)
+    df.dropna(subset=['summary', 'jobs'], thresh=1, inplace=True)
 
-    print("Dropped {} Null Records from Summary".format(original_count - len(df)))
+    print("Dropped {} Records where Summary and Jobs is Null".format(original_count - len(df)))
     original_count = len(df)
     df.fillna("", inplace=True)
     start = datetime.now()
@@ -373,15 +372,15 @@ if __name__ == "__main__":
     # Remove Null Records
     # Remove Non-English Records
 
-    preprocess_csv(corpus_fp=CORPUS_FP, n_workers=N_WORKERS)
+    # preprocess_csv(corpus_fp=config.CORPUS_FILE_2, n_workers=N_WORKERS)
 
     # Tokenize JSON records
-    spacify_docs(ignore_existing=True)
-    #
-    # # Train the phraser from JSON records
-    detect_phrases(input_dir=OUTPUT2, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
-                   common_words=STOPWORDS, min_count=10, threshold=30)
-    make_token_dictionary()
+    spacify_docs(ignore_existing=False)
+    # #
+    # # # Train the phraser from JSON records
+    # detect_phrases(input_dir=OUTPUT2, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
+    #                common_words=STOPWORDS, min_count=10, threshold=30)
+    # make_token_dictionary()
     # make_skills_dictionary()
     # get_pmi_tokens()
     # get_pmi_skills()
