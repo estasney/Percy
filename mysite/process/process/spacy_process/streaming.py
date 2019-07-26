@@ -1,13 +1,16 @@
 import glob
-import os
 import json
+import os
 import re
-
-from nltk.corpus import stopwords
+import typing
 from itertools import chain, combinations
-from gensim.utils import strided_windows
 
-from process.process.spacy_process.spacy_utils import unpack_doc
+from gensim.utils import strided_windows
+from nltk.corpus import stopwords
+
+from process.process.spacy_process.spacy_utils import unpack_doc, flatten
+
+ls = typing.TypeVar('ls', list, str, typing.Callable)
 
 """
 
@@ -16,36 +19,56 @@ Streaming
 """
 
 
-def stream_docs(files, data_key):
+def stream_docs(files: typing.Iterable, data_key: ls):
+    """
+
+    :param files: Files to load and stream
+    :param data_key: If none, stream the entire file.
+    If string or list return the values from keys. Also supports a callable function such as tool.dicttoolz.get_in
+    :return:
+    """
+
+    if data_key:
+        if isinstance(data_key, str):
+            data_get = lambda x: x[data_key]
+        elif isinstance(data_key, list):
+            data_get = lambda x: {k: v for k, v in x.items() if k in data_key}
+        else:
+            data_get = data_key
+
     for f in files:
         with open(f, 'r') as json_file:
             doc = json.load(json_file)
-        if data_key:
-            if isinstance(data_key, str):
-                doc_text = doc[data_key]
-            elif isinstance(data_key, list):
-                doc_text = {k: v for k, v in doc.items() if k in data_key}
-        else:
-            doc_text = doc
+        doc_text = data_get(doc)
         yield doc_text
 
 
-def prefilter_doc(doc):
-    doc = unpack_doc(doc)
-    doc['jobs'] = list(filter(lambda x: x, doc['jobs']))
-    return doc
+class DataKeyMixin(object):
+
+    def __init__(self, data_key: ls):
+        if isinstance(data_key, str):
+            data_get = lambda x: x[data_key]
+
+        elif isinstance(data_key, list):
+            data_get = lambda x: {k: v for k, v in x.items() if k in data_key}
+
+        else:
+            data_get = data_key
+
+        self.data_get = data_get
 
 
-class DocStreamer(object):
+class DocStreamer(DataKeyMixin):
 
-    def __init__(self, d, text_key='token_summary'):
+    def __init__(self, d, data_key):
+        super().__init__(data_key)
         self.dir = d
         self.files = glob.glob(os.path.join(self.dir, "*.json"))
-        self.text_key = text_key
 
     def load_json_(self, f):
         with open(f, 'r') as json_file:
-            return json.load(json_file)[self.text_key]
+            doc = json.load(json_file)
+        return self.data_get(doc)
 
     def __getitem__(self, i):
         file = self.files[i]
@@ -55,9 +78,11 @@ class DocStreamer(object):
     def __iter__(self):
         for file in self.files:
             doc = self.load_json_(file)
-            for sentence in doc:
-                if sentence:
-                    yield sentence
+            if isinstance(doc, str):
+                yield doc
+            else:
+                for d in flatten(doc):
+                    yield d
 
 
 class SpacyTokenFilter(object):
@@ -98,22 +123,25 @@ class SpacyTokenFilter(object):
         return True
 
 
-class SpacyReader(object):
+class SpacyReader(DataKeyMixin):
     """
-    :param text_keys: iterable, will yield from these key(s)
+    :param folder: directory for which to scan for files
+    :param data_key
+    :param
     """
 
-    def __init__(self, folder, text_keys, token_filter=SpacyTokenFilter(), token_key='norm'):
+    def __init__(self, folder, data_key: ls, token_filter=SpacyTokenFilter(), token_key='norm'):
+        super().__init__(data_key)
         self.folder = folder
         self.files = glob.glob(os.path.join(self.folder, "*.json"))
-        self.text_keys = text_keys
         self.token_filter = token_filter
         self.token_key = token_key
         self.phraser = None
 
     def load_json_(self, f):
         with open(f, 'r') as json_file:
-            return json.load(json_file)
+            doc = json.load(json_file)
+        return self.data_get(doc)
 
     def filter_tokens_(self, doc):
         tokens = list(filter(self.token_filter.filter_token, doc))
@@ -121,25 +149,19 @@ class SpacyReader(object):
 
     def as_sentences(self):
         for f in self.files:
-            doc = self.load_json_(f)
-            for k in self.text_keys:
-                doc_text = doc[k]
-                tokens = doc[k]
-                for sent in tokens:
-                    sent_tokens = self.filter_tokens_(sent)
-                    sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
-                    sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
-                    if not sent_tokens:
-                        continue
-                    yield sent_tokens
+            doc = flatten(self.load_json_(f))
+            for component in doc:
+                sent_tokens = self.filter_tokens_(component)
+                sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
+                sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
+                if not sent_tokens:
+                    continue
+                yield sent_tokens
 
     def as_documents(self):
         for f in self.files:
-            doc = self.load_json_(f)
-
-            sent_tokens = doc[self.text_keys]
-            doc_tokens = list(chain.from_iterable(sent_tokens))
-            doc_tokens = self.filter_tokens_(doc_tokens)
+            doc = flatten(self.load_json_(f))
+            doc_tokens = self.filter_tokens_(doc)
             doc_tokens = [t.get(self.token_key, None) for t in doc_tokens]
             doc_tokens = list(filter(lambda x: x is not None, doc_tokens))
             yield doc_tokens
@@ -150,9 +172,8 @@ class SpacyReader(object):
         setattr(self, 'phraser', phraser)
 
         for f in self.files:
-            doc = self.load_json_(f)
-            tokens = doc[self.text_keys]
-            for sent in tokens:
+            doc = flatten(self.load_json_(f))
+            for sent in doc:
                 sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
                 sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
@@ -161,23 +182,22 @@ class SpacyReader(object):
                 sent_tokens = self.phraser[sent_tokens]
                 yield sent_tokens
 
-    def as_phrased_documents(self, phraser, flatten=False):
+    def as_phrased_documents(self, phraser, flatten_doc=False):
         if self.phraser:
             setattr(self, 'phraser', None)
         setattr(self, 'phraser', phraser)
 
         for f in self.files:
-            doc = self.load_json_(f)
-            tokens = doc[self.text_keys]
+            doc = flatten(self.load_json_(f)) if flatten_doc else self.load_json_()
             doc_output = []
-            for sent in tokens:
+            for sent in doc:
                 sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
                 sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
                 if not sent_tokens:
                     continue
                 sent_tokens = self.phraser[sent_tokens]
-                if flatten:
+                if flatten_doc:
                     doc_output.extend(sent_tokens)
                 else:
                     doc_output.append(sent_tokens)
@@ -185,10 +205,8 @@ class SpacyReader(object):
 
     def __getitem__(self, item):
         file = self.files[item]
-        doc = self.load_json_(file)
-        sent_tokens = doc[self.text_keys]
-        doc_tokens = list(chain.from_iterable(sent_tokens))
-        doc_tokens = self.filter_tokens_(doc_tokens)
+        doc = flatten(self.load_json_(file))
+        doc_tokens = self.filter_tokens_(doc)
         doc_tokens = [t.get(self.token_key, None) for t in doc_tokens]
         doc_tokens = list(filter(lambda x: x is not None, doc_tokens))
         return doc_tokens
@@ -196,9 +214,8 @@ class SpacyReader(object):
     def __iter__(self):
 
         for f in self.files:
-            doc = self.load_json_(f)
-            sent_tokens = doc[self.text_keys]
-            for sent in sent_tokens:
+            doc = flatten(self.load_json_(f))
+            for sent in doc:
                 sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
                 sent_tokens = list(filter(lambda x: x is not None, sent_tokens))

@@ -4,7 +4,7 @@ from datetime import datetime
 import numpy as np
 import multiprocessing
 from functools import partial
-from collections import namedtuple
+from collections import namedtuple, Iterable
 import json
 from nltk.corpus import stopwords
 
@@ -173,3 +173,37 @@ def unpack_doc(doc):
     doc['titles'] = doc.get('titles', "").split("<__sep__>")
     doc['jobs'] = doc.get('jobs', "").split("<__sep__>")
     return doc
+
+
+def lazy_flatten(nested_list):
+    """Lazy version of :func:`~gensim.utils.flatten`.
+    Parameters
+    ----------
+    nested_list : list
+        Possibly nested list.
+    Yields
+    ------
+    object
+        Element of list
+    """
+    for el in nested_list:
+        if isinstance(el, Iterable) and not isinstance(el, str):
+            for sub in flatten(el):
+                yield sub
+        else:
+            yield el
+
+
+def flatten(nested_list):
+    """Recursively flatten a nested sequence of elements.
+    Parameters
+    ----------
+    nested_list : iterable
+        Possibly nested sequence of elements to flatten.
+    Returns
+    -------
+    list
+        Flattened version of `nested_list` where any elements that are an iterable (`collections.Iterable`)
+        have been unpacked into the top-level list, in a recursive fashion.
+    """
+    return list(lazy_flatten(nested_list))

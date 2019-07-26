@@ -1,9 +1,11 @@
-import json
-import glob
-import os
-import re
-import tempfile
+import itertools
+import sys
 
+sys.path.append(r"C:\Users\estasney\PycharmProjects\Percy\mysite")
+sys.path.append(r"C:\Users\estasney\PycharmProjects\Percy")
+
+import json
+import os
 import pandas as pd
 import numpy as np
 import pickle
@@ -21,9 +23,9 @@ import logging
 from gensim.corpora.dictionary import Dictionary
 
 from process import ProcessConfig
-from process.process.spacy_process.spacy_doc_piper import SpacyDocPiper
-from process.process.spacy_process.streaming import stream_docs, stream_skills, stream_pairs
-from process.process.spacy_process.spacy_utils import add_extra, STOPWORDS
+from process.process.spacy_process.streaming import (stream_docs, stream_skills, stream_pairs, stream_doc_summaries,
+                                                     stream_doc_jobs, stream_unpacked_docs)
+from process.process.spacy_process.spacy_utils import STOPWORDS, get_spacy_target_files, add_extra
 from process.process.spacy_process.spacy_phrases import detect_phrases, MyPhraser
 from process.process.spacy_process.lang import (lang_detect, lookup_language_detection, apply_by_multiprocessing,
                                                 store_language_detection)
@@ -47,7 +49,7 @@ MAX_WORD_RATIO = 0.9
 MIN_SKILL_COUNT = 25
 MAX_SKILL_RATIO = 0.9
 
-WINDOW_SIZE = 3
+WINDOW_SIZE = 5
 
 WORD_VEC_SIZE = 200
 SKILL_VEC_SIZE = 100
@@ -67,12 +69,14 @@ def time_this(func):
 
 
 @time_this
-def spacify_docs(output1=OUTPUT1, output2=OUTPUT2, prettify=False, ignore_existing=False):
+def spacify_docs(output1=OUTPUT1, output2=OUTPUT2, prettify=False, ignore_existing=False, max_files=None):
     """
 
     :param output1: From output1 to output2
     :param output2:
     :param prettify: Indent JSON Files
+    :param ignore_existing: Bool, if true exclude files found in output2
+    :param max_files: Int, if none process all files. If int, process up to this number
     :return:
     """
 
@@ -81,142 +85,81 @@ def spacify_docs(output1=OUTPUT1, output2=OUTPUT2, prettify=False, ignore_existi
     nlp = en_core_web_lg.load()
     print("Model loaded in {}".format(datetime.now() - start_time))
 
-    if prettify:
-        write_to_json = lambda x, y: json.dump(x, y, indent=4)
-    else:
-        write_to_json = lambda x, y: json.dump(x, y)
-
-    # glob files
-    if ignore_existing:
-        new_files = []
-        output1_files = glob.glob(os.path.join(output1, "*.json"))
-        for file in output1_files:
-            file_name = os.path.basename(file)
-            output2_file_path = os.path.join(output2, file_name)
-            if not os.path.isfile(output2_file_path):
-                new_files.append(file)
-        output1_files = new_files
-    else:
-        output1_files = glob.glob(os.path.join(output1, "*.json"))
-
-    # keep reference to member_ids from file names
-    file_names = [os.path.basename(x) for x in output1_files]
-
+    output1_files = get_spacy_target_files(ignore_existing, output1, output2)
     print("Found {} docs".format(len(output1_files)))
+    if max_files:
+        output1_files = output1_files[:max_files]
+    print("Processing {} docs".format(len(output1_files)))
 
-    # Stream components by flattening and rejoining later
-    doc_summary_stream = stream_docs(files=output1_files, data_key='summary')
-    doc_job_stream_raw = stream_docs(files=output1_files, data_key='jobs')
+    spacify_summaries(nlp, output1_files, output2, prettify)
+    spacify_jobs(nlp, output1_files, output2, prettify)
 
-    jobidx = []
 
-    def stream_jobs(job_stream):
-        for i, job in enumerate(job_stream):
-            doc_id = file_names[i]
-            doc_name, ext = os.path.splitext(doc_id)
-            jobs = job.split("<__sep__>")
-            jobs = list(filter(lambda x: x, jobs))
-            for i, j in enumerate(jobs):
-                fp = "{}_{}".format(doc_name, i)
-                jobidx.append(fp)
-                yield j
+@time_this
+def spacify_jobs(nlp, output1_files, output2, prettify, cache_size=1000):
+    @time_this
+    def append_jobs(cache, output_folder, prettify):  # Find or make files and add jobs
+        for doc_id, jobs in cache.items():
+            doc_fp = os.path.join(output_folder, "{}.json".format(doc_id))
+            if os.path.isfile(doc_fp):
+                with open(doc_fp, "r") as json_file:
+                    doc_data = json.load(json_file)
+            else:
+                doc_data = {'member_id': doc_id, 'jobs': []}
+            doc_data_jobs = doc_data.get('jobs', [])
+            doc_data_jobs.extend(jobs)
+            doc_data['jobs'] = doc_data_jobs
+            with open(doc_fp, "w") as json_file:
+                if prettify:
+                    json.dump(doc_data, json_file, indent=4)
+                else:
+                    json.dump(doc_data, json_file)
 
-    doc_job_stream = stream_jobs(doc_job_stream_raw)
+    doc_stream = stream_docs(files=output1_files, data_key=None)
+    job_stream = stream_doc_jobs(doc_stream)
+    job_cache = {}
+    for nlp_doc, doc_id in nlp.pipe(job_stream, batch_size=50, as_tuples=True):
+        doc_not_cached = doc_id not in job_cache
+        if doc_not_cached and len(job_cache) >= cache_size:
+            append_jobs(job_cache, output_folder=output2, prettify=prettify)
+            job_cache = {}
+        doc_jobs = job_cache.get(doc_id, [])
+        nlp_doc_json = add_extra(nlp_doc)
+        doc_jobs.append(nlp_doc_json)
+        job_cache[doc_id] = doc_jobs
 
-    # make a temp folder
-    summary_temp = tempfile.TemporaryDirectory()
-    summary_temp_path = summary_temp.name
+    append_jobs(job_cache, output_folder=output2, prettify=prettify)
 
+
+@time_this
+def spacify_summaries(nlp, output1_files, output2, prettify):
+    doc_stream = stream_docs(files=output1_files, data_key=None)  # As dict
+    doc_stream_unpacked = stream_unpacked_docs(doc_stream)
+
+    # Want to keep additional data from doc
+    data_stream, nlp_stream = itertools.tee(doc_stream_unpacked, 2)
+    summary_stream = stream_doc_summaries(nlp_stream)
     timings = []
-
-    for i, summary in enumerate(nlp.pipe(doc_summary_stream, batch_size=50)):
+    counter = 0
+    for nlp_doc, doc_id in nlp.pipe(summary_stream, batch_size=50, as_tuples=True):
         start_time = datetime.now()
-        summary = add_extra(summary)
-        out_f = os.path.join(summary_temp_path, file_names[i])
-        with open(out_f, 'w+') as y:
-            write_to_json(summary, y)
-        elapsed = (datetime.now() - start_time).total_seconds()
-        timings.append(elapsed)
-
-        if i % 1000 == 0 and i > 0:
-            step_mean = np.array(timings).mean()
-            timings = []
-            print("Step {} of Summaries, Avg {} per step".format(i, step_mean))
-
-    job_temp = tempfile.TemporaryDirectory()
-    job_temp_path = job_temp.name
-
-    timings = []
-
-    for i, job in enumerate(nlp.pipe(doc_job_stream, batch_size=50)):
-        start_time = datetime.now()
-        job = add_extra(job)
-        filename = jobidx[i] + ".json"
-        out_f = os.path.join(job_temp_path, filename)
-        with open(out_f, 'w+') as y:
-            write_to_json(job, y)
-
-        elapsed = (datetime.now() - start_time).total_seconds()
-        timings.append(elapsed)
-
-        if i % 1000 == 0 and i > 0:
-            step_mean = np.array(timings).mean()
-            timings = []
-            print("Step {} of Jobs, Avg {} per step".format(i, step_mean))
-
-    doc_stream = stream_docs(output1_files, data_key=None)
-
-    job_sort = re.compile(r"(?<=_)([0-9]+)")
-
-    def sort_jobs(fps):
-        fps = sorted(fps, key=lambda x: int(job_sort.search(x).group()))
-        return fps
-
-    timings = []
-
-    for i, doc in enumerate(doc_stream):
-        start_time = datetime.now()
-        doc.update({'skills': doc.get('skills', "").split(", ")})
-        doc.update({'titles': doc.get('titles', "").split("<__sep__>")})
-        # Remove and add from tempfiles
-        del doc['summary']
-        del doc['jobs']
-
-        doc_id = file_names[i]
-        # get the summary
-        summary_fp = os.path.join(summary_temp_path, doc_id)
-        with open(summary_fp, "r") as f:
-            summary = json.load(f)
-        doc['summary'] = summary
-
-        # get the jobs
-        doc_id, _ = os.path.splitext(doc_id)
-        job_fp_pattern = "{}_*.json".format(doc_id)
-        job_full_path = os.path.join(job_temp_path, job_fp_pattern)
-        job_files = glob.glob(job_full_path)
-        job_files = sort_jobs(job_files)
-
-        job_holder = []
-        for jf in job_files:
-            with open(jf, 'r') as f:
-                j = json.load(f)
-                job_holder.append(j)
-
-        doc['jobs'] = job_holder
-        out_f = os.path.join(output2, file_names[i])
+        nlp_doc_json = add_extra(nlp_doc)
+        doc_data = data_stream.__next__()
+        doc_data['summary'] = nlp_doc_json
+        out_f = os.path.join(output2, "{}.json".format(doc_id))
         with open(out_f, 'w+') as json_file:
             if prettify:
-                json.dump(doc, json_file, indent=4)
+                json.dump(doc_data, json_file, indent=4)
             else:
-                json.dump(doc, json_file)
-
+                json.dump(doc_data, json_file)
         elapsed = (datetime.now() - start_time).total_seconds()
         timings.append(elapsed)
-
-        if i % 1000 == 0 and i > 0:
+        counter += 1
+        if counter % 1000 == 0 and counter > 0:
             step_mean = np.array(timings).mean()
+            del timings
             timings = []
-            print("Step {} of Merging, Avg {} per step".format(i, step_mean))
+            print("Now on step {}, Avg {} per step".format(counter, step_mean))
 
 
 @time_this
@@ -262,7 +205,7 @@ def preprocess_csv(corpus_fp, n_workers, output1=OUTPUT1, prettify_output=False)
 
 @time_this
 def make_token_dictionary(folder=OUTPUT2):
-    doc_reader = SpacyReader(folder=folder, text_key="tokens")
+    doc_reader = SpacyReader(folder=folder, text_keys="tokens")
     doc_phraser = MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
@@ -293,7 +236,7 @@ def make_skills_dictionary(folder=OUTPUT2):
 
 @time_this
 def get_token_counts(folder, dictionary_fp=config.RESOURCES_DICTIONARY_TOKENS):
-    doc_reader = SpacyReader(folder=folder, text_key="tokens")
+    doc_reader = SpacyReader(folder=folder, text_keys="tokens")
     doc_phraser = MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
     dictionary = Dictionary.load(dictionary_fp)
@@ -349,7 +292,7 @@ def get_skill_probabilities(folder=OUTPUT2):
 
 @time_this
 def get_token_pair_probabilities(folder=OUTPUT2):
-    doc_reader = SpacyReader(folder=folder, text_key="tokens")
+    doc_reader = SpacyReader(folder=folder, text_keys="tokens")
     doc_phraser = MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
     dictionary = Dictionary.load(config.RESOURCES_DICTIONARY_TOKENS)
@@ -444,7 +387,7 @@ def get_pmi_skills():
 @time_this
 def get_fingerprint_tokens(folder=OUTPUT2):
     cnt = TfidfVectorizer(use_idf=True, sublinear_tf=True)
-    doc_reader = SpacyReader(folder=folder, text_key="tokens")
+    doc_reader = SpacyReader(folder=folder, text_keys="tokens")
     doc_phraser = MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
 
@@ -471,9 +414,9 @@ if __name__ == "__main__":
     # Remove Non-English Records
 
     # preprocess_csv(corpus_fp=config.CORPUS_FILE_2, n_workers=N_WORKERS)
-
-    # Tokenize JSON records
-    spacify_docs(ignore_existing=False, prettify=False)
+    #
+    # # Tokenize JSON records
+    spacify_docs(ignore_existing=False)
     # #
     # # # Train the phraser from JSON records
     # detect_phrases(input_dir=OUTPUT2, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
