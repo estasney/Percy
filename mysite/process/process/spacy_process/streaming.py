@@ -7,6 +7,7 @@ from nltk.corpus import stopwords
 from itertools import chain, combinations
 from gensim.utils import strided_windows
 
+from process.process.spacy_process.spacy_utils import unpack_doc
 
 """
 
@@ -27,6 +28,12 @@ def stream_docs(files, data_key):
         else:
             doc_text = doc
         yield doc_text
+
+
+def prefilter_doc(doc):
+    doc = unpack_doc(doc)
+    doc['jobs'] = list(filter(lambda x: x, doc['jobs']))
+    return doc
 
 
 class DocStreamer(object):
@@ -54,7 +61,6 @@ class DocStreamer(object):
 
 
 class SpacyTokenFilter(object):
-
     DEFAULT_EXCLUDED = ["is_digit", "is_punct", "is_space", "is_currency", "like_url", "like_num", "like_email"]
     STOPWORDS = set(stopwords.words("english"))
     EXTRA_STOPWORDS = ["-PRON-", "-LRB-", "-RRB-", "'s", "7/"]
@@ -93,10 +99,14 @@ class SpacyTokenFilter(object):
 
 
 class SpacyReader(object):
-    def __init__(self, folder, text_key, token_filter=SpacyTokenFilter(), token_key='norm'):
+    """
+    :param text_keys: iterable, will yield from these key(s)
+    """
+
+    def __init__(self, folder, text_keys, token_filter=SpacyTokenFilter(), token_key='norm'):
         self.folder = folder
         self.files = glob.glob(os.path.join(self.folder, "*.json"))
-        self.text_key = text_key
+        self.text_keys = text_keys
         self.token_filter = token_filter
         self.token_key = token_key
         self.phraser = None
@@ -112,19 +122,22 @@ class SpacyReader(object):
     def as_sentences(self):
         for f in self.files:
             doc = self.load_json_(f)
-            tokens = doc[self.text_key]
-            for sent in tokens:
-                sent_tokens = self.filter_tokens_(sent)
-                sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
-                sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
-                if not sent_tokens:
-                    continue
-                yield sent_tokens
+            for k in self.text_keys:
+                doc_text = doc[k]
+                tokens = doc[k]
+                for sent in tokens:
+                    sent_tokens = self.filter_tokens_(sent)
+                    sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
+                    sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
+                    if not sent_tokens:
+                        continue
+                    yield sent_tokens
 
     def as_documents(self):
         for f in self.files:
             doc = self.load_json_(f)
-            sent_tokens = doc[self.text_key]
+
+            sent_tokens = doc[self.text_keys]
             doc_tokens = list(chain.from_iterable(sent_tokens))
             doc_tokens = self.filter_tokens_(doc_tokens)
             doc_tokens = [t.get(self.token_key, None) for t in doc_tokens]
@@ -138,7 +151,7 @@ class SpacyReader(object):
 
         for f in self.files:
             doc = self.load_json_(f)
-            tokens = doc[self.text_key]
+            tokens = doc[self.text_keys]
             for sent in tokens:
                 sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
@@ -155,7 +168,7 @@ class SpacyReader(object):
 
         for f in self.files:
             doc = self.load_json_(f)
-            tokens = doc[self.text_key]
+            tokens = doc[self.text_keys]
             doc_output = []
             for sent in tokens:
                 sent_tokens = self.filter_tokens_(sent)
@@ -173,7 +186,7 @@ class SpacyReader(object):
     def __getitem__(self, item):
         file = self.files[item]
         doc = self.load_json_(file)
-        sent_tokens = doc[self.text_key]
+        sent_tokens = doc[self.text_keys]
         doc_tokens = list(chain.from_iterable(sent_tokens))
         doc_tokens = self.filter_tokens_(doc_tokens)
         doc_tokens = [t.get(self.token_key, None) for t in doc_tokens]
@@ -184,7 +197,7 @@ class SpacyReader(object):
 
         for f in self.files:
             doc = self.load_json_(f)
-            sent_tokens = doc[self.text_key]
+            sent_tokens = doc[self.text_keys]
             for sent in sent_tokens:
                 sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
@@ -206,7 +219,7 @@ class SpacyBowReader(SpacyReader):
     def __iter__(self):
         for f in self.files:
             doc = self.load_json_(f)
-            tokens = doc[self.text_key]
+            tokens = doc[self.text_keys]
             doc_output = []
             for sent in tokens:
                 sent_tokens = self.filter_tokens_(sent)
@@ -218,10 +231,6 @@ class SpacyBowReader(SpacyReader):
                 bow_tokens = self.dictionary.doc2bow(sent_tokens)
                 doc_output.extend(bow_tokens)
             yield doc_output
-
-
-
-
 
 
 def stream_skills(folder):
@@ -274,3 +283,31 @@ def stream_ngrams(fp, model, layers=1, text_key='token_summary'):
             if s:
                 doc = phrase_many(s, model, layers)
                 yield doc
+
+
+def stream_unpacked_docs(stream):
+    for doc in stream:
+        doc = unpack_doc(doc)
+        yield doc
+
+
+def stream_doc_summaries(stream):
+    for doc in stream:
+        doc_id = doc['member_id']
+        doc_summary = doc['summary']
+        if doc_summary:
+            yield doc_summary, doc_id
+        else:
+            yield "", doc_id
+
+
+def stream_doc_jobs(stream):
+    for doc in stream:
+        doc = unpack_doc(doc)
+        doc_id = doc['member_id']
+        doc_jobs = doc['jobs']
+        if not doc_jobs:
+            continue
+        for job in doc_jobs:
+            if job:
+                yield job, doc_id

@@ -49,7 +49,7 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
         1 - bigrams
         2 - trigrams, etc
     """
-    streamer = SpacyReader(folder=input_dir, text_key="tokens",
+    streamer = SpacyReader(folder=input_dir, text_keys="tokens",
                            token_filter=SpacyTokenFilter(stopwords=False, excluded_attributes=False))
 
     phrases = Phrases(streamer, common_terms=common_words, min_count=min_count, threshold=threshold)
@@ -81,7 +81,8 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
     current_layer = 0
     while current_layer <= max_layers:
         layer_start_time = datetime.now()
-        ngrams_stream = stream_ngrams(folder=input_dir, text_key=streamer.text_key, model=phrases, layers=current_layer)
+        ngrams_stream = stream_ngrams(folder=input_dir, text_key=streamer.text_keys, model=phrases,
+                                      layers=current_layer)
         ngrams_export = phrases.export_phrases(ngrams_stream)
         phrase_counts.update(ngrams_export)
         print("Finished export of layer {} in {}".format(current_layer, (datetime.now() - layer_start_time)))
@@ -104,7 +105,7 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
 
 
 def stream_ngrams(folder, text_key, model, layers=1):
-    reader = SpacyReader(folder=folder, text_key=text_key,
+    reader = SpacyReader(folder=folder, text_keys=text_key,
                          token_filter=SpacyTokenFilter(stopwords=False, excluded_attributes=False))
 
     def phrase_once(doc, model):

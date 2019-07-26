@@ -1,3 +1,5 @@
+import glob
+import os
 from datetime import datetime
 import numpy as np
 import multiprocessing
@@ -9,7 +11,6 @@ from nltk.corpus import stopwords
 STOPWORDS = set(stopwords.words("english"))
 
 Pattern = namedtuple('Pattern', 'pattern action default')
-
 
 EXCLUDED_TAGS = ['is_punct', 'is_left_punct', 'is_right_punct', 'is_space', 'is_bracket',
                  'is_quote', 'is_currency', 'like_url', 'like_email', 'is_stop']
@@ -38,7 +39,6 @@ def stream_docs(files, data_key):
 
 
 def process_phrase_tokens(target_files, phraser, n_jobs=2):
-
     file_subsets = np.array_split(target_files, n_jobs)
     target_function = partial(process_phrase_tokens_worker, phraser=phraser)
     start_time = datetime.now()
@@ -54,14 +54,13 @@ def process_phrase_tokens_worker(file_subset, phraser):
         try:
             doc['phrases'] = phrase_tokens(doc['tokens'], phraser)
             with open(fp, 'w+') as json_file:
-                    json.dump(doc, json_file, indent=4)
+                json.dump(doc, json_file, indent=4)
         except Exception as e:
             print("Bad file : {}".format(fp))
             print(e)
 
 
 def phrase_tokens(tokens, phraser):
-
     """
     Accept a list of token data
     Acts as facade to phraser by presenting only strings
@@ -100,7 +99,7 @@ def phrase_tokens(tokens, phraser):
         else:
             # we now need to grab multiple tokens
             phrased_len = len(token.split("_"))
-            output = original_tokens[index:(index+phrased_len)]
+            output = original_tokens[index:(index + phrased_len)]
             # update the index so the respective lists are aligned
             index += phrased_len
             # make a minimal shim for the phrase
@@ -152,3 +151,25 @@ def add_extra(d):
     sent_tokens = segment_sentences(json_data['tokens'], json_data['sents'])
     json_data['tokens'] = sent_tokens
     return json_data
+
+
+def get_spacy_target_files(ignore_existing, output1, output2):
+    if ignore_existing:
+        new_files = []
+        output1_files = glob.glob(os.path.join(output1, "*.json"))
+        for file in output1_files:
+            file_name = os.path.basename(file)
+            output2_file_path = os.path.join(output2, file_name)
+            if not os.path.isfile(output2_file_path):
+                new_files.append(file)
+        output1_files = new_files
+    else:
+        output1_files = glob.glob(os.path.join(output1, "*.json"))
+    return output1_files
+
+
+def unpack_doc(doc):
+    doc['skills'] = doc.get('skills', "").split(", ")
+    doc['titles'] = doc.get('titles', "").split("<__sep__>")
+    doc['jobs'] = doc.get('jobs', "").split("<__sep__>")
+    return doc
