@@ -22,35 +22,22 @@ import logging
 
 from gensim.corpora.dictionary import Dictionary
 
-from process import ProcessConfig
-from process.process.spacy_process.streaming import (stream_docs, stream_skills, stream_pairs, stream_doc_summaries,
-                                                     stream_doc_jobs, stream_unpacked_docs)
-from process.process.spacy_process.spacy_utils import STOPWORDS, get_spacy_target_files, add_extra
-from process.process.spacy_process.spacy_phrases import detect_phrases, MyPhraser
-from process.process.spacy_process.lang import (lang_detect, lookup_language_detection, apply_by_multiprocessing,
-                                                store_language_detection)
-from process.process.spacy_process.streaming import SpacyReader
+from nlp_process import ProcessConfig
+from nlp_process.spacy_process.streaming import (stream_docs, stream_skills, stream_pairs, stream_doc_summaries,
+                                                 stream_doc_jobs, stream_unpacked_docs)
+from nlp_process.spacy_process import STOPWORDS, get_spacy_target_files, add_extra
+import nlp_process.spacy_process.spacy_phrases
+from nlp_process.spacy_process.lang import (lang_detect, lookup_language_detection, apply_by_multiprocessing,
+                                            store_language_detection)
+from nlp_process.spacy_process.streaming import SpacyReader
 
 config = ProcessConfig()
 
-OUTPUT1 = config.OUTPUT1
-OUTPUT2 = config.OUTPUT2
-
-LANG_FILE = config.LANGUAGE_ID
-
-PHRASE_MODEL_FP = config.PHRASE_MODEL
-PHRASE_DUMP_FP = config.PHRASE_DUMP
-CORPUS_FP = config.CORPUS_FILE
-N_WORKERS = config.N_WORKERS
-
 MIN_WORD_COUNT = 20
 MAX_WORD_RATIO = 0.9
-
 MIN_SKILL_COUNT = 25
 MAX_SKILL_RATIO = 0.9
-
 WINDOW_SIZE = 5
-
 WORD_VEC_SIZE = 200
 SKILL_VEC_SIZE = 100
 
@@ -69,7 +56,7 @@ def time_this(func):
 
 
 @time_this
-def spacify_docs(output1=OUTPUT1, output2=OUTPUT2, prettify=False, ignore_existing=False, max_files=None):
+def spacify_docs(output1=config.OUTPUT1, output2=config.OUTPUT2, prettify=False, ignore_existing=False, max_files=None):
     """
 
     :param output1: From output1 to output2
@@ -107,6 +94,7 @@ def spacify_jobs(nlp, output1_files, output2, prettify, cache_size=1000):
             else:
                 doc_data = {'member_id': doc_id, 'jobs': []}
             doc_data_jobs = doc_data.get('jobs', [])
+            doc_data_jobs = list(filter(lambda x: isinstance(x, str) is False, doc_data_jobs))
             doc_data_jobs.extend(jobs)
             doc_data['jobs'] = doc_data_jobs
             with open(doc_fp, "w") as json_file:
@@ -163,7 +151,7 @@ def spacify_summaries(nlp, output1_files, output2, prettify):
 
 
 @time_this
-def preprocess_csv(corpus_fp, n_workers, output1=OUTPUT1, prettify_output=False):
+def preprocess_csv(corpus_fp, n_workers, output1=config.OUTPUT1, prettify_output=False):
     print("Filtering CSV")
     df = pd.read_csv(corpus_fp)
     original_count = len(df)
@@ -177,13 +165,13 @@ def preprocess_csv(corpus_fp, n_workers, output1=OUTPUT1, prettify_output=False)
     print("Starting Language Detection")
 
     # merge in lookups if they exist
-    df = lookup_language_detection(df, LANG_FILE)
+    df = lookup_language_detection(df, config.LANGUAGE_ID)
     df['lang'] = apply_by_multiprocessing(df, lang_detect, axis=1, workers=n_workers)
     elapsed = datetime.now() - start
     print("Finished Language Detection in {}".format(elapsed))
 
     # dump a list of languages detected
-    store_language_detection(df, LANG_FILE)
+    store_language_detection(df, config.LANGUAGE_ID)
     df = df.loc[df['lang'] == 'en']
     print("Corpus loaded with {} records".format(original_count))
     print("Dropping {} non english records".format(original_count - len(df)))
@@ -206,7 +194,7 @@ def preprocess_csv(corpus_fp, n_workers, output1=OUTPUT1, prettify_output=False)
 @time_this
 def make_token_dictionary(folder=OUTPUT2):
     doc_reader = SpacyReader(folder=folder, text_keys="tokens")
-    doc_phraser = MyPhraser()
+    doc_phraser = nlp_process.spacy_process.spacy_phrases.MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     dictionary = Dictionary(doc_stream)
@@ -237,7 +225,7 @@ def make_skills_dictionary(folder=OUTPUT2):
 @time_this
 def get_token_counts(folder, dictionary_fp=config.RESOURCES_DICTIONARY_TOKENS):
     doc_reader = SpacyReader(folder=folder, text_keys="tokens")
-    doc_phraser = MyPhraser()
+    doc_phraser = nlp_process.spacy_process.spacy_phrases.MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
     dictionary = Dictionary.load(dictionary_fp)
     bow = (dictionary.doc2idx(x) for x in doc_stream)
@@ -293,7 +281,7 @@ def get_skill_probabilities(folder=OUTPUT2):
 @time_this
 def get_token_pair_probabilities(folder=OUTPUT2):
     doc_reader = SpacyReader(folder=folder, text_keys="tokens")
-    doc_phraser = MyPhraser()
+    doc_phraser = nlp_process.spacy_process.spacy_phrases.MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
     dictionary = Dictionary.load(config.RESOURCES_DICTIONARY_TOKENS)
 
@@ -388,7 +376,7 @@ def get_pmi_skills():
 def get_fingerprint_tokens(folder=OUTPUT2):
     cnt = TfidfVectorizer(use_idf=True, sublinear_tf=True)
     doc_reader = SpacyReader(folder=folder, text_keys="tokens")
-    doc_phraser = MyPhraser()
+    doc_phraser = nlp_process.spacy_process.spacy_phrases.MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
 
     # Tfidf doesn't accept lists
@@ -416,11 +404,12 @@ if __name__ == "__main__":
     # preprocess_csv(corpus_fp=config.CORPUS_FILE_2, n_workers=N_WORKERS)
     #
     # # Tokenize JSON records
-    spacify_docs(ignore_existing=False)
+    # spacify_docs(ignore_existing=False, max_files=None)
     # #
     # # # Train the phraser from JSON records
-    # detect_phrases(input_dir=OUTPUT2, phrase_model_fp=PHRASE_MODEL_FP, phrase_dump_fp=PHRASE_DUMP_FP,
-    #                common_words=STOPWORDS, min_count=10, threshold=30)
+    nlp_process.spacy_process.spacy_phrases.detect_phrases(input_dir=OUTPUT2, phrase_model_fp=config.PHRASE_MODEL,
+                                                           phrase_dump_fp=config.PHRASE_DUMP,
+                                                           common_words=STOPWORDS, min_count=10, threshold=30)
     # make_token_dictionary()
     # make_skills_dictionary()
     # get_pmi_tokens()

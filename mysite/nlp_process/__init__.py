@@ -1,0 +1,1 @@
+from mysite.nlp_process.process_config import ProcessConfig

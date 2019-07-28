@@ -3,12 +3,12 @@ import json
 import os
 import re
 import typing
-from itertools import chain, combinations
+from itertools import combinations
 
 from gensim.utils import strided_windows
 from nltk.corpus import stopwords
 
-from process.process.spacy_process.spacy_utils import unpack_doc, flatten
+from nlp_process.spacy_process import unpack_doc, flatten
 
 ls = typing.TypeVar('ls', list, str, typing.Callable)
 
@@ -32,9 +32,11 @@ def stream_docs(files: typing.Iterable, data_key: ls):
         if isinstance(data_key, str):
             data_get = lambda x: x[data_key]
         elif isinstance(data_key, list):
-            data_get = lambda x: {k: v for k, v in x.items() if k in data_key}
+            data_get = lambda x: flatten([v for k, v in x.items() if k in data_key])
         else:
             data_get = data_key
+    else:
+        data_get = lambda x: x
 
     for f in files:
         with open(f, 'r') as json_file:
@@ -50,7 +52,7 @@ class DataKeyMixin(object):
             data_get = lambda x: x[data_key]
 
         elif isinstance(data_key, list):
-            data_get = lambda x: {k: v for k, v in x.items() if k in data_key}
+            data_get = lambda x: flatten([v for k, v in x.items() if k in data_key])
 
         else:
             data_get = data_key
@@ -78,11 +80,8 @@ class DocStreamer(DataKeyMixin):
     def __iter__(self):
         for file in self.files:
             doc = self.load_json_(file)
-            if isinstance(doc, str):
-                yield doc
-            else:
-                for d in flatten(doc):
-                    yield d
+            for d in doc:
+                yield d
 
 
 class SpacyTokenFilter(object):
@@ -131,7 +130,7 @@ class SpacyReader(DataKeyMixin):
     """
 
     def __init__(self, folder, data_key: ls, token_filter=SpacyTokenFilter(), token_key='norm'):
-        super().__init__(data_key)
+        super().__init__(data_key=data_key)
         self.folder = folder
         self.files = glob.glob(os.path.join(self.folder, "*.json"))
         self.token_filter = token_filter
@@ -149,7 +148,7 @@ class SpacyReader(DataKeyMixin):
 
     def as_sentences(self):
         for f in self.files:
-            doc = flatten(self.load_json_(f))
+            doc = self.load_json_(f)
             for component in doc:
                 sent_tokens = self.filter_tokens_(component)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
@@ -160,7 +159,7 @@ class SpacyReader(DataKeyMixin):
 
     def as_documents(self):
         for f in self.files:
-            doc = flatten(self.load_json_(f))
+            doc = self.load_json_(f)
             doc_tokens = self.filter_tokens_(doc)
             doc_tokens = [t.get(self.token_key, None) for t in doc_tokens]
             doc_tokens = list(filter(lambda x: x is not None, doc_tokens))
@@ -172,7 +171,7 @@ class SpacyReader(DataKeyMixin):
         setattr(self, 'phraser', phraser)
 
         for f in self.files:
-            doc = flatten(self.load_json_(f))
+            doc = self.load_json_(f)
             for sent in doc:
                 sent_tokens = self.filter_tokens_(sent)
                 sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
@@ -182,13 +181,13 @@ class SpacyReader(DataKeyMixin):
                 sent_tokens = self.phraser[sent_tokens]
                 yield sent_tokens
 
-    def as_phrased_documents(self, phraser, flatten_doc=False):
+    def as_phrased_documents(self, phraser):
         if self.phraser:
             setattr(self, 'phraser', None)
         setattr(self, 'phraser', phraser)
 
         for f in self.files:
-            doc = flatten(self.load_json_(f)) if flatten_doc else self.load_json_()
+            doc = self.load_json_(f)
             doc_output = []
             for sent in doc:
                 sent_tokens = self.filter_tokens_(sent)
@@ -197,15 +196,12 @@ class SpacyReader(DataKeyMixin):
                 if not sent_tokens:
                     continue
                 sent_tokens = self.phraser[sent_tokens]
-                if flatten_doc:
-                    doc_output.extend(sent_tokens)
-                else:
-                    doc_output.append(sent_tokens)
-            yield doc_output
+                doc_output.append(sent_tokens)
+            yield flatten(doc_output)
 
     def __getitem__(self, item):
         file = self.files[item]
-        doc = flatten(self.load_json_(file))
+        doc = self.load_json_(file)
         doc_tokens = self.filter_tokens_(doc)
         doc_tokens = [t.get(self.token_key, None) for t in doc_tokens]
         doc_tokens = list(filter(lambda x: x is not None, doc_tokens))
@@ -214,14 +210,15 @@ class SpacyReader(DataKeyMixin):
     def __iter__(self):
 
         for f in self.files:
-            doc = flatten(self.load_json_(f))
-            for sent in doc:
-                sent_tokens = self.filter_tokens_(sent)
-                sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
-                sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
-                if not sent_tokens:
-                    continue
-                yield sent_tokens
+            doc = self.load_json_(f)
+            for sub_doc in doc:
+                for sent in sub_doc:
+                    sent_tokens = self.filter_tokens_(sent)
+                    sent_tokens = [t.get(self.token_key, None) for t in sent_tokens]
+                    sent_tokens = list(filter(lambda x: x is not None, sent_tokens))
+                    if not sent_tokens:
+                        continue
+                    yield sent_tokens
 
 
 class SpacyBowReader(SpacyReader):

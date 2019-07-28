@@ -2,12 +2,12 @@ from collections import Counter
 import os
 import glob
 from gensim.models.phrases import Phrases, Phraser
-from process.process.utils import DocStreamer, stream_ngrams
-from process.process.words import PhraseFilter
+from nlp_process.process.utils import DocStreamer, stream_ngrams
+from nlp_process.process.words import PhraseFilter
 import easygui
 import json
 from datetime import datetime
-from process.process_config import ProcessConfig
+from nlp_process.process_config import ProcessConfig
 #
 config = ProcessConfig()
 EXCLUDED = config.PHRASE_EXCLUDED

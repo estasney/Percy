@@ -188,8 +188,12 @@ def lazy_flatten(nested_list):
     """
     for el in nested_list:
         if isinstance(el, Iterable) and not isinstance(el, str):
-            for sub in flatten(el):
-                yield sub
+            if isinstance(el, dict):
+                for sub in flatten(list(el.values())):
+                    yield sub
+            else:
+                for sub in flatten(el):
+                    yield sub
         else:
             yield el
 

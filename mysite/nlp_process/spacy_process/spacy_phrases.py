@@ -4,11 +4,13 @@ from collections import namedtuple
 from datetime import datetime
 
 import easygui
+import toolz
 from gensim.models.phrases import Phraser, Phrases
 from pampy import match, _, TAIL
 
-from mysite.process.process.spacy_process.streaming import SpacyReader, SpacyTokenFilter
-from mysite.process.process_config import ProcessConfig
+from nlp_process.spacy_process.streaming import SpacyReader, SpacyTokenFilter
+from mysite.nlp_process.process_config import ProcessConfig
+
 
 Pattern = namedtuple('Pattern', 'pattern action default')
 
@@ -49,7 +51,22 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
         1 - bigrams
         2 - trigrams, etc
     """
-    streamer = SpacyReader(folder=input_dir, text_keys="tokens",
+
+    def get_tokens(x):
+        tokens = []
+        summary_tokens = toolz.dicttoolz.get_in(['summary', 'tokens'], x, default=[])
+        if summary_tokens:
+            tokens.append(summary_tokens)
+        jobs = toolz.dicttoolz.get_in(['jobs'], x, default=[])
+        for job in jobs:
+            if job:
+                job_tokens = job.get('tokens', [])
+                if job_tokens:
+                    tokens.append(job_tokens)
+        tokens = list(filter(lambda x: x, tokens))
+        return tokens
+
+    streamer = SpacyReader(folder=input_dir, data_key=get_tokens,
                            token_filter=SpacyTokenFilter(stopwords=False, excluded_attributes=False))
 
     phrases = Phrases(streamer, common_terms=common_words, min_count=min_count, threshold=threshold)
@@ -81,7 +98,7 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
     current_layer = 0
     while current_layer <= max_layers:
         layer_start_time = datetime.now()
-        ngrams_stream = stream_ngrams(folder=input_dir, text_key=streamer.text_keys, model=phrases,
+        ngrams_stream = stream_ngrams(folder=input_dir, data_key=get_tokens, model=phrases,
                                       layers=current_layer)
         ngrams_export = phrases.export_phrases(ngrams_stream)
         phrase_counts.update(ngrams_export)
@@ -104,8 +121,8 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
             tfile.write("\n")
 
 
-def stream_ngrams(folder, text_key, model, layers=1):
-    reader = SpacyReader(folder=folder, text_keys=text_key,
+def stream_ngrams(folder, data_key, model, layers=1):
+    reader = SpacyReader(folder=folder, data_key=data_key,
                          token_filter=SpacyTokenFilter(stopwords=False, excluded_attributes=False))
 
     def phrase_once(doc, model):
