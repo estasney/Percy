@@ -1,11 +1,12 @@
 import glob
-import os
-from datetime import datetime
-import numpy as np
-import multiprocessing
-from functools import partial
-from collections import namedtuple, Iterable
 import json
+import multiprocessing
+import os
+from collections import namedtuple
+from datetime import datetime
+from functools import partial
+
+import numpy as np
 from nltk.corpus import stopwords
 
 STOPWORDS = set(stopwords.words("english"))
@@ -121,7 +122,10 @@ def add_extra(d):
     others = ['is_alpha', 'is_ascii', 'is_digit', 'is_punct', 'is_space', 'is_currency', 'like_url', 'like_num',
               'like_email']
 
+    noun_chunks = [x.lemma_ for x in list(d.noun_chunks)]
+
     json_data = d.to_json()
+    json_data['noun_chunks'] = noun_chunks
     for i, t in enumerate(d):
         token_data = json_data['tokens'][i]
         token_data.update({'lemma': t.lemma_, 'norm': t.norm_, 'text': t.text})
@@ -175,39 +179,3 @@ def unpack_doc(doc):
     return doc
 
 
-def lazy_flatten(nested_list):
-    """Lazy version of :func:`~gensim.utils.flatten`.
-    Parameters
-    ----------
-    nested_list : list
-        Possibly nested list.
-    Yields
-    ------
-    object
-        Element of list
-    """
-    for el in nested_list:
-        if isinstance(el, Iterable) and not isinstance(el, str):
-            if isinstance(el, dict):
-                for sub in flatten(list(el.values())):
-                    yield sub
-            else:
-                for sub in flatten(el):
-                    yield sub
-        else:
-            yield el
-
-
-def flatten(nested_list):
-    """Recursively flatten a nested sequence of elements.
-    Parameters
-    ----------
-    nested_list : iterable
-        Possibly nested sequence of elements to flatten.
-    Returns
-    -------
-    list
-        Flattened version of `nested_list` where any elements that are an iterable (`collections.Iterable`)
-        have been unpacked into the top-level list, in a recursive fashion.
-    """
-    return list(lazy_flatten(nested_list))

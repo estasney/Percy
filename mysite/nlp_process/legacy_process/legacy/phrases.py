@@ -2,8 +2,8 @@ from collections import Counter
 import os
 import glob
 from gensim.models.phrases import Phrases, Phraser
-from nlp_process.process.utils import DocStreamer, stream_ngrams
-from nlp_process.process.words import PhraseFilter
+from nlp_process.legacy_process.utils import DocStreamer, stream_ngrams
+from nlp_process.legacy_process.words import PhraseFilter
 import easygui
 import json
 from datetime import datetime

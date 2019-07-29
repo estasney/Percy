@@ -4,11 +4,11 @@ import sys
 from datetime import datetime
 
 import pandas as pd
-from nlp_process.process.legacy.lang import lang_detect, lookup_language_detection, apply_by_multiprocessing, \
+from nlp_process.legacy_process.legacy.lang import lang_detect, lookup_language_detection, apply_by_multiprocessing, \
     store_language_detection
 
-from nlp_process.process.legacy.process import pool_process_text, STOPWORDS
-from nlp_process.process.legacy.phrases import detect_phrases
+from nlp_process.legacy_process.legacy.process import pool_process_text, STOPWORDS
+from nlp_process.legacy_process.legacy.phrases import detect_phrases
 
 from nlp_process.process_config import ProcessConfig
 

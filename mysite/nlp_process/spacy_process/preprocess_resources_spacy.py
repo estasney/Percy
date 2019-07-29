@@ -2,15 +2,12 @@ import itertools
 import sys
 
 sys.path.append(r"C:\Users\estasney\PycharmProjects\Percy\mysite")
-sys.path.append(r"C:\Users\estasney\PycharmProjects\Percy")
-
 import json
 import os
 import pandas as pd
 import numpy as np
 import pickle
 from datetime import datetime
-from functools import wraps
 from collections import Counter
 from math import log
 from scipy.sparse import csc_matrix
@@ -23,16 +20,15 @@ import logging
 from gensim.corpora.dictionary import Dictionary
 
 from nlp_process import ProcessConfig
-from nlp_process.spacy_process.streaming import (stream_docs, stream_skills, stream_pairs, stream_doc_summaries,
-                                                 stream_doc_jobs, stream_unpacked_docs)
-from nlp_process.spacy_process import STOPWORDS, get_spacy_target_files, add_extra
-import nlp_process.spacy_process.spacy_phrases
-from nlp_process.spacy_process.lang import (lang_detect, lookup_language_detection, apply_by_multiprocessing,
-                                            store_language_detection)
-from nlp_process.spacy_process.streaming import SpacyReader
+from nlp_process.spacy_process import (stream_docs, stream_skills, stream_pairs, stream_doc_summaries,
+                                       stream_doc_jobs, stream_unpacked_docs, get_spacy_target_files, add_extra,
+                                       SpacyReader, time_this, MyPhraser, get_sub_docs)
+from nlp_process.spacy_process import (lang_detect, lookup_language_detection, apply_by_multiprocessing,
+                                       store_language_detection)
 
 config = ProcessConfig()
 
+TOKEN_KEY_TYPE = 'lemma'
 MIN_WORD_COUNT = 20
 MAX_WORD_RATIO = 0.9
 MIN_SKILL_COUNT = 25
@@ -40,19 +36,6 @@ MAX_SKILL_RATIO = 0.9
 WINDOW_SIZE = 5
 WORD_VEC_SIZE = 200
 SKILL_VEC_SIZE = 100
-
-
-def time_this(func):
-    @wraps(func)
-    def wrapped(*args, **kwargs):
-        start_time = datetime.now()
-        print("Starting {}".format(func.__name__))
-        result = func(*args, **kwargs)
-        elapsed = datetime.now() - start_time
-        print("Finished {} in {}".format(func.__name__, elapsed))
-        return result
-
-    return wrapped
 
 
 @time_this
@@ -192,9 +175,9 @@ def preprocess_csv(corpus_fp, n_workers, output1=config.OUTPUT1, prettify_output
 
 
 @time_this
-def make_token_dictionary(folder=OUTPUT2):
-    doc_reader = SpacyReader(folder=folder, text_keys="tokens")
-    doc_phraser = nlp_process.spacy_process.spacy_phrases.MyPhraser()
+def make_token_dictionary(folder=config.OUTPUT2):
+    doc_reader = SpacyReader(folder=folder, data_key=get_sub_docs, token_key=TOKEN_KEY_TYPE)
+    doc_phraser = MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     dictionary = Dictionary(doc_stream)
@@ -209,7 +192,7 @@ def make_token_dictionary(folder=OUTPUT2):
 
 
 @time_this
-def make_skills_dictionary(folder=OUTPUT2):
+def make_skills_dictionary(folder=config.OUTPUT2):
     skill_stream = stream_skills(folder)
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     dictionary = Dictionary(skill_stream)
@@ -224,8 +207,8 @@ def make_skills_dictionary(folder=OUTPUT2):
 
 @time_this
 def get_token_counts(folder, dictionary_fp=config.RESOURCES_DICTIONARY_TOKENS):
-    doc_reader = SpacyReader(folder=folder, text_keys="tokens")
-    doc_phraser = nlp_process.spacy_process.spacy_phrases.MyPhraser()
+    doc_reader = SpacyReader(folder=folder, data_key=get_sub_docs, token_key=TOKEN_KEY_TYPE)
+    doc_phraser = MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
     dictionary = Dictionary.load(dictionary_fp)
     bow = (dictionary.doc2idx(x) for x in doc_stream)
@@ -251,7 +234,7 @@ def get_skills_counts(folder, dictionary_fp=config.RESOURCES_DICTIONARY_SKILLS):
 
 
 @time_this
-def get_token_probabilities(folder=OUTPUT2):
+def get_token_probabilities(folder=config.OUTPUT2):
     cx = get_token_counts(folder)
     token_sums = sum(cx.values())
     probabilities = np.array(list(cx.values()))
@@ -265,7 +248,7 @@ def get_token_probabilities(folder=OUTPUT2):
 
 
 @time_this
-def get_skill_probabilities(folder=OUTPUT2):
+def get_skill_probabilities(folder=config.OUTPUT2):
     cx = get_skills_counts(folder)
     token_sums = sum(cx.values())
     probabilities = np.array(list(cx.values()))
@@ -279,9 +262,9 @@ def get_skill_probabilities(folder=OUTPUT2):
 
 
 @time_this
-def get_token_pair_probabilities(folder=OUTPUT2):
-    doc_reader = SpacyReader(folder=folder, text_keys="tokens")
-    doc_phraser = nlp_process.spacy_process.spacy_phrases.MyPhraser()
+def get_token_pair_probabilities(folder=config.OUTPUT2):
+    doc_reader = SpacyReader(folder=folder, data_key=get_sub_docs, token_key=TOKEN_KEY_TYPE)
+    doc_phraser = MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
     dictionary = Dictionary.load(config.RESOURCES_DICTIONARY_TOKENS)
 
@@ -300,7 +283,7 @@ def get_token_pair_probabilities(folder=OUTPUT2):
 
 
 @time_this
-def get_skill_pair_probabilities(folder=OUTPUT2):
+def get_skill_pair_probabilities(folder=config.OUTPUT2):
     doc_stream = stream_skills(folder)
     dictionary = Dictionary.load(config.RESOURCES_DICTIONARY_SKILLS)
 
@@ -373,10 +356,10 @@ def get_pmi_skills():
 
 
 @time_this
-def get_fingerprint_tokens(folder=OUTPUT2):
+def get_fingerprint_tokens(folder=config.OUTPUT2):
     cnt = TfidfVectorizer(use_idf=True, sublinear_tf=True)
-    doc_reader = SpacyReader(folder=folder, text_keys="tokens")
-    doc_phraser = nlp_process.spacy_process.spacy_phrases.MyPhraser()
+    doc_reader = SpacyReader(folder=folder, data_key=get_sub_docs, token_key=TOKEN_KEY_TYPE)
+    doc_phraser = MyPhraser()
     doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
 
     # Tfidf doesn't accept lists
@@ -407,11 +390,11 @@ if __name__ == "__main__":
     # spacify_docs(ignore_existing=False, max_files=None)
     # #
     # # # Train the phraser from JSON records
-    nlp_process.spacy_process.spacy_phrases.detect_phrases(input_dir=OUTPUT2, phrase_model_fp=config.PHRASE_MODEL,
-                                                           phrase_dump_fp=config.PHRASE_DUMP,
-                                                           common_words=STOPWORDS, min_count=10, threshold=30)
+    # nlp_process.spacy_process.spacy_phrases.detect_phrases(input_dir=OUTPUT2, phrase_model_fp=config.PHRASE_MODEL,
+    #                                                        phrase_dump_fp=config.PHRASE_DUMP,
+    #                                                        common_words=STOPWORDS, min_count=10, threshold=30)
     # make_token_dictionary()
     # make_skills_dictionary()
-    # get_pmi_tokens()
-    # get_pmi_skills()
-    # get_fingerprint_tokens()
+    get_pmi_tokens()
+    get_pmi_skills()
+    get_fingerprint_tokens()
