@@ -7,9 +7,9 @@ import easygui
 from gensim.models.phrases import Phraser, Phrases
 from pampy import match, _, TAIL
 
-from mysite.nlp_process.process_config import ProcessConfig
-from nlp_process.spacy_process import get_sub_docs
-from nlp_process.spacy_process.streaming import SpacyReader, SpacyTokenFilter
+from nlp_process.process_config import ProcessConfig
+from nlp_process.spacy_process.utils import time_this
+from nlp_process.spacy_process.streaming import get_sub_docs, SpacyTokenFilter, SpacyReader
 
 Pattern = namedtuple('Pattern', 'pattern action default')
 
@@ -23,7 +23,7 @@ f2 = make_pattern(["--", _])  # --_--
 
 # 10_years, 3+_years
 f3 = make_pattern([re.compile(r"([0-9+]{1,2}\+?)"),
-                   re.compile(r"(years?)")])
+                   re.compile(r"(years?|months?|days?)")])
 
 # 15_percent 15+_percent, 55_%
 f4 = make_pattern([re.compile(r"([0-9]{1,}\+?)"),
@@ -44,15 +44,16 @@ def filter_phrases(phrase_line, patterns=phrase_patterns):
     return True
 
 
-def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min_count, threshold, max_layers=2):
+@time_this
+def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min_count, threshold, token_key,
+                   max_layers=2):
     """
     max_layers
         1 - bigrams
         2 - trigrams, etc
     """
 
-    streamer = SpacyReader(folder=input_dir, data_key=get_sub_docs,
-                           token_filter=SpacyTokenFilter(stopwords=False, excluded_attributes=False))
+    streamer = SpacyReader(folder=input_dir, data_key=get_sub_docs, token_key=token_key)
 
     phrases = Phrases(streamer, common_terms=common_words, min_count=min_count, threshold=threshold)
 

@@ -3,14 +3,15 @@ import json
 import os
 import re
 import typing
+from functools import partial
 from itertools import combinations
 
 import toolz
 from gensim.utils import strided_windows
 from nltk.corpus import stopwords
+from pampy import match
 
 from nlp_process import ProcessConfig
-from nlp_process.data.phrases.patterns import make_pattern
 from nlp_process.spacy_process.spacy_utils import unpack_doc
 
 ls = typing.TypeVar('ls', list, str, typing.Callable, type(None))
@@ -87,15 +88,45 @@ class DocStreamer(DataKeyMixin):
                 yield d
 
 
-starts_with_num = make_pattern(pattern=re.compile(r"(^[0-9]+)"), action=False, default=True)
-is_versioning = make_pattern(pattern=re.compile(r"([0-9\.]+)"), action=False, default=True)
-starts_with_punc = make_pattern(
-        pattern=re.compile(r"^(!|\"|#|$|%|&|'|\(|\)|\*|\+|,|-|\.|/|:|;|<|=|>|\?|@|\[|\|\]|\^|_|`|{|}|~)"), action=False,
-        default=True)
+def callable_pattern(x, pattern, action_call=None):
+    # run pampy match
+    if match(x, pattern, True, default=False):
+        return action_call(x)
+    else:
+        return x
 
 
-class TokenPatternMatcher(object):
-    pass
+starts_with_punc_ = re.compile(r"^(!|\"|#|$|%|&|'|\(|\)|\*|\+|,|-|\.|/|:|;|<|=|>|\?|@|\[|\|\]|\^|_|`|{|}|~)")
+remove_leading_punc = lambda x: starts_with_punc_.sub("", x)
+starts_with_punc = partial(callable_pattern, pattern=starts_with_punc_, action_call=remove_leading_punc)
+
+has_dates_anywhere_ = re.compile(r"(years?|days?|months?)", flags=re.IGNORECASE)
+drop_token = lambda x: ""
+has_dates_anywhere = partial(callable_pattern, pattern=has_dates_anywhere_, action_call=drop_token)
+
+starts_with_num_ = re.compile(r"(^[0-9]+)")
+starts_with_num = partial(callable_pattern, pattern=starts_with_num_, action_call=drop_token)
+
+is_versioning_ = re.compile(r"([0-9\.]+)")
+is_versioning = partial(callable_pattern, pattern=is_versioning_, action_call=drop_token)
+
+
+class SpacyTokenCleaner(object):
+    """
+    Class that matches 'bad' tokens and attempts to correct them
+    """
+    TOKEN_PATTERNS = [starts_with_punc, has_dates_anywhere, starts_with_num, is_versioning]
+
+    def __init__(self, token_key):
+        self.token_key = token_key
+
+    def clean_token(self, token):
+        token_text = token.get(self.token_key, None)
+        if not token_text:
+            return ""
+        for f in self.TOKEN_PATTERNS:
+            token_text = f(token_text)
+        return token_text
 
 
 class SpacyTokenFilter(object):
@@ -143,11 +174,12 @@ class SpacyReader(DataKeyMixin):
     :param
     """
 
-    def __init__(self, folder, data_key: ls, token_key, token_filter=SpacyTokenFilter()):
+    def __init__(self, folder, data_key: ls, token_key, token_filter=SpacyTokenFilter, token_cleaner=SpacyTokenCleaner):
         super().__init__(data_key=data_key)
         self.folder = folder
         self.files = glob.glob(os.path.join(self.folder, "*.json"))
-        self.token_filter = token_filter
+        self.token_filter = token_filter(token_key=token_key)
+        self.token_cleaner = token_cleaner(token_key=token_key)
         self.token_key = token_key
         self.phraser = None
 
@@ -157,7 +189,16 @@ class SpacyReader(DataKeyMixin):
         return self.data_get(doc)
 
     def filter_tokens_(self, doc):
-        tokens = list(filter(self.token_filter.filter_token, doc))
+        if self.token_cleaner:
+            for token in doc:
+                old_text = token.get(self.token_key)
+                new_text = self.token_cleaner.clean_token(token)
+                if old_text != new_text:
+                    token.update({self.token_key: new_text})
+        if self.token_filter:
+            tokens = list(filter(self.token_filter.filter_token, doc))
+        else:
+            tokens = doc
         return tokens
 
     def as_sentences(self):

@@ -22,13 +22,13 @@ from gensim.corpora.dictionary import Dictionary
 from nlp_process import ProcessConfig
 from nlp_process.spacy_process import (stream_docs, stream_skills, stream_pairs, stream_doc_summaries,
                                        stream_doc_jobs, stream_unpacked_docs, get_spacy_target_files, add_extra,
-                                       SpacyReader, time_this, MyPhraser, get_sub_docs)
+                                       SpacyReader, time_this, MyPhraser, get_sub_docs, detect_phrases, STOPWORDS)
 from nlp_process.spacy_process import (lang_detect, lookup_language_detection, apply_by_multiprocessing,
                                        store_language_detection)
 
 config = ProcessConfig()
 
-TOKEN_KEY_TYPE = 'lemma'
+TOKEN_KEY_TYPE = 'norm'
 MIN_WORD_COUNT = 20
 MAX_WORD_RATIO = 0.9
 MIN_SKILL_COUNT = 25
@@ -390,11 +390,11 @@ if __name__ == "__main__":
     # spacify_docs(ignore_existing=False, max_files=None)
     # #
     # # # Train the phraser from JSON records
-    # nlp_process.spacy_process.spacy_phrases.detect_phrases(input_dir=OUTPUT2, phrase_model_fp=config.PHRASE_MODEL,
-    #                                                        phrase_dump_fp=config.PHRASE_DUMP,
-    #                                                        common_words=STOPWORDS, min_count=10, threshold=30)
-    # make_token_dictionary()
-    # make_skills_dictionary()
+    detect_phrases(input_dir=config.OUTPUT2, phrase_model_fp=config.PHRASE_MODEL,
+                   phrase_dump_fp=config.PHRASE_DUMP,
+                   common_words=STOPWORDS, min_count=10, threshold=30, token_key=TOKEN_KEY_TYPE)
+    make_token_dictionary()
+    make_skills_dictionary()
     get_pmi_tokens()
     get_pmi_skills()
     get_fingerprint_tokens()
