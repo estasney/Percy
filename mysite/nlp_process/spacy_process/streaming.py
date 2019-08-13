@@ -11,8 +11,8 @@ from gensim.utils import strided_windows
 from nltk.corpus import stopwords
 from pampy import match
 
-from nlp_process import ProcessConfig
-from nlp_process.spacy_process.spacy_utils import unpack_doc
+from mysite.nlp_process import ProcessConfig
+from mysite.nlp_process.spacy_process.spacy_utils import unpack_doc
 
 ls = typing.TypeVar('ls', list, str, typing.Callable, type(None))
 

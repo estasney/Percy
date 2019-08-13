@@ -7,9 +7,9 @@ import easygui
 from gensim.models.phrases import Phraser, Phrases
 from pampy import match, _, TAIL
 
-from nlp_process.process_config import ProcessConfig
-from nlp_process.spacy_process.utils import time_this
-from nlp_process.spacy_process.streaming import get_sub_docs, SpacyTokenFilter, SpacyReader
+from mysite.nlp_process.process_config import ProcessConfig
+from mysite.nlp_process.spacy_process.utils import time_this
+from mysite.nlp_process.spacy_process.streaming import get_sub_docs, SpacyTokenFilter, SpacyReader
 
 Pattern = namedtuple('Pattern', 'pattern action default')
 
@@ -85,7 +85,7 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
     while current_layer <= max_layers:
         layer_start_time = datetime.now()
         ngrams_stream = stream_ngrams(folder=input_dir, data_key=get_sub_docs, model=phrases,
-                                      layers=current_layer)
+                                      layers=current_layer, token_key=token_key)
         ngrams_export = phrases.export_phrases(ngrams_stream)
         phrase_counts.update(ngrams_export)
         print("Finished export of layer {} in {}".format(current_layer, (datetime.now() - layer_start_time)))
@@ -107,9 +107,8 @@ def detect_phrases(input_dir, phrase_model_fp, phrase_dump_fp, common_words, min
             tfile.write("\n")
 
 
-def stream_ngrams(folder, data_key, model, layers=1):
-    reader = SpacyReader(folder=folder, data_key=data_key,
-                         token_filter=SpacyTokenFilter(stopwords=False, excluded_attributes=False))
+def stream_ngrams(folder, data_key, model, token_key, layers=1):
+    reader = SpacyReader(folder=folder, data_key=data_key, token_key=token_key)
 
     def phrase_once(doc, model):
         return model[doc]
