@@ -1,6 +1,6 @@
-{% extends "layout.html" %}
+{% extends "percy/layout.html" %}
 {% block content %}
-{% include 'partials/helps/helps_diversity_lookup.html' %}
+    {% include 'percy/partials/helps/helps_diversity_lookup.html' %}
 {% if success == 'True' or success == 'False' %}
 {% else %}
 {% set original = "" %}
@@ -53,7 +53,7 @@
 
 {% endblock %}
 {% block js_script %}
-{% include "datatables.html" %}
+    {% include "percy/datatables.html" %}
 {% endblock %}
 
 

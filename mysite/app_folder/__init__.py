@@ -12,7 +12,7 @@ migrate = Migrate()
 
 
 def server_error_page(e):
-    return render_template("500.html"), 500
+    return render_template("percy/500.html"), 500
 
 
 def create_app(config_class=Config):

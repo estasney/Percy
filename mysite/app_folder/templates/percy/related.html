@@ -1,4 +1,4 @@
-{% extends "layout.html" %} {% block content %} {% include 'partials/helps/helps_related.html' %}
+{% extends "percy/layout.html" %} {% block content %} {% include 'percy/partials/helps/helps_related.html' %}
 
 <div class="container">
     <div id="buttons-toolbar">
@@ -30,4 +30,4 @@
 
     <script type="text/javascript" src="{{ url_for('static',filename='related.js', v=static_version) }}"></script>
 
-{% endblock %} {% block js_script %} {% include "datatables.html" %} {% endblock %}
+{% endblock %} {% block js_script %} {% include "percy/datatables.html" %} {% endblock %}

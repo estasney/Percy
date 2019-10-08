@@ -10,6 +10,7 @@ import toolz
 from gensim.utils import strided_windows
 from nltk.corpus import stopwords
 from pampy import match
+from spacy.tokens import Token
 
 from mysite.nlp_process import ProcessConfig
 from mysite.nlp_process.spacy_process.spacy_utils import unpack_doc
@@ -152,17 +153,31 @@ class SpacyTokenFilter(object):
             self.excluded_attributes = []
 
         self.token_key = token_key
+        self.token_key_spacy = self.token_key + "_"
         self.char_filter = re.compile(self.CHAR_FILTER)
 
-    def filter_token(self, token: dict):
-        token_text = token.get(self.token_key, None)
+    def _get_token_text(self, token: typing.Union[dict, Token]) -> bool:
+        if type(token) == dict:
+            return token.get(self.token_key, None)
+        else:
+            return getattr(token, self.token_key_spacy, None)
+
+    def _get_token_attr(self, token: typing.Union[dict, Token]) -> list:
+        if type(token) == dict:
+            return [token.get(attr, False) for attr in self.excluded_attributes]
+        else:
+            return [getattr(token, attr, False) for attr in self.excluded_attributes]
+
+    def filter_token(self, token: typing.Union[dict, Token]) -> bool:
+        token_text = self._get_token_text(token)
         if not token_text:
             return False
         if not self.char_filter.sub("", token_text):  # Empty string after removing special chars
             return False
         if token_text in self.stopwords:
             return False
-        if any([token.get(attr, False) for attr in self.excluded_attributes]):
+        token_attr = self._get_token_attr(token)
+        if any(token_attr):
             return False
         return True
 

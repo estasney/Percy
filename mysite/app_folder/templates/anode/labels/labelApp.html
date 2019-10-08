@@ -1,0 +1,10 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+    <div class="container-fluid" id="labelApp" data-projectid="{{ project_id }}">
+    </div>
+
+
+{% endblock %}
+{% block tail_body %}
+    <script src="{{ url_for('static', filename='dist/js/labelApp.js') }}"></script>
+{% endblock %}

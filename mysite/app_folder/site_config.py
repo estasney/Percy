@@ -16,6 +16,9 @@ class Config(object):
     UPLOAD_FOLDER = os.path.join(basedir, 'resources{}uploads').format(os.path.sep)
     SECRET_KEY = 'never-guess-this'
     SQLALCHEMY_DATABASE_URI = 'mysql://estasney:password@localhost:3306/names_db?charset=utf8mb4'
+    SQLALCHEMY_BINDS = {
+        "anode": 'mysql://estasney:password@localhost:3306/anode?charset=utf8mb4'
+        }
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_POOL_RECYCLE = 299
 

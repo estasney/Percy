@@ -1,6 +1,6 @@
-{% extends "layout.html" %}
+{% extends "percy/layout.html" %}
 {% block content %}
-{% include 'partials/helps/helps_tfidf.html' %}
+    {% include 'percy/partials/helps/helps_tfidf.html' %}
 {% if success == 'True' %}
 <div class="form-group text-center">
     <form action="/tf_idf" method="POST">
@@ -51,7 +51,7 @@
 </div>{% else %} {% endif %}
 {% endblock %}
 {% block js_script %}
-{% include "datatables.html" %}
+    {% include "percy/datatables.html" %}
 {% endblock %}
 
 
