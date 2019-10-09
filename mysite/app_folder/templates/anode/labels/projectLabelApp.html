@@ -1,4 +1,4 @@
-{% extends "layouts/base.html" %}
+{% extends "anode/layouts/base.html" %}
 {% block content %}
     <div class="container-fluid" id="projectLabelApp" data-projectid="{{ project_id }}">
     </div>
@@ -6,5 +6,5 @@
 
 {% endblock %}
 {% block tail_body %}
-    <script src="{{ url_for('static', filename='dist/js/projectLabelApp.js') }}"></script>
+    <script src="{{ url_for('static', filename='anode/dist/js/projectLabelApp.js') }}"></script>
 {% endblock %}

@@ -34,6 +34,9 @@ module.exports = {
                 exclude: ['/node_modules/', '/img/'],
                 use: {
                     loader: 'babel-loader',
+                    options:{
+                        presets: []
+                    }
 
                 }
             },

@@ -1,5 +1,5 @@
 from typing import Union
-
+from colour import Color
 from app_folder.anode_models import *
 
 
@@ -145,18 +145,16 @@ def get_next_document(action: str, project: LabelProject, user_id: int, incoming
         data.update(doc_out.to_dict(user_id))
     return data
 
-    if incoming_doc_id:
-        doc = Document.query.get(incoming_doc_id)
-        user.documents_seen.append(doc)
-        db.session.commit()
-    if get_doc:
-        document = project.fetch_document(doc_id=doc_id)
-    elif step > 0 and not get_doc:
-        document = project.next_document(user=user, doc_id=doc_id)
+def pick_font_color(color_str: str, luminance_threshold: float = 0.5) -> str:
+    """
+    Given a background color, determine whether a font should be black or white based on calculated luminance
+    :param color_str: Color string such as hex, RGB, etc
+    :param luminance_threshold: Luminances above this threshold return 'black', below returns 'white'
+    :return: 'black' or 'white'
+    """
+    c = Color(color_str)
+    lum = c.get_luminance()
+    if lum >= luminance_threshold:
+        return '#000000'
     else:
-        document = project.previous_document(doc_id=doc_id)
-    if not document:
-        return None
-    data = {"project_status": project.project_status(user)}
-    data.update(document.to_dict(user))
-    return data
+        return '#ffffff'

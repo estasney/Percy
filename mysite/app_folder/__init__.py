@@ -1,5 +1,7 @@
 from flask import Flask, render_template
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_login import LoginManager
+
 from app_folder.site_config import Config, FConfig
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
@@ -9,6 +11,7 @@ toolbar = DebugToolbarExtension()
 moment = Moment()
 db = SQLAlchemy()
 migrate = Migrate()
+login_manager = LoginManager()
 
 
 def server_error_page(e):
@@ -23,6 +26,7 @@ def create_app(config_class=Config):
     moment.init_app(app_run)
     db.init_app(app_run)
     migrate.init_app(app_run, db)
+    login_manager.init_app(app_run)
 
     from app_folder.main import bp as main_bp
     app_run.register_blueprint(main_bp)

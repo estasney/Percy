@@ -3,7 +3,6 @@ import typing
 from datetime import datetime
 
 import seaborn as sns
-from app_folder.utils import pick_font_color
 from flask_login import UserMixin
 from sqlalchemy import and_
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -139,6 +138,7 @@ class Label(db.Model):
 
     @bg_color.setter
     def bg_color(self, bg_color_str: str, text_color_str: typing.Union[str, type(None)] = None):
+        from app_folder.anode.utils import pick_font_color
         if not text_color_str:
             text_color_str = pick_font_color(bg_color_str)
         self._bg_color = bg_color_str

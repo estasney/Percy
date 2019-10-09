@@ -11,14 +11,14 @@ from app_folder.anode_models import LabelProject, Document, User
 @bp.route('/')
 def index():
     if not current_user.is_authenticated:
-        return redirect(url_for('main.login'))
+        return redirect(url_for('anode.login'))
 
     latest_project = get_latest_project(current_user)
     if not latest_project:
-        return render_template("main/index.html")
+        return render_template("anode/main/index.html")
 
     else:
-        return render_template("main/index.html", project_status=latest_project.project_status(current_user.id),
+        return render_template("anode/main/index.html", project_status=latest_project.project_status(current_user.id),
                                project_name=latest_project.name,
                                endpoint="label/{}/label".format(latest_project.id), btn_text="Start Labeling")
 
@@ -26,23 +26,23 @@ def index():
 @bp.route('/login/', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template("main/login.html", error=False)
+        return render_template("anode/main/login.html", error=False)
     user = User.query.filter_by(username=request.form['username']).first()
     if user is None:
-        return render_template("main/login.html", error=True)
+        return render_template("anode/main/login.html", error=True)
 
     if not user.check_password(request.form['password']):
-        return render_template('main/login.html', error=True)
+        return render_template('anode/main/login.html', error=True)
 
     login_user(user, remember=True)
-    return redirect(url_for('main.index'))
+    return redirect(url_for('anode.index'))
 
 
 @bp.route('/logout/')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('main.index'))
+    return redirect(url_for('anode.index'))
 
 
 @login_required
@@ -104,23 +104,8 @@ def label_api(project_id):
 @bp.route("/label/<project_id>", methods=['GET', 'POST'], defaults={"category": None})
 def label_docs(project_id, category):
     if category == "manage_labels":
-        return render_template("labels/projectLabelApp.html", project_id=project_id)
+        return render_template("anode/labels/projectLabelApp.html", project_id=project_id)
     if category == "label":
-        return render_template("labels/labelApp.html", project_id=project_id)
+        return render_template("anode/labels/labelApp.html", project_id=project_id)
 
 
-@bp.route("/annotate", methods=['GET', 'POST'])
-def annotate():
-    if request.method == "GET":
-        return render_template("annotations/annotate.html", annotation=get_next_task())
-
-    elif request.method == "POST":
-
-        annotation_data = request.json['annotation'][0]
-        task = Task.query.get(annotation_data['annotation_id'])
-        task_answer = task.keypress_to_answer(annotation_data['key_press'])
-        task.answer = task_answer
-        db.session.commit()
-
-        response = get_next_task()
-        return jsonify(response), 201

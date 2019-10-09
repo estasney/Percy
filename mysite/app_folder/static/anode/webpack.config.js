@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 var rootAssetPath = './src';
 var publicPath = '/static/dist';
-
+var webpack = require('webpack');
 var path = require('path');
 
 
@@ -11,7 +11,8 @@ module.exports = {
     mode: 'development',
     entry: {
         labelApp: ['./src/js/labels.jsx'],
-        projectLabelApp: ['./src/js/projectlabels.jsx']
+        projectLabelApp: ['./src/js/projectlabels.jsx'],
+        vendor: ['./src/js/vendor.js']
     },
     devtool: 'inline-source-map',
     output: {
@@ -43,9 +44,11 @@ module.exports = {
     },
 
     plugins: [
-        new ManifestRevisionPlugin(path.join('dist', 'manifest.json'), {
-            rootAssetPath: rootAssetPath,
-            ignorePaths: ['/img']
+        new webpack.ProvidePlugin({
+            "$": 'jquery',
+            "jQuery": "jquery",
+            "window.jQuery": "jquery"
+
         })
     ]
 
