@@ -1,5 +1,5 @@
-var $ = require("jquery");
-require("jquery-ui");
+import typeahead from "typeahead.js";
+import bloodhound from "bloodhound-js";
 
 window.addEventListener("load", function () {
 

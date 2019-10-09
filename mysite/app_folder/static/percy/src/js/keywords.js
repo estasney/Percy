@@ -1,6 +1,5 @@
-// let $ = require("jquery");
-// let d3 = require("d3");
-// require("gasparesganga-jquery-loading-overlay");
+import typeahead from "typeahead.js";
+import bloodhound from "bloodhound-js";
 
 $(document).ready(function () {
 

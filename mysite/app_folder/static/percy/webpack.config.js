@@ -10,12 +10,16 @@ var path = require('path');
 module.exports = {
     mode: 'development',
     entry: {
-        percy: ['./src/js/percy.js'],
+        vendor: ['./src/js/vendor.js'],
         keywords: ['./src/js/keywords.js'],
         related: ['./src/js/related.js'],
         results_table: ['./src/js/results_table.js'],
         ms_form: ['./src/js/ms_form.js']
-
+    },
+    resolve: {
+        alias: {
+            jquery: "jquery/src/jquery"
+        }
     },
     devtool: 'inline-source-map',
     output: {
@@ -43,7 +47,12 @@ module.exports = {
             }
         ]
     }, plugins: [
+        new webpack.ProvidePlugin({
+            "$": 'jquery',
+            "jQuery": "jquery",
+            "window.jQuery": "jquery"
 
+        })
 
     ]
 

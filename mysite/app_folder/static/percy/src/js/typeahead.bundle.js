@@ -4,7 +4,11 @@
  * Copyright 2013-2015 Twitter, Inc. and other contributors; Licensed MIT
  */
 
-(function(root, factory) {
+export function bloodhound(f) {
+
+}
+
+bloodhound(function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define("bloodhound", [ "jquery" ], function(a0) {
             return root["Bloodhound"] = factory(a0);
@@ -917,7 +921,11 @@
     return Bloodhound;
 });
 
-(function(root, factory) {
+export function typeahead(f) {
+
+}
+
+typeahead(function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define("typeahead.js", [ "jquery" ], function(a0) {
             return factory(a0);
