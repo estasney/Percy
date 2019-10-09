@@ -36,6 +36,9 @@ def create_app(config_class=Config):
     from app_folder.autocomplete import bp as autocomplete_bp
     app_run.register_blueprint(autocomplete_bp, url_prefix='/autocomplete')
 
+    from app_folder.anode import bp as anode_bp
+    app_run.register_blueprint(anode_bp, url_prefix='/anode')
+
     @app_run.context_processor
     def static_version():
         return {'static_version': FConfig.STATIC_VERSION_ID}
