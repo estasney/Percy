@@ -1,3 +1,6 @@
+var $ = require("jquery");
+require("jquery-ui");
+
 window.addEventListener("load", function () {
 
     let substringMatcher = function (strs) {

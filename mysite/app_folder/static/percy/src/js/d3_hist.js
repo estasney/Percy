@@ -1,9 +1,11 @@
-function histogramChart(range_min, range_max) {
-    var margin = {top: 0, right: 0, bottom: 20, left: 0},
+
+
+export function histogramChart(range_min, range_max) {
+    let margin = {top: 0, right: 0, bottom: 20, left: 0},
         width = 960,
         height = 500;
 
-    var histogram = d3.layout.histogram(),
+    let histogram = d3.layout.histogram(),
         x = d3.scale.ordinal(),
         y = d3.scale.linear(),
         xAxis = d3.svg.axis().scale(x).orient("bottom").tickSize(6, 0);
@@ -17,7 +19,7 @@ function histogramChart(range_min, range_max) {
             // Get bin counts
             data_bin_counts = {};
             data.forEach(function (d, i) {
-                var current_count = data_bin_counts[i] || 0;
+                let current_count = data_bin_counts[i] || 0;
                 current_count += d.length;
                 data_bin_counts[i] = current_count;
             });
@@ -36,10 +38,10 @@ function histogramChart(range_min, range_max) {
                 .range([height - margin.top - margin.bottom, 0]);
 
             // Select the svg element, if it exists.
-            var svg = d3.select(this).selectAll("svg").data([data]);
+            let svg = d3.select(this).selectAll("svg").data([data]);
 
             // Otherwise, create the skeletal chart.
-            var gEnter = svg.enter().append("svg").append("g");
+            let gEnter = svg.enter().append("svg").append("g");
             gEnter.append("g").attr("class", "bars");
             gEnter.append("g").attr("class", "x axis");
 
@@ -48,11 +50,11 @@ function histogramChart(range_min, range_max) {
                 .attr("height", height);
 
             // Update the inner dimensions.
-            var g = svg.select("g")
+            let g = svg.select("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             // Update the bars.
-            var bar = svg.select(".bars").selectAll(".bar").data(data);
+            let bar = svg.select(".bars").selectAll(".bar").data(data);
             bar.enter().append("rect")
                 .append("svg:title")
                 .text(function (d, i) {

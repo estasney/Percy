@@ -28,6 +28,6 @@
     <table id="results-table" style="display:none;" data-classes="table table-bordered table-hover table-striped"></table>
 </div>
 
-    <script type="text/javascript" src="{{ url_for('static',filename='related.js', v=static_version) }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='percy/dist/js/related.min.js', v=static_version) }}"></script>
 
-{% endblock %} {% block js_script %} {% include "percy/datatables.html" %} {% endblock %}
+{% endblock %} {% block js_script %} {% endblock %}

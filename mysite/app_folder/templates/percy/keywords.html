@@ -54,6 +54,6 @@
       {% endblock %}
       {% block js_script %}
 
-      <script src="https://estasney.pythonanywhere.com/js/loadingoverlay.min.js"></script>
-          <script src="{{ url_for('static', filename='keywords.js', v=static_version) }}"></script>
+      
+<script src="{{ url_for('static', filename='percy/dist/js/keywords.min.js', v=static_version) }}"></script>
       {% endblock %}

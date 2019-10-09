@@ -1,6 +1,10 @@
+// let $ = require("jquery");
+// let d3 = require("d3");
+// require("gasparesganga-jquery-loading-overlay");
+
 $(document).ready(function () {
 
-    var el, output_el, graph_visible;
+    let el, output_el, graph_visible;
 
     // Select all range inputs, watch for change
     $("input[type='range']").change(function () {
@@ -10,7 +14,7 @@ $(document).ready(function () {
         output_el = $(".slider-output");
         output_el.text(el.val());
 
-        if (graph_visible == true) {
+        if (graph_visible === true) {
             clearGraph();
             startSearch(false, true);
         }
@@ -18,17 +22,17 @@ $(document).ready(function () {
     });
 
 
-    var data_url = "/kw_data";
+    let data_url = "/kw_data";
 
 
-    var r_base = 6;
+    let r_base = 6;
     $('#search').on('click', startSearch);
     $('#reset').on('click', restart);
     $('#reset').on('click', enableGo);
     $('#reset').on('click', clearGraph);
 
     function windowSize() {
-        var ws = document.getElementById('window-size');
+        const ws = document.getElementById('window-size');
         return ws.value;
     }
 
@@ -50,38 +54,37 @@ $(document).ready(function () {
         };
     }
 
-    var width = window.outerWidth;
-    var height = window.outerHeight;
-    var graph = {
+    const width = window.outerWidth;
+    const height = window.outerHeight;
+    let graph = {
         "nodes": {},
         "links": {}
     };
 
 
-    var force = d3.layout.force().size([width, height])
+    let force = d3.layout.force().size([width, height])
         .linkDistance(function (d) {
-            var source_w = d.source_n_links * 30;
-            var target_w = d.target_n_links * 30;
+            const source_w = d.source_n_links * 30;
+            const target_w = d.target_n_links * 30;
             return Math.max(source_w, target_w);
         })
         .charge(function (d) {
-            var x = (d.node_n_links * -300);
-            return x;
+            return (d.node_n_links * -300);
         })
         .gravity(0.15);
-    var svg = d3.select('body').append('svg')
+    let svg = d3.select('body').append('svg')
         .attr('width', width)
         .attr('height', height);
 
     function startSearch(show_modal, is_update) {
-        if (show_modal == undefined) {
+        if (show_modal === undefined) {
             show_modal = true;
         }
-        if (is_update == undefined) {
+        if (is_update === undefined) {
             is_update = false;
         }
-        var search_term;
-        var active_pill = $(".nav-link.active")[0].id;
+        let search_term;
+        let active_pill = $(".nav-link.active")[0].id;
         switch (active_pill) {
             case 'v-pills-paste-tab':
                 search_term = $("#search-term-paste").prop('value');
@@ -92,7 +95,7 @@ $(document).ready(function () {
             default:
                 search_term = "";
         }
-        var window_size = windowSize();
+        let window_size = windowSize();
         getData(search_term, active_pill, window_size, show_modal, is_update);
         disableGo();
     }
@@ -103,7 +106,7 @@ $(document).ready(function () {
     }
 
     function getData(term, data_type, limit, show_modal, is_update) {
-        if (show_modal == true) {
+        if (show_modal === true) {
             $.LoadingOverlay("show");
         }
 
@@ -124,13 +127,13 @@ $(document).ready(function () {
                 xhr.setRequestHeader('Data-Type', data_type);
             },
             success: function (data) {
-                if (show_modal == true) {
+                if (show_modal === true) {
                     $.LoadingOverlay("hide");
                 }
 
                 var json_data = JSON.stringify(data);
                 var search_data = JSON.parse(json_data).data;
-                if (is_update == true) {
+                if (is_update === true) {
                     restart();
                 }
                 newLinks(search_data);

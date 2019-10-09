@@ -27,11 +27,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico', v=static_version) }}"
+    <link rel="shortcut icon" href="{{ url_for('static', filename='percy/dist/img/favicon.ico', v=static_version) }}"
           type="image/x-icon">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico', v=static_version) }}" type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename='percy/dist/img/favicon.ico', v=static_version) }}" type="image/x-icon">
   <!-- Bootstrap 4 CSS-->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <!-- Bootstrap 4 / Selectize Shim -->
   <link rel="stylesheet" href="https://estasney.pythonanywhere.com/styles/selectize.bootstrap4.css">
   <!-- FontAwesome CSS -->
@@ -41,14 +41,14 @@
 
   <!-- Mainpage CSS-->
     <link rel="stylesheet" type="text/css"
-          href="{{ url_for('static',filename='styles/mainpage.css', v=static_version) }}">
+          href="{{ url_for('static',filename='percy/dist/css/mainpage.css', v=static_version) }}">
   <!-- jQueryUI CSS-->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
   <!-- Fonts-->
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-    <link href="{{ url_for('static', filename='styles/ms_form.css', v=static_version) }}" rel="stylesheet"
+    <link href="{{ url_for('static', filename='percy/dist/css/ms_form.css', v=static_version) }}" rel="stylesheet"
           type="text/css">
 
     {% block headscript %} {% endblock %}

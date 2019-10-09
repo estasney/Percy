@@ -5,6 +5,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 def load_p(fn):
+    if not os.path.isfile(fn):
+        return None
     with open(fn, "rb") as pfile:
         p = pickle.load(pfile)
     return p

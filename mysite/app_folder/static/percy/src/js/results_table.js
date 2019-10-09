@@ -1,6 +1,7 @@
 // formatter function for bootstrap-table
 // Wrap percentages in bootstrap4 progress bars
 
+require("bootstrap-table");
 var $table;
 
 

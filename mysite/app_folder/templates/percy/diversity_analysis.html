@@ -67,10 +67,10 @@
 
 {% endblock %}
 {% block js_script %}
-    <script src="{{ url_for('static', filename='ms_form.js', v=static_version) }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.0/dist/jquery.validate.min.js"></script>
+    <script src="{{ url_for('static', filename='percy/dist/js/ms_form.min.js', v=static_version) }}"></script>
+
 {% if result is defined %}
-    <script src="{{ url_for('static', filename='d3_hist.js', v=static_version) }}"></script>
+    <script src="{{ url_for('static', filename='percy/dist/js/d3_hist.min.js', v=static_version) }}"></script>
 <script>
 
 

@@ -1,0 +1,13 @@
+require("jquery");
+require("jquery-ui");
+require("jquery-validation");
+require("selectize");
+require("popper.js");
+require("bootstrap");
+require("core-js");
+require("gasparesganga-jquery-loading-overlay");
+require("bootstrap-table");
+require("d3");
+require("fontawesome");
+require("./typeahead.bundle");
+require("moment");

@@ -1,0 +1,52 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const MinifyPlugin = require("babel-minify-webpack-plugin");
+var rootAssetPath = './src';
+var publicPath = '/static/dist';
+var webpack = require('webpack');
+var path = require('path');
+
+
+module.exports = {
+    mode: 'development',
+    entry: {
+        percy: ['./src/js/percy.js'],
+        keywords: ['./src/js/keywords.js'],
+        related: ['./src/js/related.js'],
+        results_table: ['./src/js/results_table.js'],
+        ms_form: ['./src/js/ms_form.js']
+
+    },
+    devtool: 'inline-source-map',
+    output: {
+        path: path.resolve('./dist/js'),
+        filename: '[name].min.js',
+        publicPath: publicPath
+    },
+    module: {
+        rules: [
+            {
+                test: /\.(js|jsx)$/,
+                exclude: ['/node_modules/', '/img/'],
+                use: {
+                    loader: 'babel-loader',
+
+                }
+            },
+            {
+                test: /\.css$/,
+                loader: 'style-loader!css-loader?modules'
+            },
+            {
+                test: /\.(img|ico)$/,
+                loader: 'raw-loader'
+            }
+        ]
+    }, plugins: [
+
+
+    ]
+
+};
+
+

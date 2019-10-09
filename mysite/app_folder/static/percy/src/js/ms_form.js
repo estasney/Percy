@@ -1,4 +1,7 @@
-// Adapted from https://codepen.io/atakan/pen/gqbIz
+$ = require("jquery");
+require("jquery-ui");
+require("jquery-validation");
+
 $(document).ready(function () {
     var $upload_form = $("#msform_spreadsheet");
     var $paste_form = $("#msform_paste");
@@ -184,7 +187,6 @@ $(document).ready(function () {
             current_fs_elements = current_fs.find("input:not(.action-button),textarea");
             current_fs_elements.each(function (i, e) {
                 if (validator.element(e) == false) {
-                    console.log(e);
                     allow_next = false;
                 }
             });
