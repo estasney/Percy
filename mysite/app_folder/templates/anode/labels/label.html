@@ -1,0 +1,56 @@
+{% extends "anode/layouts/base.html" %}
+{% from "anode/labels/macros.html" import label_slider %}
+{% block content %}
+    <div class="container text-center">
+        {% if document is not none %}
+            {% set document_id = document['id'] %}
+            {% set document_text = document['text'] %}
+            {% set document_labels = document['labels'] %}
+            {% if document['name'] is none %}
+                {% set document_name = document_id %}
+            {% else %}
+                {% set document_name = document['name'] %}
+            {% endif %}
+            {% set project_percent_int = document['project_status'] * 100 %}
+            {% set project_percent_str = "{:.2%}".format(document['project_status']) %}
+
+            <div class="row">
+                <div class="col">
+                    <div class="progress">
+                        <div id="progress-bar"
+                             class="progress-bar bg-success progress-bar-striped progress-bar-animated"
+
+                             role="progressbar" aria-valuenow="{{ project_percent_int }}" aria-valuemin="0"
+                             aria-valuemax="100" style="width: {{ project_percent_int }}%"></div>
+                        <p id="progress-text"
+                           class="justify-content-center d-flex position-absolute w-100">{{ project_percent_str }}
+                            complete</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col">
+                    <h2>{{ document_name }}</h2>
+                    <span id="document-id" style="display:none;">{{ document_id }}</span>
+                    <div class="document-text">{{ document_text }}</div>
+                </div>
+
+            </div>
+        {% else %}
+        {% endif %}
+
+    </div>
+    <div id="labelTools">
+        <div id="labelToolbar">
+            <a title="Show Label Toolbar" id="labelToolbarButton" href="#">«</a>
+
+        </div>
+    </div>
+
+
+
+{% endblock %}
+{% block tail_body %}
+    <script src="{{ url_for('static', filename='js/label_slider.js') }}"></script>
+{% endblock %}

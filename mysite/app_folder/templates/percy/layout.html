@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+{% include "percy/head.html" %}
+<body id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">
+{% include "percy/navbar.html" %}
+{% block jumbotron %}
+<div class="jumbotron text-center">
+  <h1>Percy</h1>
+  <p>Data Science + Talent Acquisition</p>
+</div>
+{% endblock %}
+<div id="content">{% block content %}{% endblock %}</div>
+<!-- webpack -->
+<script src="{{ url_for('static', filename='percy/dist/js/vendor.min.js') }}"></script>
+</body>
+{% block js_script %}{% endblock %}
+</html>

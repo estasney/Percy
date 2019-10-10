@@ -1,0 +1,40 @@
+{% extends "percy/layout.html" %}
+{% block content %}
+{% if success == 'True' %}
+<form action="/stemmed" method="POST">
+<div class="form-group text-center">
+    <p> Easily capture all possible forms with a word using wildcards</p>
+  <label for="raw_stem">Enter Words To Convert them to Their Stemmed Forms</label>
+  <textarea class="form-control" rows="5" id="raw_stem" name="raw_stem">{{ original }}</textarea>
+    <div class="input-group-btn">
+        <button type="raw_stem" name="button" value="raw_stem" class="btn btn-danger">Get Wildcard Boolean</button>
+      </div>
+</div>
+</form>
+{% else %}
+<form action="/stemmed" method="POST">
+<div class="form-group text-center">
+    <p> Easily capture all possible forms with a word using wildcards</p>
+  <label for="raw_stem">Enter Words To Convert them to Their Stemmed Forms</label>
+  <textarea class="form-control" rows="5" id="raw_stem" name="raw_stem"></textarea>
+    <div class="input-group-btn">
+        <button type="raw_stem" name="button" value="raw_stem" class="btn btn-danger">Get Wildcard Boolean</button>
+      </div>
+</div>
+</form>
+{% endif %}
+{% if success == 'True' %}
+<div class="container-fluid text-center">
+    <div class="well well-lg">
+        <h1>{{stemmed_bool}} </h1>
+    </div>
+</div>
+
+{% elif success == 'False' %}
+<div class="container-fluid">
+    <h2>Oops!</h2>
+    <p>Something went wrong.</p>
+</div>
+{% else %}
+{% endif %}
+{% endblock %}

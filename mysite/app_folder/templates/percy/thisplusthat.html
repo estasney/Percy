@@ -1,0 +1,114 @@
+{% extends "percy/layout.html" %}
+{% block content %}
+    {% include 'percy/partials/helps/helps_thisplusthat.html' %}
+ <div class="container text-center">
+     <h3>Let's Try Some Word Equations</h3>
+ {% if success == 'True' %}
+ <form class="form" action="/thisplusthat" method="POST">
+     <div class="form-group ">
+       
+        <label for="pos_words">Add Words Together</label>
+        <input type="text" class="addition-word form-control mb2" name="pwords" id="pos_words" value="{{pos_words}}">
+       
+    </div>
+     <div class="form-group">
+         <label for="pos_words">Subtract These Words</label>
+        <input type="text" class="subtraction-word form-control" name="negwords" id="neg_words" value="{{neg_words}}">
+     </div>
+   <div class="row">
+        <div class="col-4 offset-4">
+            <div class="radio">
+                <label>
+                    {% if scope == "words" %}
+                    <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    {% else %}
+                    <input type="radio" name="scope" id="wordsradio" value="words">
+                    {% endif %}
+                    Calculate Words
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    {% if scope == "skills" %}
+                    <input type="radio" name="scope" id="skillsradio" value="skills" checked>
+                    {% else %}
+                    <input type="radio" name="scope" id="skillsradio" value="skills">
+                    {% endif %}
+                  Calculate Skills
+                </label>
+            </div>
+        </div>
+    </div>
+     <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
+</form>
+ {% else %}
+     <form class="form" action="/thisplusthat" method="POST">
+     <div class="form-group">
+        <label for="pos_words">Add Words Together</label>
+        <input type="text" class="addition-word form-control" name="pwords" id="pos_words" value="" placeholder="Hardware, Software">
+    </div>
+     <div class="form-group">
+         <label for="neg_words">Subtract These Words</label>
+        <input type="text" class="subtraction-word form-control" name="negwords" id="neg_words" value="">
+     </div>
+       <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="wordsradio" value="words" checked>
+                    Calculate Words
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="scope" id="skillsradio" value="skills">
+                  Calculate Skills
+                </label>
+            </div>
+        </div>
+    </div>
+     <button type="submit" name="button" value="math" class="btn btn-danger">Ask Percy</button>
+</form>
+ {% endif %}
+  <h5>Hints:</h5>
+  <p>You can leave the 'Subtraction Words' blank.</p>
+   <p>Percy recognizes  multiple word phrases. For example: Java, "Quality Assurance"</p>
+</div>
+{% if success == 'True' %}
+<div class="container bg-grey">
+    {% if unknown_words is not none and unknown_words != "" %}
+    <h2 class="text-center">I removed some words outside of my vocabulary</h2>
+    <h3 class="text-center">{{unknown_words}}</h3>
+    {% endif %}
+
+  <h2 class="text-center">According to my calculations...</h2>
+  <h3 class="text-center">{{user_equation}}</h3>
+<table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-search="true">
+    <thead>
+      <tr>
+         <th data-field="word" data-sortable="true">Closest Match</th>
+          <th data-field="score" data-sortable="true">Similarity Score</th>
+
+      </tr>
+    </thead>
+    <tbody>
+        {% for word, score in result %}
+      <tr>
+        <td> {{ word }} </td>
+        <td> {{ score }} </td>
+      </tr>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% elif success == 'False' %}
+<div class="container-fluid">
+    <h2>I don't know!</h2>
+
+</div>
+{% else %}
+{% endif %}
+{% endblock %}
+{% block js_script %}
+{% endblock %}

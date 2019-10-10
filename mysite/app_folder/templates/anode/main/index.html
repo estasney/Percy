@@ -1,0 +1,40 @@
+{% extends 'anode/layouts/base.html' %}
+{% block content %}
+    {% if not project_status is defined %}
+        <div class="container">
+            <div class="col text-center">
+                <h1>No Projects Found</h1>
+            </div>
+        </div>
+    {% else %}
+        {% set project_percent_int = project_status * 100 %}
+        {% set project_percent_str = "{:.2%}".format(project_status) %}
+        <div class="container">
+            <div class="row">
+                <div class="col text-center">
+
+                    <h1>Project Status</h1>
+                    <h2>{{ project_name }}</h2>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="progress">
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated"
+                             role="progressbar" aria-valuenow="{{ project_percent_int }}" aria-valuemin="0"
+                             aria-valuemax="100" style="width: {{ project_percent_int }}%"></div>
+                        <p id="progress-text"
+                           class="justify-content-center d-flex position-absolute w-100">{{ project_percent_str }}
+                            complete</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-center">
+                    <a class="btn btn-primary btn-lg" href="{{ endpoint }}" role="button">{{ btn_text }}</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

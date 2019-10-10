@@ -1,5 +1,5 @@
 from app_folder.tools.decorators import memoized
-from app_folder.models import Name
+from app_folder.percy_models import Name
 
 from app_folder.site_config import FConfig
 from app_folder.tools.diversity_tools_.namesearch import NameSearch

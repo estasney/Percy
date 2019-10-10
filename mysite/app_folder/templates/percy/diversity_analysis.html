@@ -1,0 +1,89 @@
+{% extends "percy/layout.html" %}
+{% block content %}
+    {% include 'percy/partials/helps/helps_diversity.html' %}
+    {% import 'percy/diversity_analysis_form.html' as forms %}
+{% if result is defined %}
+<div class="container-fluid text-center bg-white">
+    <style>
+
+    .bars rect {
+      fill: steelblue;
+    }
+
+    .axis text {
+      font: 10px sans-serif;
+    }
+
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    </style>
+    <h2>Results of Diversity Analysis</h2>
+    <h3>Over {{result.n_trials}} Trials</h3>
+    <div id="hist"></div>
+    <table class="table">
+    <thead>
+      <tr>
+          <th class="text-center">Total Names</th>
+          <th class="text-center">Known Names</th>
+          <th class="text-center">Unknown Names</th>
+          <th class="text-center">Min % Female</th>
+          <th class="text-center">Max % Female</th>
+          <th class="text-center">Confidence</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td> {{ result.n_names }} </td>
+        <td> {{ result.n_known }} </td>
+        <td> {{ result.n_unknown }} </td>
+        <td> {{ "{:.2%}".format(result.trial_min) }} </td>
+        <td> {{ "{:.2%}".format(result.trial_max) }} </td>
+        <td> {{ "{:.2%}".format(result.sample_confidence) }} </td>
+
+      </tr>
+      </tbody>
+    </table>
+</div>
+{% elif success == 'False' %}
+<div class="container-fluid text-center">
+<h2>Something Went Wrong..</h2>
+<h2>{{error_message}}</h2>
+</div>
+<div class="container-fluid text-center">
+{{forms.make_ms_form_select()}}
+{{forms.make_ms_form('spreadsheet')}}
+{{forms.make_ms_form('paste')}}
+ </div>
+{% else %}
+{{forms.make_ms_form_select()}}
+{{forms.make_ms_form('spreadsheet')}}
+{{forms.make_ms_form('paste')}}
+{% endif %}
+
+
+{% endblock %}
+{% block js_script %}
+    <script src="{{ url_for('static', filename='percy/dist/js/ms_form.min.js', v=static_version) }}"></script>
+
+{% if result is defined %}
+    <script src="{{ url_for('static', filename='percy/dist/js/d3_hist.min.js', v=static_version) }}"></script>
+<script>
+
+
+    d3.select("#hist")
+        .datum({{result.trial_means}})
+      .call(histogramChart()
+        .bins(d3.scale.linear().domain([{{result.trial_means_min}}, {{result.trial_means_max}}]).ticks(20))
+        .tickFormat(d3.format(".02%")));
+
+
+
+</script>
+{% endif %}
+{% endblock %}
+
+

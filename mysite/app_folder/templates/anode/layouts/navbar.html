@@ -1,0 +1,27 @@
+<header class="navbar navbar-expand-md navbar-dark bg-dark flex-md-row">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="dropdown01" data-toggle="dropdown" aria-haspopup="true"
+                   aria-expanded="false">Menu</a>
+                <div class="dropdown-menu" aria-labelledby="dropdown01">
+                    {% if current_user.is_authenticated %}
+                        <a class="dropdown-item" href="{{ url_for('anode.logout') }}">Logout</a>
+                    {% else %}
+                        <a class="dropdown-item" href="{{ url_for('anode.login') }}">Login</a>
+                    {% endif %}
+
+                    <a class="dropdown-item" href="{{ url_for('anode.label_docs', project_id=project_id, category='manage_labels') }}">Manage Labels</a>
+                    <a class="dropdown-item" href="{{ url_for('main.open_page') }}">Back to Percy</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</header>

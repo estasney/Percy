@@ -1,0 +1,224 @@
+/*form styles*/
+form[id*='msform']{
+  width: 800px;
+  margin: 50px auto;
+  text-align: center;
+  position: relative;
+}
+
+form[id*='msform'] fieldset {
+  background: white;
+  border: 0 none;
+  border-radius: 3px;
+  box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+  padding: 20px 30px;
+  box-sizing: border-box;
+  width: 80%;
+  margin: 0 10%;
+  /*stacking fieldsets above each other*/
+  position: relative;
+}
+
+/*Hide all except first fieldset*/
+form[id*='msform'] fieldset:not(:first-of-type) {
+  display: none;
+}
+
+/*inputs*/
+form[id*='msform'] input, form[id*='msform'] textarea {
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: montserrat;
+  color: #2C3E50;
+  font-size: 13px;
+}
+
+/*buttons*/
+form[id*='msform'] .action-button {
+  width: 100px;
+  background: #555bde;
+  font-weight: bold;
+  color: white;
+  border: 0 none;
+  border-radius: 1px;
+  cursor: pointer;
+  padding: 10px 5px;
+  margin: 10px 5px;
+}
+
+form[id*='msform'] .action-button.previous {
+  background: #e1e2ec8c;
+  color: black;
+}
+
+form[id*='msform'] .action-button:hover, form[id*='msform'] .action-button:focus {
+  box-shadow: 0 0 0 2px white, 0 0 0 3px #27AE60;
+}
+
+/*headings*/
+.fs-title {
+  font-size: 15px;
+  text-transform: uppercase;
+  color: #2C3E50;
+  margin-bottom: 10px;
+}
+
+.fs-subtitle {
+  font-weight: normal;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/*progressbar*/
+[id*='progressbar'] {
+  /* background: rgb(129,129,129); */
+  /* margin-bottom: 30px; */
+  overflow: hidden;
+  /*CSS counters to number the steps*/
+  counter-reset: step;
+  padding-inline-start: 0;
+}
+
+[id*='progressbar'] li {
+  list-style-type: none;
+  color: black;
+  text-transform: uppercase;
+  font-size: 9px;
+  width: 33.33%;
+  float: left;
+  position: relative;
+}
+
+[id*='progressbar'] li:before {
+  content: counter(step);
+  counter-increment: step;
+  width: 20px;
+  line-height: 20px;
+  display: block;
+  font-size: 10px;
+  color: #333;
+  background: #ddcfcf;
+  border-radius: 3px;
+  margin: 0 auto 5px auto;
+}
+
+/*progressbar connectors*/
+[id*='progressbar'] li:after {
+  content: '';
+  width: 100%;
+  height: 2px;
+  background: rgb(85,91,222);
+  position: absolute;
+  left: -50%;
+  top: 9px;
+  z-index: -1;
+  /*put it behind the numbers*/
+}
+
+[id*='progressbar'] li:first-child:after {
+  /*connector not needed before the first step*/
+  content: none;
+}
+
+/*marking active/completed steps green*/
+/*The number of the step and the connector before it = green*/
+[id*='progressbar'] li.active:before, [id*='progressbar'] li.active:after {
+  background: #555bde;
+  color: white;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+[id*='female_slider_'] > div.ui-slider-range {
+    background: #555bde;
+}
+
+
+label {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input.slider {
+  -webkit-appearance: none;
+  width: 100%;
+    height: auto;
+    text-align: center;
+    font-size: inherit;
+  border-radius: 0px;
+    background: #f7f7f7;
+  outline: none;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+  .slider-output {
+    font-size: 1.1rem;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    padding: .375rem 1rem;
+    color: #fff;
+    border-radius: .25rem;
+    background-color: #555bde;
+  }
+
+
+  .centerMe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+  }
+
+  .loading {
+
+    display: inline-block;
+    padding: 0.5rem;
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    border: 15px solid #2c3e50;
+    border-top-color: #2980b9;
+    -webkit-animation: spin 1s infinite linear;
+            animation: spin 1s infinite linear;
+  }
+
+ .qq {
+  width: 80%;
+  border: solid 1px #ced4da;
+  border-radius: 0.25rem;
+  box-shadow: 0.5rem 0.5rem 0.5rem 0 #ced4da;
+}
+
+
+  @-webkit-keyframes spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+              transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+              transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+              transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+              transform: rotate(360deg);
+    }
+  }
