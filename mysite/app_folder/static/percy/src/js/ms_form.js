@@ -1,5 +1,7 @@
 $ = require("jquery");
 require("jquery-ui");
+let slider = require("jquery-ui/ui/widgets/slider");
+let tooltip = require("jquery-ui/ui/widgets/tooltip");
 require("jquery-validation");
 
 $(document).ready(function () {
