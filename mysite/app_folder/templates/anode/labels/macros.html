@@ -1,0 +1,20 @@
+{% macro label_slider(labels) %}
+
+    <ol id="labelToolbarList">
+        <li>
+            <a id="labelToolbarHide" href="#" title="Hide Toolbar">Hide »</a>
+        </li>
+        {% for label in labels %}
+        {% if label.is_selected %}
+            {% set checked = "checked" %}
+        {% else %}
+            {% set checked = "" %}
+        {% endif %}
+        <li>
+            <input type="checkbox" value="" id="label-check-{{ label.id }}" {{ checked }}>
+            <label style="background-color: {{ label.bg_color }}; color: {{ label.text_color }}"
+                   for="label-check-{{ label.id }}">{{ label.name }}</label>
+        </li>
+    </ol>
+
+{% endmacro %}
