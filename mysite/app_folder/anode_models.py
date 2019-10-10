@@ -221,7 +221,9 @@ class DocumentLabel(db.Model):
     YES = True
     NO = False
 
+    __bind_key__ = "anode"
     __tablename__ = "documentlabels"
+
     document_id = db.Column(db.Integer, db.ForeignKey("documents.id"), primary_key=True)
     label_id = db.Column(db.Integer, db.ForeignKey("labels.id"), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
@@ -246,6 +248,8 @@ class DocumentLabel(db.Model):
 
 
 class User(UserMixin, db.Model):
+
+    __bind_key__ = "anode"
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128))

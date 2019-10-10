@@ -19,8 +19,9 @@ def index():
 
     else:
         return render_template("anode/main/index.html", project_status=latest_project.project_status(current_user.id),
-                               project_name=latest_project.name,
-                               endpoint="label/{}/label".format(latest_project.id), btn_text="Start Labeling")
+                               project_name=latest_project.name, project_id=latest_project.id,
+                               endpoint=url_for('anode.label_docs', project_id=latest_project.id, category='label'),
+                               btn_text="Start Labeling")
 
 
 @bp.route('/login/', methods=['GET', 'POST'])

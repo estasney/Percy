@@ -68,7 +68,7 @@ class LabelApp extends React.Component {
         window.addEventListener('scroll', this.handleScroll);
         window.document.addEventListener('keypress', this.shortcutKeys);
         let params = {action: "setup"};
-        let url = makeUrl(this.props.project_id, "/api/label/", params);
+        let url = makeUrl(this.props.project_id, "/anode/api/label/", params);
         fetch(url)
             .then(res => res.json())
             .then(
@@ -106,7 +106,7 @@ class LabelApp extends React.Component {
     }
 
     postState(doc_id, labels) {
-        let url = makeUrl(this.props.project_id, "/api/label/");
+        let url = makeUrl(this.props.project_id, "/anode/api/label/");
         fetch(url, {
             method: 'POST',
             headers: {
@@ -167,7 +167,7 @@ class LabelApp extends React.Component {
         }
         const next_idx_id = idxDocs[idxPos + step].id;
         let params = {action: "fetch", doc_id_in: doc_id, doc_id_out: next_idx_id};
-        let url = makeUrl(this.props.project_id, "/api/label/", params);
+        let url = makeUrl(this.props.project_id, "/anode/api/label/", params);
         fetch(url)
             .then(res => res.json())
             .then(
@@ -239,7 +239,7 @@ class LabelApp extends React.Component {
             });
         }
         const params = {action: "fetch", doc_id_out: id, doc_id_in: this.state.id};
-        const url = makeUrl(this.props.project_id, "/api/label/", params);
+        const url = makeUrl(this.props.project_id, "/anode/api/label/", params);
 
         // Show loading
         this.setState({

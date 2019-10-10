@@ -229,7 +229,7 @@ class ProjectLabelsApp extends React.Component {
     }
 
     handleClick(label_state) {
-        let url = makeUrl(this.props.project_id, "/api/label/manage/");
+        let url = makeUrl(this.props.project_id, "/anode/api/label/manage/");
         fetch(url, {
             method: 'POST',
             headers: {
@@ -257,7 +257,7 @@ class ProjectLabelsApp extends React.Component {
     }
 
     componentDidMount() {
-        let url = makeUrl(this.props.project_id, "/api/label/manage/");
+        let url = makeUrl(this.props.project_id, "/anode/api/label/manage/");
         fetch(url)
             .then(res => res.json())
             .then(
