@@ -7,25 +7,6 @@ class IndexDoc extends React.Component {
         this.clickWrapper = this.clickWrapper.bind(this);
     }
 
-    componentDidMount() {
-        if (this.props.active) {
-
-            ReactDom.findDOMNode(this).scrollIntoView({
-                behavior: "smooth",
-                block: "center"
-            });
-        }
-    }
-
-    componentDidUpdate() {
-        if (this.props.active) {
-            ReactDom.findDOMNode(this).scrollIntoView({
-                behavior: "smooth"
-            });
-        }
-    }
-
-
     clickWrapper(e) {
         e.preventDefault();
         this.props.myChange(this.props.id);
