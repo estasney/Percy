@@ -18,7 +18,7 @@
                         <a class="dropdown-item" href="{{ url_for('anode.login') }}">Login</a>
                     {% endif %}
 
-                    <a class="dropdown-item" href="{{ url_for('anode.label_docs', project_id=project_id, category='manage_labels') }}">Manage Labels</a>
+                    <a class="dropdown-item" href="{{ url_for('anode.label_docs', project_id=current_user.active_project.id, category='manage_labels') }}">Manage Labels</a>
                     <a class="dropdown-item" href="{{ url_for('main.open_page') }}">Back to Percy</a>
                 </div>
             </li>
