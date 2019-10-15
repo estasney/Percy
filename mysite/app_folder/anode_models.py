@@ -25,11 +25,6 @@ def standardize_name(s):
     return s
 
 
-User_LabelProjects = db.Table('user_labelprojects',
-                              db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-                              db.Column('project_id', db.Integer, db.ForeignKey('label_projects.id'), primary_key=True),
-                              info={"bind_key": "anode"})
-
 Tags_Documents = db.Table('tags_documents',
                           db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True),
                           db.Column('document_id', db.Integer, db.ForeignKey('documents.id'), primary_key=True),
@@ -41,9 +36,31 @@ User_Seen_Documents = db.Table("user_seen_documents",
                                info={"bind_key": "anode"})
 
 
+class User_LabelProjects(db.Model):
+    __bind_key__ = "anode"
+    __tablename__ = "user_labelprojects"
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey("label_projects.id"), primary_key=True)
+    active = db.Column(db.Boolean, default=False)
+
+    user = db.relationship("User",
+                           backref=backref("user_projects", cascade='all, delete-orphan'))
+    project = db.relationship("LabelProject",
+                              backref=backref("users", cascade='all, delete-orphan'))
+
+    def __init__(self, user=None, project=None, is_active=False):
+        self.project = project
+        self.user = user
+        self.is_active = is_active
+
+
 class LabelProject(db.Model):
     __bind_key__ = "anode"
     __tablename__ = "label_projects"
+
+    JSON_KEYS = ["id", "name", "created", "active", "labels"]
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
     created = db.Column(db.DateTime, default=datetime.now())
@@ -99,8 +116,6 @@ class LabelProject(db.Model):
         return Document.query.filter(and_(
                 Document.project_id == self.id),
                 Document.index == (doc_idx - 1)).first()
-
-    "anode"
 
 
 class Label(db.Model):
@@ -213,8 +228,6 @@ class Document(db.Model):
         d['labels_data'] = self.labels_data(user_id)
         return d
 
-    __bind_key__ = "anode"
-
 
 class DocumentLabel(db.Model):
     NA = None
@@ -244,19 +257,16 @@ class DocumentLabel(db.Model):
         self.label = label
         self.user = user
         self.selected = selected
-        __bind_key__ = "anode"
 
 
 class User(UserMixin, db.Model):
-
     __bind_key__ = "anode"
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128))
     password_hash = db.Column(db.Text)
     _is_active = db.Column(db.Boolean, default=True)
-    projects = db.relationship("LabelProject", secondary=User_LabelProjects, lazy=True,
-                               backref=db.backref('users', lazy=True))
+    projects = association_proxy("user_projects", "project")
     documents_seen = db.relationship("Document", secondary=User_Seen_Documents, lazy=True, back_populates='seen_by')
 
     def __init__(self, username, password):
@@ -267,6 +277,26 @@ class User(UserMixin, db.Model):
     def is_active(self):
         return self._is_active
 
+    @property
+    def active_project(self):
+        if not self.user_projects:
+            return None
+        active_project = next((prj for prj in self.user_projects if prj.active), None)
+        if not active_project:
+            return None
+        return active_project.project
+
+    @active_project.setter
+    def active_project(self, project: LabelProject):
+        current_active = next((prj for prj in self.user_projects if prj.active), None)
+        if current_active:
+            current_active.active = False
+        matched_project = next((prj for prj in self.user_projects if prj.project_id == project.id), None)
+        if not matched_project:
+            raise IndexError("No project found for ID {}".format(project.id))
+        matched_project.active = True
+        db.session.commit()
+
     def get_id(self):
         return str(self.id)
 
@@ -275,7 +305,6 @@ class User(UserMixin, db.Model):
 
     def generate_new_password(self, new_password):
         self.password_hash = generate_password_hash(new_password)
-
 
 
 @login_manager.user_loader
