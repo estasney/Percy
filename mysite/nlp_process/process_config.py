@@ -54,7 +54,24 @@ class ProcessConfig(object):
 
 
 if __name__ == "__main__":
+    import re
+    path_finder = re.compile(r"(?:/[A-z0-9]+)+|(?<=[A-z]:)(\\[A-z0-9]+)")
+    ext_finder = re.compile(r"(\.[a-z]{2,4})")
     p = ProcessConfig()
     for attribute, value in p.__dict__.items():
         if attribute.isupper():
             print(attribute, value)
+
+    for attribute, value in p.__dict__.items():
+        if not isinstance(value, str):
+            continue
+        is_path_like = path_finder.search(value)
+        if not is_path_like:
+            continue
+        is_dir = ext_finder.search(value) is None
+        if not is_dir:
+            continue
+        dir_exists = os.path.isdir(value)
+        if not dir_exists:
+            print("Mkdir : {}".format(attribute))
+            os.mkdir(value)
