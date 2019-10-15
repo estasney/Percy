@@ -117,6 +117,9 @@ class LabelProject(db.Model):
                 Document.project_id == self.id),
                 Document.index == (doc_idx - 1)).first()
 
+    def to_dict(self):
+        return {k: getattr(self, k, None) for k in self.JSON_KEYS}
+
 
 class Label(db.Model):
     __bind_key__ = "anode"

@@ -111,11 +111,20 @@ def label_docs(project_id, category):
         return render_template("anode/labels/projectPicker.html", projects=user_projects)
     elif not project_id and request.method == 'POST':
         user = User.query.get(current_user.id)
+        user_projects = [p.to_dict() for p in user.projects]
+        project_id = request.form.get('id', None)
+        if not project_id:
+            return render_template("anode/labels/projectPicker.html", projects=user_projects, code='error')
+        try:
+            project = LabelProject.query.get(project_id)
+            user.active_project = project
+            return render_template("anode/labels/projectPicker.html", projects=user_projects, code='success')
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return render_template("anode/labels/projectPicker.html", projects=user_projects, code='error')
 
-        return jsonify({}), 200
     if category == "manage_labels":
         return render_template("anode/labels/projectLabelApp.html", project_id=project_id)
     if category == "label":
         return render_template("anode/labels/labelApp.html", project_id=project_id)
-
-
