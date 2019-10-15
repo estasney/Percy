@@ -40,8 +40,9 @@ class User_LabelProjects(db.Model):
     __bind_key__ = "anode"
     __tablename__ = "user_labelprojects"
 
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey("label_projects.id"), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey("label_projects.id"), nullable=False)
     active = db.Column(db.Boolean, default=False)
 
     user = db.relationship("User",
