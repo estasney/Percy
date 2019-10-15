@@ -103,7 +103,16 @@ def label_api(project_id):
 @login_required
 @bp.route("/label/<project_id>/<category>", methods=["GET", "POST"])
 @bp.route("/label/<project_id>", methods=['GET', 'POST'], defaults={"category": None})
+@bp.route("/label", methods=['GET', 'POST'], defaults={"category": None, "project_id": None})
 def label_docs(project_id, category):
+    if not project_id and request.method == 'GET':
+        user = User.query.get(current_user.id)
+        user_projects = [p.to_dict() for p in user.projects]
+        return render_template("anode/labels/projectPicker.html", projects=user_projects)
+    elif not project_id and request.method == 'POST':
+        user = User.query.get(current_user.id)
+
+        return jsonify({}), 200
     if category == "manage_labels":
         return render_template("anode/labels/projectLabelApp.html", project_id=project_id)
     if category == "label":

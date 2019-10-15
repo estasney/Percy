@@ -1,0 +1,35 @@
+{% extends "anode/layouts/base.html" %}
+{% block content %}
+    <div class="container">
+    <h2>Select Project</h2>
+
+    {% if code == 'error' %}
+    <div class="alert alert-warning" role="alert">
+        Error setting active project
+    </div>
+
+    {% elif code == 'success' %}
+    <div class="alert alert-success" role="alert">
+        Project selected!
+    </div>
+    {% endif %}
+
+    <form action="{{ url_for('anode.label_docs') }}" method="post">
+    <div class="form-group row">
+        <label for="project_name" class="col-2 col-form-label">Select Project</label>
+        <div class="col-8">
+            <select class="form-control" id="project_name" name="id">
+                {% for project in projects %}
+                    {% if project.active %}
+                    <option value="{{project.id}}" selected>{{project.name}}</option>
+                    {% else %}
+                    <option value="{{project.id}}">{{project.name}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+     <button type="submit" class="btn btn-primary">Set Active</button>
+    </form>
+    </div>
+{% endblock %}
