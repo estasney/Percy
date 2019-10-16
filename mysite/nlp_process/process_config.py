@@ -12,6 +12,7 @@ class ProcessConfig(object):
         self.PHRASE_FOLDER = self.smart_path('data', 'phrases')
         self.PHRASE_EXCLUDED = self.smart_path(self.PHRASE_FOLDER, 'excluded.txt')
         self.PHRASE_INCLUDED = self.smart_path(self.PHRASE_FOLDER, 'included.txt')
+        self.ANNOTATED_PHRASES = self.smart_path(self.PHRASE_FOLDER, 'annotated_phrases.txt')
         self.PHRASE_DUMP = self.smart_path(self.PHRASE_FOLDER, 'phrase_dump.txt')
         self.PHRASE_MODEL = self.smart_path(self.PHRASE_FOLDER, 'phrases.model')
 
