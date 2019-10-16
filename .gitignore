@@ -21,3 +21,4 @@ venv/
 /mysite/notebooks/data/beta_params.npy
 /mysite/notebooks/
 /mysite/app_folder/static/percy/node_modules/
+/mysite/app_folder/scripts/anode/
