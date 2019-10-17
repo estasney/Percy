@@ -1,5 +1,4 @@
 import spacy
-import en_core_web_sm
 from typing import Callable
 
 

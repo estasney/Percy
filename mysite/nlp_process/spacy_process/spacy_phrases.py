@@ -3,7 +3,7 @@ from collections import Counter
 from collections import namedtuple
 from datetime import datetime
 
-import easygui
+
 from gensim.models.phrases import Phraser, Phrases
 from pampy import match, _, TAIL
 

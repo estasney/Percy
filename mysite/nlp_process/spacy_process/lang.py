@@ -27,13 +27,13 @@ def lang_detect(x):
         merged_text = summary_text + job_text
         try:
             return detect(merged_text)
-        except:
+        except Exception:
             return ""
 
     if x['lang'] == -1:  # Not previously detected
         try:
             return text_merge(x)
-        except:
+        except Exception:
             return ""
     else:
         return x['lang']

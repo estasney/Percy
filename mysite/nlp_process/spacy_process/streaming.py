@@ -131,7 +131,8 @@ class SpacyTokenCleaner(object):
 
 
 class SpacyTokenFilter(object):
-    DEFAULT_EXCLUDED = ["is_digit", "is_punct", "is_space", "is_currency", "like_url", "like_num", "like_email"]
+    DEFAULT_EXCLUDED = ["is_digit", "is_punct", "is_space", "is_currency", "like_url", "like_num", "like_email",
+                        "is_quote", "is_stop"]
     STOPWORDS = set(stopwords.words("english"))
     EXTRA_STOPWORDS = ["-PRON-", "-LRB-", "-RRB-", "'s", "7/"]
     CHAR_FILTER = "([^A-z0-9!#%\'()*+,-./:?@\[\]_~])"

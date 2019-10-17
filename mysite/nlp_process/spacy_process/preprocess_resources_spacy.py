@@ -1,8 +1,10 @@
 import itertools
+import re
 import sys
 
 sys.path.append(r"C:\Users\estasney\PycharmProjects\Percy\mysite")
 import json
+from tqdm import tqdm
 import os
 import pandas as pd
 import numpy as np
@@ -28,7 +30,7 @@ from nlp_process.spacy_process import (lang_detect, lookup_language_detection, a
 
 config = ProcessConfig()
 
-TOKEN_KEY_TYPE = 'norm'
+TOKEN_KEY_TYPE = 'lemma'
 MIN_WORD_COUNT = 20
 MAX_WORD_RATIO = 0.9
 MIN_SKILL_COUNT = 25
@@ -38,7 +40,7 @@ WORD_VEC_SIZE = 200
 SKILL_VEC_SIZE = 100
 
 
-@time_this
+
 def spacify_docs(output1=config.OUTPUT1, output2=config.OUTPUT2, prettify=False, ignore_existing=False, max_files=None):
     """
 
@@ -50,10 +52,59 @@ def spacify_docs(output1=config.OUTPUT1, output2=config.OUTPUT2, prettify=False,
     :return:
     """
 
+    from spacy.tokens import Span
+    from spacy.tokens import Doc
+    from spacy.matcher import PhraseMatcher
+
+    Doc.set_extension("phrase_spans", default=None)
+
     start_time = datetime.now()
     print("Loading spacy model")
     nlp = en_core_web_lg.load()
     print("Model loaded in {}".format(datetime.now() - start_time))
+
+    with open(config.ANNOTATED_PHRASES, "r") as fp:
+        phrases = fp.read().splitlines()
+        print("{} Phrases Loaded".format(len(phrases)))
+
+    phrases_nlp = [nlp(p) for p in phrases]
+    matcher = PhraseMatcher(nlp.vocab, attr='NORM')
+    matcher.add("Phrase", None, *phrases_nlp)
+
+    def merge_ents(doc):
+        with doc.retokenize() as retokenizer:
+            for ent in doc.ents:
+                ent_start, ent_end = ent.start, ent.end
+                attrs = {
+                    "tag":   ent.root.tag, "dep": ent.root.dep, "ent_type": ent.label,
+                    'LEMMA': "_".join([x.lemma_ for x in doc[ent_start:ent_end]]),
+                    'NORM':  "_".join([x.norm_ for x in doc[ent_start:ent_end]])
+                    }
+                retokenizer.merge(ent, attrs=attrs)
+        return doc
+
+    def mark_phrases(doc, matcher=matcher):
+        doc._.phrase_spans = matcher(doc)
+        return doc
+
+    def merge_phrases(doc):
+        if not doc._.phrase_spans:
+            return doc
+        with doc.retokenize() as retokenizer:
+            for phrase in doc._.phrase_spans:
+                _, phrase_start, phrase_end = phrase
+                lemma_phrase = "_".join([x.lemma_ for x in doc[phrase_start:phrase_end]])
+                norm_phrase = "_".join([x.norm_ for x in doc[phrase_start:phrase_end]])
+                attr = {"LEMMA": lemma_phrase, "NORM": norm_phrase}
+                try:
+                    retokenizer.merge(doc[phrase_start:phrase_end], attrs=attr)
+                except ValueError:
+                    continue
+        return doc
+
+    nlp.add_pipe(merge_ents, last=True)
+    nlp.add_pipe(mark_phrases, last=True)
+    nlp.add_pipe(merge_phrases, last=True)
 
     output1_files = get_spacy_target_files(ignore_existing, output1, output2)
     print("Found {} docs".format(len(output1_files)))
@@ -65,9 +116,8 @@ def spacify_docs(output1=config.OUTPUT1, output2=config.OUTPUT2, prettify=False,
     spacify_jobs(nlp, output1_files, output2, prettify)
 
 
-@time_this
+
 def spacify_jobs(nlp, output1_files, output2, prettify, cache_size=1000):
-    @time_this
     def append_jobs(cache, output_folder, prettify):  # Find or make files and add jobs
         for doc_id, jobs in cache.items():
             doc_fp = os.path.join(output_folder, "{}.json".format(doc_id))
@@ -86,10 +136,12 @@ def spacify_jobs(nlp, output1_files, output2, prettify, cache_size=1000):
                 else:
                     json.dump(doc_data, json_file)
 
+    pb = tqdm(total=len(output1_files), desc='Processing Jobs')
     doc_stream = stream_docs(files=output1_files, data_key=None)
     job_stream = stream_doc_jobs(doc_stream)
     job_cache = {}
     for nlp_doc, doc_id in nlp.pipe(job_stream, batch_size=50, as_tuples=True):
+        pb.update(1)
         doc_not_cached = doc_id not in job_cache
         if doc_not_cached and len(job_cache) >= cache_size:
             append_jobs(job_cache, output_folder=output2, prettify=prettify)
@@ -100,9 +152,10 @@ def spacify_jobs(nlp, output1_files, output2, prettify, cache_size=1000):
         job_cache[doc_id] = doc_jobs
 
     append_jobs(job_cache, output_folder=output2, prettify=prettify)
+    pb.close()
 
 
-@time_this
+
 def spacify_summaries(nlp, output1_files, output2, prettify):
     doc_stream = stream_docs(files=output1_files, data_key=None)  # As dict
     doc_stream_unpacked = stream_unpacked_docs(doc_stream)
@@ -110,27 +163,24 @@ def spacify_summaries(nlp, output1_files, output2, prettify):
     # Want to keep additional data from doc
     data_stream, nlp_stream = itertools.tee(doc_stream_unpacked, 2)
     summary_stream = stream_doc_summaries(nlp_stream)
-    timings = []
-    counter = 0
+
+    pb = tqdm(total=len(output1_files), desc='Processing Summaries')
+
     for nlp_doc, doc_id in nlp.pipe(summary_stream, batch_size=50, as_tuples=True):
-        start_time = datetime.now()
         nlp_doc_json = add_extra(nlp_doc)
         doc_data = data_stream.__next__()
-        doc_data['summary'] = nlp_doc_json
+        doc_data['text'] = nlp_doc_json
         out_f = os.path.join(output2, "{}.json".format(doc_id))
         with open(out_f, 'w+') as json_file:
             if prettify:
                 json.dump(doc_data, json_file, indent=4)
             else:
                 json.dump(doc_data, json_file)
-        elapsed = (datetime.now() - start_time).total_seconds()
-        timings.append(elapsed)
-        counter += 1
-        if counter % 1000 == 0 and counter > 0:
-            step_mean = np.array(timings).mean()
-            del timings
-            timings = []
-            print("Now on step {}, Avg {} per step".format(counter, step_mean))
+        pb.update(1)
+
+    pb.close()
+
+
 
 
 @time_this
@@ -177,8 +227,7 @@ def preprocess_csv(corpus_fp, n_workers, output1=config.OUTPUT1, prettify_output
 @time_this
 def make_token_dictionary(folder=config.OUTPUT2):
     doc_reader = SpacyReader(folder=folder, data_key=get_sub_docs, token_key=TOKEN_KEY_TYPE)
-    doc_phraser = MyPhraser()
-    doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
+    doc_stream = doc_reader.as_sentences()
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     dictionary = Dictionary(doc_stream)
     print("Dictionary found {} unique tokens".format(len(dictionary)))
@@ -264,8 +313,8 @@ def get_skill_probabilities(folder=config.OUTPUT2):
 @time_this
 def get_token_pair_probabilities(folder=config.OUTPUT2):
     doc_reader = SpacyReader(folder=folder, data_key=get_sub_docs, token_key=TOKEN_KEY_TYPE)
-    doc_phraser = MyPhraser()
-    doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
+    # doc_phraser = MyPhraser()
+    doc_stream = doc_reader.as_sentences()
     dictionary = Dictionary.load(config.RESOURCES_DICTIONARY_TOKENS)
 
     pair_stream = stream_pairs(doc_stream, dictionary, window_size=WINDOW_SIZE)
@@ -359,8 +408,8 @@ def get_pmi_skills():
 def get_fingerprint_tokens(folder=config.OUTPUT2):
     cnt = TfidfVectorizer(use_idf=True, sublinear_tf=True)
     doc_reader = SpacyReader(folder=folder, data_key=get_sub_docs, token_key=TOKEN_KEY_TYPE)
-    doc_phraser = MyPhraser()
-    doc_stream = doc_reader.as_phrased_sentences(doc_phraser)
+    # doc_phraser = MyPhraser()
+    doc_stream = doc_reader.as_sentences()
 
     # Tfidf doesn't accept lists
     def stream_tokens_from_sentences(doc_stream):
@@ -378,23 +427,43 @@ def get_fingerprint_tokens(folder=config.OUTPUT2):
     with open(config.RESOURCES_FINGERPRINT_VEC_TOKENS, "wb+") as pfile:
         pickle.dump(cnt, pfile)
 
+def dump_text(output, format='fasttext'):
+
+    if format not in ['fasttext']:
+        raise NotImplementedError
+
+    doc_reader = SpacyReader(folder=config.OUTPUT2, data_key=get_sub_docs, token_key=TOKEN_KEY_TYPE)
+    replace_datum = re.compile("datum", re.IGNORECASE)
+    stream = doc_reader.as_sentences()
+    with open(output, encoding="utf-8", mode="w+") as fp:
+        for sentence_tokens in stream:
+            if not sentence_tokens:
+                continue
+            sentence_line = " ".join(sentence_tokens)
+            sentence_line = replace_datum.sub("data", sentence_line)
+            fp.write(sentence_line)
+            fp.write("\n")
+
+
+
 
 if __name__ == "__main__":
     # CSV To JSON
     # Remove Null Records
     # Remove Non-English Records
 
-    preprocess_csv(corpus_fp=config.CORPUS_FILE_2, n_workers=N_WORKERS)
+    # preprocess_csv(corpus_fp=config.CORPUS_FILE, n_workers=8)
 
-    # Tokenize JSON records
+    # # Tokenize JSON records
     spacify_docs(ignore_existing=False, max_files=None)
-    #
-    # # Train the phraser from JSON records
-    detect_phrases(input_dir=config.OUTPUT2, phrase_model_fp=config.PHRASE_MODEL,
-                   phrase_dump_fp=config.PHRASE_DUMP,
-                   common_words=STOPWORDS, min_count=10, threshold=30, token_key=TOKEN_KEY_TYPE)
-    make_token_dictionary()
-    make_skills_dictionary()
-    get_pmi_tokens()
-    get_pmi_skills()
-    get_fingerprint_tokens()
+    # #
+    # # # Train the phraser from JSON records
+    # detect_phrases(input_dir=config.OUTPUT2, phrase_model_fp=config.PHRASE_MODEL,
+    #                phrase_dump_fp=config.PHRASE_DUMP,
+    #                common_words=STOPWORDS, min_count=10, threshold=30, token_key=TOKEN_KEY_TYPE)
+    # make_token_dictionary()
+    # make_skills_dictionary()
+    # get_pmi_tokens()
+    # get_pmi_skills()
+    # get_fingerprint_tokens()
+    dump_text("/home/eric/PycharmProjects/Percy/mysite/nlp_process/data/corpus/sent_corpus.txt")
