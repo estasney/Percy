@@ -13,19 +13,28 @@ class IndexDoc extends React.Component {
     }
 
     render() {
-        let c = "index-item";
-        let check = "icon";
+        let rowClass = "index-item";
         if (this.props.active) {
-            c += " active";
+            rowClass += " active";
         }
+
+        let check = "icon";
         if (!this.props.seen) {
             check += " hidden";
         }
 
+        let flag = "icon";
+        if (!this.props.flagged) {
+            flag += " hidden";
+        }
+
         return (
-            <a href="#" onClick={this.clickWrapper} className={c}>
+            <a href="#" onClick={this.clickWrapper} className={rowClass}>
                 <span className={check}>
                     <i className={"fa fa-check"}/>
+                </span>
+                <span className={flag}>
+                    <i className={"fas fa-bookmark"}/>
                 </span>
                 <span className={"snippet"}>
                     {this.props.name}
@@ -66,6 +75,7 @@ export class IndexManager extends React.Component {
                     seen={doc.seen}
                     active={doc.active}
                     name={doc.name}
+                    flagged={doc.flag}
                     myChange={() => manager.props.parent.handleIndexClick(doc.id)}>
 
                 </IndexDoc>

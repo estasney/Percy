@@ -88,12 +88,20 @@ class LabelProject(db.Model):
     def project_index(self, user_id: int):
         user = User.query.get(user_id)
         user_seen = db.session.query(User_Seen_Documents).filter(User_Seen_Documents.c.user_id == user.id).subquery()
-        index = db.session.query(Document, user_seen.c.user_id) \
+        user_flagged = db.session.query(User_Flag_Documents).filter(User_Flag_Documents.c.user_id == user.id).subquery()
+        index = db.session.query(Document, user_seen.c.user_id, user_flagged.c.user_id) \
             .options(load_only(Document.id, Document.name, Document.project_id)) \
             .outerjoin(user_seen, Document.id == user_seen.c.document_id) \
+            .outerjoin(user_flagged, Document.id == user_flagged.c.document_id) \
             .filter(Document.project_id == self.id) \
-            .with_entities(Document.id, Document.name, user_seen.c.user_id).all()
-        index_out = [{"id": i[0], "name": i[1], "seen": True if i[2] else False} for i in index]
+            .with_entities(Document.id, Document.name, user_seen.c.user_id, user_flagged.c.user_id).all()
+        index_out = []
+        for i in index:
+            td = {
+                "id":      i[0], "name": i[1], "seen": True if i[2] else False,
+                "flagged": True if i[3] else False
+                }
+            index_out.append(td)
         return index_out
 
     def mark_seen(self, doc_id: typing.Union[int, str], user_id: int):

@@ -240,6 +240,16 @@ class LabelApp extends React.Component {
                 const current_state = tools[toolPos].selected;
                 tools[toolPos].active = !current_state;
             }
+
+            //update index to reflect tools
+            let idxDocs = this.state.index_docs.slice();
+            const idxPos = idxDocs.map(function (x) {
+                return x.id;
+            }).indexOf(this.state.id);
+            idxDocs[idxPos].flag = !idxDocs[idxPos].flag;
+            this.setState({
+                index_docs: idxDocs
+            });
         }
 
 
