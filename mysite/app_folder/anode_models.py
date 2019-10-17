@@ -271,7 +271,8 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(128))
     password_hash = db.Column(db.Text)
     _is_active = db.Column(db.Boolean, default=True)
-    projects = association_proxy("user_projects", "project")
+    projects = association_proxy("user_projects", "project",
+                                 creator=lambda project: User_LabelProjects(project=project))
     documents_seen = db.relationship("Document", secondary=User_Seen_Documents, lazy=True, back_populates='seen_by')
 
     def __init__(self, username, password):
