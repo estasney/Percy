@@ -1,4 +1,5 @@
 import React from "react";
+import {FlagButton} from "./toolbtns.jsx";
 
 class InactiveLabel extends React.Component {
     constructor(props) {
@@ -95,71 +96,114 @@ class ActiveLabel extends React.Component {
 
 }
 
+
 export class LabelManager extends React.Component {
     constructor(props) {
         super(props);
+
     }
 
     render() {
-
         const labels = this.props.labels;
-        const manager = this;
-        let sticky_class;
-        if (this.props.sticky_state) {
-            sticky_class = "sticky";
-        } else {
-            sticky_class = "";
-        }
-        const labels_list_active = labels.map(function (label) {
-            if (label.selected) {
-                return (<ActiveLabel
-                    key={label.id}
-                    selected={label.selected}
-                    bg_color={label.bg_color}
-                    text_color={label.text_color}
-                    name={label.name}
-                    hotkey={label.hotkey}
-                    myChange={() => manager.props.parent.handleClick(label.id, label.selected)}
-                />)
-            }
+        const labeltools = this.props.labeltools;
 
-        });
+        const labels_empty = labels.length === 0;
+        const tools_empty = labeltools.length === 0;
+        const loaded = !labels_empty && !tools_empty;
 
-        const labels_list_inactive = labels.map(function (label) {
 
-            if (!label.selected) {
-                return (<InactiveLabel
-                    key={label.id}
-                    selected={label.selected}
-                    bg_color={label.bg_color}
-                    text_color={label.text_color}
-                    name={label.name}
-                    hotkey={label.hotkey}
-                    myChange={() => manager.props.parent.handleClick(label.id, label.selected)}
-                />)
-            }
+        if (!loaded) {
+            return (
+                <div id={"sticky-label"} className={""}>
+                    <div className={"labels top-bar"}>
+                        <button className={"pagination-btn br-top-left"}
+                        >
+                            <i className="fas fa-arrow-left"/>
+                        </button>
+                        <div className={"labels inactive"}>
 
-        });
-        return (
-            <div id={"sticky-label"} className={sticky_class}>
-                <div className={"labels top-bar"}>
-                    <button className={"pagination-btn br-top-left"}
-                            onClick={() => manager.props.parent.paginate("back")}>
-                        <i className="fas fa-arrow-left"></i>
-                    </button>
-                    <div className={"labels inactive"}>
-                        {labels_list_inactive}
+                        </div>
+                        <button className={"pagination-btn br-top-right"}
+                        >
+                            <i className="fas fa-arrow-right"/>
+                        </button>
                     </div>
-                    <button className={"pagination-btn br-top-right"}
-                            onClick={() => manager.props.parent.paginate("next")}>
-                        <i className="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-                <div className={"labels selected"}>
-                    {labels_list_active}
-                </div>
-            </div>
-        )
-    }
+                    <div className={"labels selected"}>
+                    </div>
+                    <div className={"labels toolbar"}>
+                    </div>
+                </div>)
+        } else {
+            const manager = this;
+            let sticky_class;
+            if (this.props.sticky_state) {
+                sticky_class = "sticky";
+            } else {
+                sticky_class = "";
+            }
+            const labels_list_active = labels.map(function (label) {
+                if (label.selected) {
+                    return (<ActiveLabel
+                        key={label.id}
+                        selected={label.selected}
+                        bg_color={label.bg_color}
+                        text_color={label.text_color}
+                        name={label.name}
+                        hotkey={label.hotkey}
+                        myChange={() => manager.props.parent.handleClick(label.id, label.selected, "label")}
+                    />)
+                }
 
+            });
+            const labels_list_inactive = labels.map(function (label) {
+
+                if (!label.selected) {
+                    return (<InactiveLabel
+                        key={label.id}
+                        selected={label.selected}
+                        bg_color={label.bg_color}
+                        text_color={label.text_color}
+                        name={label.name}
+                        hotkey={label.hotkey}
+                        myChange={() => manager.props.parent.handleClick(label.id, label.selected, "label")}
+                    />)
+                }
+
+            });
+
+            const flagPos = labeltools.map(function (x) {
+                return x.id;
+            }).indexOf("flag");
+            const flagActive = labeltools[flagPos].active;
+            return (
+                <div id={"sticky-label"} className={sticky_class}>
+                    <div className={"labels top-bar"}>
+                        <button className={"pagination-btn br-top-left"}
+                                onClick={() => manager.props.parent.paginate("back")}>
+                            <i className="fas fa-arrow-left"></i>
+                        </button>
+                        <div className={"labels inactive"}>
+                            {labels_list_inactive}
+                        </div>
+                        <button className={"pagination-btn br-top-right"}
+                                onClick={() => manager.props.parent.paginate("next")}>
+                            <i className="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div className={"labels selected"}>
+                        {labels_list_active}
+                    </div>
+                    <div className={"labels toolbar"}>
+                        <FlagButton
+                            active={flagActive}
+                            id={"flag"}
+                            key={"flag"}
+                            toolPressed={() => manager.props.parent.handleClick("flag", flagActive, "tool")}
+                        />
+                    </div>
+                </div>
+            )
+
+        }
+    }
 }

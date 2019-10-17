@@ -85,6 +85,7 @@ def label_api(project_id):
     if request.method == "POST":
         # We will be changing selected on one label
         doc_id, labels_data = request.json.get('doc_id_in', None), request.json.get('labels', None)
+        labeltools = request.json.get('labeltools', None)
         if not all([doc_id, labels_data]):
             error_message = ""
             if not doc_id:
@@ -93,7 +94,7 @@ def label_api(project_id):
                 error_message += "Missing field labels "
             r = {"status": "error", "message": error_message}
             return jsonify(r), 400
-        update_doc_labels(doc_id, labels_data, user_id=current_user.id)
+        update_doc_labels(doc_id, labels_data, labeltools, user_id=current_user.id)
         doc = Document.query.get(doc_id)
         r = {"status": "success", "document": doc.to_dict(current_user.id)}
 

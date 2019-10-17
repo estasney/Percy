@@ -225,6 +225,7 @@ class ProjectLabelsApp extends React.Component {
             labels: [],
         };
         this.handleClick = this.handleClick.bind(this);
+        this.toolPressed = this.toolPressed.bind(this);
 
     }
 
@@ -254,6 +255,11 @@ class ProjectLabelsApp extends React.Component {
                     });
                 }
             );
+    }
+
+    toolPressed(id, active) {
+        console.log(id);
+        console.log(active);
     }
 
     componentDidMount() {

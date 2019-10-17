@@ -19,6 +19,7 @@ class LabelApp extends React.Component {
             name: "",
             id: "",
             labels: [],
+            labeltools: [],
             sticky_state: false,
             label_hotkeys: [],
             index_docs: [],
@@ -90,6 +91,7 @@ class LabelApp extends React.Component {
                         name: result.document.name,
                         id: result.document.id,
                         labels: result.document.labels_data,
+                        labeltools: result.document.labeltools,
                         label_hotkeys: hotkey2id,
                         index_docs: result.index
                     });
@@ -98,6 +100,8 @@ class LabelApp extends React.Component {
                     this.setState({
                         documentLoaded: false,
                         indexLoaded: false,
+                        labels: [],
+                        labeltools: [],
                         error
                     });
                 }
@@ -105,7 +109,7 @@ class LabelApp extends React.Component {
 
     }
 
-    postState(doc_id, labels) {
+    postState(doc_id, labels, labeltools) {
         let url = makeUrl(this.props.project_id, "/anode/api/label/");
         fetch(url, {
             method: 'POST',
@@ -115,7 +119,8 @@ class LabelApp extends React.Component {
             },
             body: JSON.stringify({
                 doc_id_in: doc_id,
-                labels: labels
+                labels: labels,
+                labeltools: labeltools
             })
         })
             .then(res => res.json())
@@ -123,6 +128,7 @@ class LabelApp extends React.Component {
                 (result) => {
                     this.setState({
                         labels: result.document.labels_data,
+                        labeltools: result.document.labeltools,
                         id: result.document.id
                     });
                 },
@@ -132,7 +138,9 @@ class LabelApp extends React.Component {
                         textAbridged: error,
                         text: error,
                         name: "",
-                        id: null
+                        id: null,
+                        labels: [],
+                        labeltools: []
                     });
                 }
             );
@@ -178,7 +186,8 @@ class LabelApp extends React.Component {
                         textAbridged: result.document.text_abridged,
                         name: result.document.name,
                         id: result.document.id,
-                        labels: result.document.labels_data
+                        labels: result.document.labels_data,
+                        labeltools: result.document.labeltools
                     });
                 },
                 (error) => {
@@ -188,14 +197,16 @@ class LabelApp extends React.Component {
                             textAbridged: error,
                             text: error,
                             name: "",
-                            id: null
+                            id: null,
+                            labels: [],
+                            labeltools: []
                         }
                     );
                 }
             );
     }
 
-    handleClick(id, active) {
+    handleClick(id, active, element_type) {
         /*
         Given a label id toggle it's selection state
         Update server with new state
@@ -205,17 +216,34 @@ class LabelApp extends React.Component {
 
          */
         const labels = this.state.labels.slice();
-        const elementPos = labels.map(function (x) {
-            return x.id;
-        }).indexOf(id);
-        if (active) {
-            labels[elementPos].selected = !active;
+        const tools = this.state.labeltools.slice();
+
+        if (element_type === 'label') {
+
+            const elementPos = labels.map(function (x) {
+                return x.id;
+            }).indexOf(id);
+            if (active) {
+                labels[elementPos].selected = !active;
+            } else {
+                const current_state = labels[elementPos].selected;
+                labels[elementPos].selected = !current_state;
+            }
         } else {
-            const current_state = labels[elementPos].selected;
-            labels[elementPos].selected = !current_state;
+
+            const toolPos = tools.map(function (x) {
+                return x.id;
+            }).indexOf(id);
+            if (active) {
+                tools[toolPos].active = !active;
+            } else {
+                const current_state = tools[toolPos].selected;
+                tools[toolPos].active = !current_state;
+            }
         }
 
-        this.postState(this.state.id, labels);
+
+        this.postState(this.state.id, labels, tools);
 
     }
 
@@ -264,6 +292,7 @@ class LabelApp extends React.Component {
                         name: result.document.name,
                         id: result.document.id,
                         labels: result.document.labels_data,
+                        labeltools: result.document.labeltools,
                         label_hotkeys: hotkey2id,
                     });
                 },
@@ -273,7 +302,9 @@ class LabelApp extends React.Component {
                         text: error,
                         textAbridged: error,
                         name: "",
-                        id: null
+                        id: null,
+                        labels: [],
+                        labeltools: []
                     });
                 }
             );
@@ -284,7 +315,7 @@ class LabelApp extends React.Component {
     render() {
         const {
             error, initLoaded, documentLoaded, indexLoaded, text,
-            textAbridged, name, id, labels, sticky_state, label_hotkeys, index_docs
+            textAbridged, name, id, labels, labeltools, sticky_state, label_hotkeys, index_docs
         } = this.state;
         if (error) {
             return (
@@ -306,6 +337,7 @@ class LabelApp extends React.Component {
                         <div>
                             <LabelManager
                                 labels={this.state.labels}
+                                labeltools={this.state.labeltools}
                                 parent={this}
                                 sticky_state={this.state.sticky_state}
                             >

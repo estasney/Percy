@@ -54,7 +54,7 @@ def update_project_labels(project: LabelProject, client_labels: list, user_id: U
     return project.labels
 
 
-def update_doc_labels(doc_id, client_labels, user_id):
+def update_doc_labels(doc_id, client_labels, client_labeltools, user_id):
     """
     Request returns the current state of the labels. Look for changes to state and update accordingly in db
     """
@@ -79,6 +79,26 @@ def update_doc_labels(doc_id, client_labels, user_id):
             if client_label_state is not None:
                 matched_db_label.selected = client_label_state
         doc_labels_out.append(matched_db_label)
+
+    # look for flags
+    doc_flag = next((lt for lt in client_labeltools if lt['id'] == 'flag'), None)
+    if not doc_flag:
+        db.session.commit()
+        return doc_labels_out
+
+    client_doc_flagged = doc_flag['active'] is True
+    db_doc_flagged = document.is_flagged_by_user(user_id)
+
+    if client_doc_flagged != db_doc_flagged:
+        if client_doc_flagged and not db_doc_flagged:
+            document.flagged_by.append(user)
+        else:
+            del_obj = User_Flag_Documents.delete().where(and_(
+                    User_Flag_Documents.c.user_id == user_id,
+                    User_Flag_Documents.c.document_id == doc_id
+                    ))
+
+            db.session.execute(del_obj)
 
     db.session.commit()
     return doc_labels_out

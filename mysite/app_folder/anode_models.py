@@ -234,9 +234,18 @@ class Document(db.Model):
             output.append(label)
         return output
 
+    def labeltools(self, user_id: int) -> list:
+        tools = []
+        tools.append({'id': 'flag', 'active': self.is_flagged_by_user(user_id)})
+        return tools
+
+    def is_flagged_by_user(self, user_id):
+        return user_id in [user.id for user in self.flagged_by]
+
     def to_dict(self, user_id: int) -> dict:
         d = {k: getattr(self, k, None) for k in self.JSON_KEYS}
         d['labels_data'] = self.labels_data(user_id)
+        d['labeltools'] = self.labeltools(user_id)
         return d
 
 
