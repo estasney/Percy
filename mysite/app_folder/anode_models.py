@@ -35,6 +35,11 @@ User_Seen_Documents = db.Table("user_seen_documents",
                                db.Column("document_id", db.Integer, db.ForeignKey("documents.id"), primary_key=True),
                                info={"bind_key": "anode"})
 
+User_Flag_Documents = db.Table("user_flag_documents",
+                               db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+                               db.Column("document_id", db.Integer, db.ForeignKey("documents.id"), primary_key=True),
+                               info={"bind_key": "anode"})
+
 
 class User_LabelProjects(db.Model):
     __bind_key__ = "anode"
@@ -195,6 +200,7 @@ class Document(db.Model):
     created = db.Column(db.DateTime, default=datetime.now())
     labels = association_proxy("doc_labels", "label")
     seen_by = db.relationship("User", secondary=User_Seen_Documents, lazy=True, back_populates='documents_seen')
+    flagged_by = db.relationship("User", secondary=User_Flag_Documents, lazy=True, back_populates='documents_flagged')
 
     def mark_null_labels(self, user_id: int, value: bool = False):
         unmarked = DocumentLabel.query.filter(and_(
@@ -274,6 +280,8 @@ class User(UserMixin, db.Model):
     projects = association_proxy("user_projects", "project",
                                  creator=lambda project: User_LabelProjects(project=project))
     documents_seen = db.relationship("Document", secondary=User_Seen_Documents, lazy=True, back_populates='seen_by')
+    documents_flagged = db.relationship("Document", secondary=User_Flag_Documents, lazy=True,
+                                        back_populates='flagged_by')
 
     def __init__(self, username, password):
         self.username = username
