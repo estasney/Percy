@@ -84,8 +84,9 @@ class LabelProject(db.Model):
         user = User.query.get(user_id)
         user_seen = db.session.query(User_Seen_Documents).filter(User_Seen_Documents.c.user_id == user.id).subquery()
         index = db.session.query(Document, user_seen.c.user_id) \
-            .options(load_only(Document.id, Document.name)) \
+            .options(load_only(Document.id, Document.name, Document.project_id)) \
             .outerjoin(user_seen, Document.id == user_seen.c.document_id) \
+            .filter(Document.project_id == self.id) \
             .with_entities(Document.id, Document.name, user_seen.c.user_id).all()
         index_out = [{"id": i[0], "name": i[1], "seen": True if i[2] else False} for i in index]
         return index_out
