@@ -55,7 +55,7 @@ class LabelApp extends React.Component {
                 if (e.key in this.state.label_hotkeys) {
                     e.preventDefault();
                     const label_id = this.state.label_hotkeys[e.key];
-                    this.handleClick(label_id, false);
+                    this.handleClick(label_id, false, "label");
                 }
         }
     }
