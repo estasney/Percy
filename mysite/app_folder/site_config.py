@@ -24,7 +24,11 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_POOL_RECYCLE = 299
     ENV = 'development'
-
+    STATIC_PACK_FILES = [r"anode\dist\js\labelApp.js",
+                         r"anode\dist\js\projectLabelApp.js",
+                         r"anode\dist\js\vendor.js",
+                         r"anode\dist\css\style.css",
+                         r"anode\dist\img\favicon.ico"]
 
 
 class FConfig(object):

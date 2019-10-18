@@ -11,13 +11,13 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
           integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='anode/dist/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset_url_for('static', filename='anode/dist/css/style.css') }}">
     {% block head %}{% endblock %}
 </head>
 <body>
 {% include 'anode/layouts/navbar.html' %}
 {% block content %} {% endblock %}
-<script src="{{ url_for('static', filename='anode/dist/js/vendor.js') }}"></script>
+<script src="{{ asset_url_for('static', filename='anode/dist/js/vendor.js') }}"></script>
 {% block tail_body %}
 {% endblock %}
 </body>
