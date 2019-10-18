@@ -23,6 +23,7 @@ class Config(object):
         }
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_POOL_RECYCLE = 299
+    ENV = 'development'
 
 
 

@@ -23,7 +23,7 @@ class IndexDoc extends React.Component {
             check += " hidden";
         }
 
-        let flag = "icon";
+        let flag = "icon green";
         if (!this.props.flagged) {
             flag += " hidden";
         }
@@ -75,7 +75,7 @@ export class IndexManager extends React.Component {
                     seen={doc.seen}
                     active={doc.active}
                     name={doc.name}
-                    flagged={doc.flag}
+                    flagged={doc.flagged}
                     myChange={() => manager.props.parent.handleIndexClick(doc.id)}>
 
                 </IndexDoc>

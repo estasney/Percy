@@ -246,7 +246,7 @@ class LabelApp extends React.Component {
             const idxPos = idxDocs.map(function (x) {
                 return x.id;
             }).indexOf(this.state.id);
-            idxDocs[idxPos].flag = !idxDocs[idxPos].flag;
+            idxDocs[idxPos].flagged = !idxDocs[idxPos].flagged;
             this.setState({
                 index_docs: idxDocs
             });
