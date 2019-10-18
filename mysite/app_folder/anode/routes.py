@@ -61,6 +61,9 @@ def label_api_sub(project_id):
             r = {"status": "error", "message": error_message}
             return jsonify(r), 400
         update_project_labels(project, client_labels=labels_data, user_id=current_user.id)
+        labels = [label.to_dict() for label in project.labels]
+        r = {"status": "success", "labels": labels}
+        return jsonify(r), 200
 
 
 @login_required

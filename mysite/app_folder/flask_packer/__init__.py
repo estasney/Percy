@@ -35,10 +35,15 @@ class Packer(object):
         matched_contents = glob.glob(glob_str)
         if not matched_contents:
             return None
-        else:
+        elif len(matched_contents) == 1:
             matched = matched_contents[0]
             matched = os.path.split(matched)[1]
             return matched
+        else:
+            matched = sorted(matched_contents, key=lambda x: os.path.getmtime(x), reverse=True)[0]
+            matched = os.path.split(matched)[1]
+            return matched
+
 
     def asset_url_for(self, folder, filename):
 

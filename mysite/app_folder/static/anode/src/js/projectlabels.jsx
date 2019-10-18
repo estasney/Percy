@@ -16,8 +16,8 @@ class LabelRow extends React.Component {
             },
             name: this.props.name,
             id: this.props.id,
-            bg_color: this.props.bg_color,
-            text_color: this.props.text_color,
+            bg_color: this.props.bg_color || "#ffff00",
+            text_color: this.props.text_color || "#000000",
             hotkey: this.props.hotkey,
             is_new: this.props.is_new,
             active: this.props.active,
@@ -215,6 +215,7 @@ class LabelForm extends React.Component {
 
 }
 
+//
 class ProjectLabelsApp extends React.Component {
     constructor(props) {
         super(props);
@@ -225,7 +226,6 @@ class ProjectLabelsApp extends React.Component {
             labels: [],
         };
         this.handleClick = this.handleClick.bind(this);
-        this.toolPressed = this.toolPressed.bind(this);
 
     }
 
@@ -255,11 +255,6 @@ class ProjectLabelsApp extends React.Component {
                     });
                 }
             );
-    }
-
-    toolPressed(id, active) {
-        console.log(id);
-        console.log(active);
     }
 
     componentDidMount() {

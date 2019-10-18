@@ -20,7 +20,7 @@ def update_project_labels(project: LabelProject, client_labels: list, user_id: U
         # Existing or new?
         try:
             label_id = int(label['id'])
-        except ValueError or TypeError:
+        except (ValueError, TypeError):
             label_id = None
 
         # If existing attempt to find match db label
@@ -33,9 +33,9 @@ def update_project_labels(project: LabelProject, client_labels: list, user_id: U
             label_params = {"project_id": project.id}
             for k in label_keys:
                 if isinstance(k, str):
-                    label_params[k] = getattr(label, k)
+                    label_params[k] = label.get(k, None)
                 else:
-                    label_params[k[1]] = getattr(label, k[0])
+                    label_params[k[1]] = label.get(k[0], None)
 
             db_label = Label(**label_params)
             db.session.add(db_label)
@@ -45,7 +45,7 @@ def update_project_labels(project: LabelProject, client_labels: list, user_id: U
                     client_key, db_key = k, k
                 else:
                     client_key, db_key = k[0], k[1]
-                new_value, old_value = getattr(label, client_key), getattr(matched_db_label, db_key)
+                new_value, old_value = label.get(client_key, None), getattr(matched_db_label, db_key)
                 if new_value == old_value:
                     continue
                 setattr(matched_db_label, db_key, new_value)
