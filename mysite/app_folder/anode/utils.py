@@ -4,7 +4,8 @@ from app_folder.anode_models import *
 
 
 def get_latest_project(user):
-    return LabelProject.query.filter(LabelProject.active == True).first()
+    user = User.query.get(user.id)
+    return user.active_project
 
 
 def update_project_labels(project: LabelProject, client_labels: list, user_id: Union[str, int]):
