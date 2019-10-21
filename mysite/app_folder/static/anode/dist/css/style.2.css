@@ -26,6 +26,8 @@
 
 .react-container .labels.top-bar {
     display: flex;
+    justify-content: space-between;
+    background-color: #aeb4c58c;
 }
 
 .br-top-left {
@@ -74,7 +76,6 @@
     justify-content: flex-start;
     flex-wrap: wrap;
     margin-bottom: 0;
-    background-color: #aeb4c58c;
     padding: 0 0.25rem 0.25rem 0.25rem;
 
 }
