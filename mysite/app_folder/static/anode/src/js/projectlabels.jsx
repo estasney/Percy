@@ -156,19 +156,11 @@ class LabelRow extends React.Component {
 class LabelForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            n_empty: 0,
-        };
         this.addBlankRow = this.addBlankRow.bind(this);
     }
 
     addBlankRow() {
-        console.log("add");
-        this.setState({
-                n_empty: this.state.n_empty + 1
-            }
-        );
-
+        this.props.addEmpty();
     }
 
     render() {
@@ -189,16 +181,13 @@ class LabelForm extends React.Component {
         });
 
         let blank_rows = [];
-        if (this.state.n_empty > 0) {
-            for (let i = 0; i < this.state.n_empty; i++) {
+        if (this.props.n_empty > 0) {
+            for (let i = 0; i < this.props.n_empty; i++) {
                 let chr = String.fromCharCode(97 + i);
                 blank_rows.push(
                     <LabelRow
                         key={chr}
-                        id={null}
-                        bg_color={""}
-                        name={""}
-                        hotkey={""}
+                        id={chr}
                         is_new={true}
                         myChange={(s) => manager.props.parent.handleClick(s)}
                     />);
@@ -230,12 +219,36 @@ class ProjectLabelsApp extends React.Component {
             initLoaded: false,
             labelsLoaded: false,
             labels: [],
+            n_empty: 0
         };
         this.handleClick = this.handleClick.bind(this);
+        this.addEmpty = this.addEmpty.bind(this);
 
     }
 
+    addEmpty() {
+        this.setState({
+            n_empty: this.state.n_empty + 1
+        });
+    }
+
     handleClick(label_state) {
+        // check if label_state.is_new is true, if so remove it from labels to prevent duplicate labels
+        if (label_state.is_new) {
+            let projectLabels = this.state.labels.slice();
+            const idxPos = projectLabels.map(function (x) {
+                return x.id;
+            }).indexOf(label_state.id);
+            projectLabels.splice(idxPos);
+
+            this.setState({
+                labels: projectLabels,
+                n_empty: 0
+            })
+
+        }
+
+
         let url = makeUrl(this.props.project_id, "/anode/api/label/manage/");
         fetch(url, {
             method: 'POST',
@@ -289,7 +302,8 @@ class ProjectLabelsApp extends React.Component {
     }
 
     render() {
-        const {error, initLoaded, labelsLoaded, labels} = this.state;
+        const {error, initLoaded, labelsLoaded, labels, n_empty} = this.state;
+        const manager = this;
         if (error) {
             return (
                 <div>Error: {error.message}
@@ -302,6 +316,8 @@ class ProjectLabelsApp extends React.Component {
                         labels={this.state.labels}
                         parent={this}
                         loaded={labelsLoaded}
+                        n_empty={n_empty}
+                        addEmpty={() => manager.addEmpty()}
                     >
                     </LabelForm>
 
