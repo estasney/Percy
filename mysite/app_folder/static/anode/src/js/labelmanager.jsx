@@ -141,7 +141,13 @@ export class LabelManager extends React.Component {
             } else {
                 sticky_class = "";
             }
-            const labels_list_active = labels.map(function (label) {
+
+            // dont render labels where active is false - these are hidden by user
+            let visible_labels = labels.filter((l) => {
+                return l.active === true
+            });
+
+            const labels_list_active = visible_labels.map(function (label) {
                 if (label.selected) {
                     return (<ActiveLabel
                         key={label.id}
@@ -155,7 +161,7 @@ export class LabelManager extends React.Component {
                 }
 
             });
-            const labels_list_inactive = labels.map(function (label) {
+            const labels_list_inactive = visible_labels.map(function (label) {
 
                 if (!label.selected) {
                     return (<InactiveLabel
