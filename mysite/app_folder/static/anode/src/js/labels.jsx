@@ -77,7 +77,7 @@ class LabelApp extends React.Component {
 
                     let hotkey2id = {};
                     result.document.labels_data.forEach(function (label) {
-                        if (label.hotkey) {
+                        if (label.hotkey && label.active) {
                             hotkey2id[label.hotkey] = label.id;
                         }
                     });
@@ -290,7 +290,7 @@ class LabelApp extends React.Component {
 
                     let hotkey2id = {};
                     result.document.labels_data.forEach(function (label) {
-                        if (label.hotkey) {
+                        if (label.hotkey && label.active) {
                             hotkey2id[label.hotkey] = label.id;
                         }
                     });
