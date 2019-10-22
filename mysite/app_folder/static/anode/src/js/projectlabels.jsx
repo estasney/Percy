@@ -20,6 +20,7 @@ class LabelRow extends React.Component {
             text_color: this.props.text_color || "#000000",
             hotkey: this.props.hotkey,
             is_new: this.props.is_new,
+            is_changed: false,
             active: this.props.active,
             name_changed: false,
             bg_color_changed: false,
@@ -38,7 +39,12 @@ class LabelRow extends React.Component {
             return false;
         }
         this.setState({
-            is_changed: false
+            is_changed: false,
+            name_changed: false,
+            bg_color_changed: false,
+            text_color_changed: false,
+            hotkey_changed: false,
+            active_changed: false
         });
         const s = this.state;
         this.props.myChange(s);
