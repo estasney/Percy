@@ -94,7 +94,7 @@ class LabelRow extends React.Component {
             savebtnClass += " disabled";
         }
         let visibilitybtnClass = "far fa-eye";
-        if (this.state.active) {
+        if (!this.state.active) {
             visibilitybtnClass += "-slash";
         }
         return (
