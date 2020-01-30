@@ -22,3 +22,4 @@ venv/
 /mysite/notebooks/
 /mysite/app_folder/static/percy/node_modules/
 /mysite/app_folder/scripts/anode/
+/mysite/app_folder/resources
