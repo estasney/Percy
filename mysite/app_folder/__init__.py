@@ -46,6 +46,9 @@ def create_app(config_class=Config):
     from app_folder.anode import bp as anode_bp
     app_run.register_blueprint(anode_bp, url_prefix='/anode')
 
+    from app_folder.webex_api import bp as webex_bp
+    app_run.register_blueprint(webex_bp, url_prefix='/webex')
+
     @app_run.context_processor
     def static_version():
         return {'static_version': FConfig.STATIC_VERSION_ID}
