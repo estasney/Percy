@@ -8,9 +8,14 @@ var path = require('path');
 
 
 module.exports = {
-    mode: 'development',
+    mode: 'production',
     entry: {
         vendor: ['./src/js/vendor.js'],
+        vendor_jquery: ['./src/js/vendor_jquery.js'],
+        vendor_fa: ['./src/js/vendor_fa.js'],
+        vendor_d3: ['./src/js/vendor_d3.js'],
+        vendor_bs_table: ['./src/js/vendor_bs_table.js'],
+        vendor_moment: ['./src/js/vendor_moment.js'],
         keywords: ['./src/js/keywords.js'],
         related: ['./src/js/related.js'],
         results_table: ['./src/js/results_table.js'],
@@ -22,7 +27,7 @@ module.exports = {
             jquery: "jquery/src/jquery"
         }
     },
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     output: {
         path: path.resolve('./dist/js'),
         filename: '[name].min.js',

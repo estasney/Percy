@@ -8,13 +8,13 @@ var path = require('path');
 
 
 module.exports = {
-    mode: 'development',
+    mode: 'production',
+    devtool: 'source-map',
     entry: {
         labelApp: ['./src/js/labels.jsx'],
         projectLabelApp: ['./src/js/projectlabels.jsx'],
         vendor: ['./src/js/vendor.js']
     },
-    devtool: 'inline-source-map',
     output: {
         path: path.resolve('./dist/js'),
         filename: '[name].[contenthash].js',
@@ -51,8 +51,6 @@ module.exports = {
 
         })
     ]
-
-
 };
 
 

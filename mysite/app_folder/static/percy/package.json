@@ -2,17 +2,18 @@
   "name": "percy",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack -p --progress --config webpack.config.js",
+    "prod-build": "webpack -p --progress --config webpack.config.js",
+    "prod-watch": "webpack -p --progress --config webpack.config.js --watch",
     "dev-build": "webpack --progress -d --config webpack.config.js",
-    "watch": "webpack --progress -d --config webpack.config.js --watch",
+    "dev-watch": "webpack --progress -d --config webpack.config.js --watch",
     "start": "webpack-dev-server --open"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "eslintConfig": {
+    "extends": "react-app"
+  },
   "devDependencies": {
     "@babel/core": "^7.6.3",
     "@babel/preset-env": "^7.6.3",
