@@ -1,11 +1,3 @@
-require("jquery");
-require("jquery-ui");
-require("jquery-validation");
 require("selectize");
 require("popper.js");
 require("bootstrap");
-require("gasparesganga-jquery-loading-overlay");
-require("bootstrap-table");
-require("d3");
-require("fontawesome");
-require("moment");

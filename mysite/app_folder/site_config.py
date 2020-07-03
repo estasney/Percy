@@ -19,7 +19,8 @@ class Config(object):
     SECRET_KEY = 'never-guess-this'
     SQLALCHEMY_DATABASE_URI = 'mysql://estasney:password@localhost:3306/names_db?charset=utf8mb4'
     SQLALCHEMY_BINDS = {
-        "anode": 'mysql://estasney:password@localhost:3306/anode?charset=utf8mb4'
+        "anode": 'mysql://estasney:password@localhost:3306/anode?charset=utf8mb4',
+        'webex': 'mysql://estasney:password@localhost:3306/webex?charset=utf8mb4',
         }
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_POOL_RECYCLE = 299
