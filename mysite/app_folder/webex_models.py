@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask import current_app
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, VARCHAR
 from sqlalchemy.orm import relationship
 
 from app_folder import db
@@ -50,11 +50,12 @@ class Person(db.Model):
     __bind_key__ = "webex"
     __tablename__ = 'people'
 
-    id = Column(String(128), primary_key=True)
-    displayName = Column(String(512))
-    email = Column(String(512), nullable=False)
+    id = Column(Integer, primary_key=True)
+    external_id = Column(VARCHAR(128), nullable=False, unique=True)
+    displayName = Column(VARCHAR(512))
+    email = Column(VARCHAR(128), nullable=False, unique=True)
     lastActivity = Column(DateTime, nullable=True)
-    lastStatus = Column(String(512), nullable=True)
+    lastStatus = Column(VARCHAR(512), nullable=True)
 
     statuses = relationship("Status", back_populates='person', cascade='all, delete-orphan')
 
@@ -73,8 +74,8 @@ class Status(db.Model):
     __tablename__ = 'statuses'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    person_id = Column(String(128), ForeignKey("people.id"))
     dt = Column(DateTime, default=datetime.now(), nullable=False)
-    value = Column(String(128))
+    person_id = Column(Integer, ForeignKey("people.id"), nullable=False)
+    value = Column(VARCHAR(128))
 
     person = relationship("Person", back_populates='statuses')
