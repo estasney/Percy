@@ -1,13 +1,9 @@
-const ManifestRevisionPlugin = require('manifest-revision-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-var rootAssetPath = './src';
-var publicPath = '/static/dist';
-var webpack = require('webpack');
-var path = require('path');
+const CopyPlugin = require("copy-webpack-plugin");
+let webpack = require("webpack");
+let path = require("path");
 
-
-module.exports = {
+module.exports ={
     mode: 'production',
     devtool: 'source-map',
     entry: {
@@ -16,29 +12,20 @@ module.exports = {
         vendor: ['./src/js/vendor.js']
     },
     output: {
-        path: path.resolve('./dist/js'),
-        filename: '[name].[hash:8].js',
-        publicPath: publicPath
+        path: path.resolve('../assets/anode/js'),
+        filename: '[name].[hash:8].min.js'
     },
     module: {
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                exclude: ['/node_modules/', '/img/'],
+                exclude: ['/node_modules/'],
                 use: {
                     loader: 'babel-loader',
                     options: {
                         presets: ['@babel/preset-react']
                     }
                 }
-            },
-            {
-                test: /\.css$/,
-                loader: 'style-loader!css-loader?modules'
-            },
-            {
-                test: /\.(img|ico)$/,
-                loader: 'raw-loader'
             }
         ]
     },
@@ -49,8 +36,17 @@ module.exports = {
             "jQuery": "jquery",
             "window.jQuery": "jquery"
 
-        })
+        }),
+        new CleanWebpackPlugin(),
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: path.resolve(__dirname, 'src', 'css', '*.css'),
+                    to: "../../../assets/anode/css/[name].[hash:8].css",
+                    toType: 'template'
+                }
+            ]
+        }),
     ]
-};
-
+}
 
