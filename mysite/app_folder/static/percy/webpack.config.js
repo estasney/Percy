@@ -1,13 +1,13 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+let webpack = require("webpack");
+let path = require("path");
+
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const MinifyPlugin = require("babel-minify-webpack-plugin");
-var rootAssetPath = './src';
-var publicPath = '/static/dist';
-var webpack = require('webpack');
-var path = require('path');
 
+let config = {
+    module: {}
+};
 
-module.exports = {
+let jsConfig = Object.assign({}, config, {
     mode: 'production',
     entry: {
         vendor: ['./src/js/vendor.js'],
@@ -29,9 +29,9 @@ module.exports = {
     },
     devtool: 'source-map',
     output: {
-        path: path.resolve('./dist/js'),
-        filename: '[name].min.js',
-        publicPath: publicPath
+        path: path.resolve("../assets/js"),
+        filename: '[name].[hash:8].min.js'
+
     },
     module: {
         rules: [
@@ -40,31 +40,53 @@ module.exports = {
                 exclude: ['/node_modules/', '/img/'],
                 use: {
                     loader: 'babel-loader',
-                    options:{
+                    options: {
                         presets: []
                     }
-
                 }
-            },
-            {
-                test: /\.css$/,
-                loader: 'style-loader!css-loader?modules'
-            },
-            {
-                test: /\.(img|ico)$/,
-                loader: 'raw-loader'
             }
         ]
-    }, plugins: [
+    },
+    plugins: [
         new webpack.ProvidePlugin({
             "$": 'jquery',
             "jQuery": "jquery",
             "window.jQuery": "jquery"
 
-        })
+        }),
+        new CleanWebpackPlugin()
 
     ]
+});
 
-};
+let styleConfig = Object.assign({}, config, {
+    mode: "production",
+    entry: {
+
+        mainpage: ['./src/css/mainpage.css'],
+        ms_form: ['./src/css/ms_form.css'],
+        selectize_bootstrap: ['./src/css/selectize_bootstrap.css']
+    },
+    output: {
+        path: path.resolve("../assets/css"),
+        filename: '[name].[hash:8].css',
+
+    },
+    module: {
+        rules: [
+            {
+                test: /\.(css)$/,
+                use: {
+                    loader: 'raw-loader'
+                }
+            }
+        ]
+    }
+
+});
+
+module.exports = [
+    jsConfig, styleConfig
+];
 
 
