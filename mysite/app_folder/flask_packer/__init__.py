@@ -22,16 +22,18 @@ class Packer(object):
         if app.config.get('DEBUG', False):
             self.cache_assets = False
 
-
     def _file_search(self, path, filename, file_ext):
 
         # check if this file is present as-is
-        straight_string = "{}{}{}{}".format(path, os.sep, filename, file_ext)
-        if os.path.isfile(straight_string):
-            matched = "{}{}".format(filename, file_ext)
-            return matched
+        filename_ext = filename + file_ext
 
-        glob_str = "{}{}{}.*{}".format(path, os.sep, filename, file_ext)
+        straight_string = os.path.join(path, filename_ext)
+        if os.path.isfile(straight_string):
+            return filename_ext
+
+        del filename_ext, straight_string
+        filename_glob_ext = "{}*{}".format(filename, file_ext)
+        glob_str = os.path.join(path, filename_glob_ext)
         matched_contents = glob.glob(glob_str)
         if not matched_contents:
             return None
@@ -43,7 +45,6 @@ class Packer(object):
             matched = sorted(matched_contents, key=lambda x: os.path.getmtime(x), reverse=True)[0]
             matched = os.path.split(matched)[1]
             return matched
-
 
     def asset_url_for(self, folder, filename):
 
