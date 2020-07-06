@@ -1,7 +1,9 @@
 {% extends "percy/layout.html" %}
 {% block content %}
     {% include 'percy/partials/helps/helps_tfidf.html' %}
+<div class="container">
 {% if success == 'True' %}
+
 <div class="form-group text-center">
     <form action="/tf_idf" method="POST">
         <label for="tfidf">Paste in a Resume to Calculate Most Informative Words</label>
@@ -24,7 +26,7 @@
 {% endif %}
 {% if success == 'True' %}
 <div class="container bg-grey">
-    <table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-pagination="true" data-page-size="25" data-search="true">
+    <table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="25" data-striped="true" data-pagination="true" data-page-size="25" data-search="true">
         <thead>
         <tr>
             <th data-field="word" data-sortable="true">Word</th>
@@ -35,7 +37,13 @@
         {% for word, value in result %}
         <tr>
             <td>{{ word }}</td>
-            <td>{{ value }}</td>
+          <td>
+            <div class="progress-bar" role="progressbar"
+                 style="width: {{ value|ratio }}%"
+                 aria-valuenow="{{ value|ratio }}"
+                 aria-valuemin="0"
+                 aria-valuemax="100">
+            {{ value|ratio }}</div></td>
         </tr>
         {% endfor %}
         </tbody>
@@ -47,6 +55,7 @@
     <p>Something went wrong.</p>
     <p>{{error_message}}</p>
 </div>{% else %} {% endif %}
+</div>
 {% endblock %}
 {% block js_script %}
 {% endblock %}

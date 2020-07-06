@@ -10,7 +10,7 @@ function int2progress(value, row, index, field) {
     numFloat = numFloat.toFixed(2);
     return `<div class="progress">
     <div class="progress-bar" role="progressbar" style="width: ${numFloat}%" aria-valuenow="${numFloat}"
-     aria-valuemin="0" aria-valuemax="100"> ${numFloat}%</div>
+     aria-valuemin="0" aria-valuemax="100">${numFloat}%</div>
     </div>`;
 }
 

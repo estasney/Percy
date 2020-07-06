@@ -73,5 +73,10 @@ def create_app(config_class=Config):
     def static_version():
         return {'static_version': FConfig.STATIC_VERSION_ID}
 
+
+    @app_run.template_filter('ratio')
+    def ratio(value):
+        return "{:.2f}".format(value * 100)
+
     app_run.register_error_handler(500, server_error_page)
     return app_run
