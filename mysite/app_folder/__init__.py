@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from flask_debugtoolbar import DebugToolbarExtension
+
 from flask_login import LoginManager
 
 from app_folder.site_config import Config, FConfig
@@ -8,7 +8,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from app_folder.flask_packer import Packer
 
-toolbar = DebugToolbarExtension()
+# noinspection PyBroadException
+try:
+    from flask_debugtoolbar import DebugToolbarExtension
+    toolbar = DebugToolbarExtension()
+except Exception:
+    toolbar = None
+
 moment = Moment()
 db = SQLAlchemy()
 migrate = Migrate()
@@ -44,7 +50,8 @@ def create_app(config_class=Config):
     app_run = Flask(__name__)
     app_run.config.from_object(config_class)
 
-    toolbar.init_app(app_run)
+    if toolbar:
+        toolbar.init_app(app_run)
     moment.init_app(app_run)
     db.init_app(app_run)
     migrate.init_app(app_run, db)
