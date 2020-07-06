@@ -1,13 +1,10 @@
 let webpack = require("webpack");
 let path = require("path");
-
+const CopyPlugin = require("copy-webpack-plugin");
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
-let config = {
-    module: {}
-};
+module.exports = {
 
-let jsConfig = Object.assign({}, config, {
     mode: 'production',
     entry: {
         vendor: ['./src/js/vendor.js'],
@@ -54,39 +51,22 @@ let jsConfig = Object.assign({}, config, {
             "window.jQuery": "jquery"
 
         }),
-        new CleanWebpackPlugin()
-
-    ]
-});
-
-let styleConfig = Object.assign({}, config, {
-    mode: "production",
-    entry: {
-
-        mainpage: ['./src/css/mainpage.css'],
-        ms_form: ['./src/css/ms_form.css'],
-        selectize_bootstrap: ['./src/css/selectize_bootstrap.css']
-    },
-    output: {
-        path: path.resolve("../assets/css"),
-        filename: '[name].[hash:8].css',
-
-    },
-    module: {
-        rules: [
-            {
-                test: /\.(css)$/,
-                use: {
-                    loader: 'raw-loader'
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: path.resolve(__dirname, 'src', 'css', '*.css'),
+                    to: "../../assets/css/[name].[hash:8].css",
+                    toType: 'template'
+                },
+                {
+                    from: path.resolve(__dirname, 'src', 'img', '*'),
+                    to: "../../assets/img/[name].[hash:8].[ext]",
+                    toType: 'template'
                 }
-            }
-        ]
-    }
-
-});
-
-module.exports = [
-    jsConfig, styleConfig
-];
+            ]
+        }),
+        new CleanWebpackPlugin()
+    ]
+};
 
 

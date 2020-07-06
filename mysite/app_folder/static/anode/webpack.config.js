@@ -37,7 +37,6 @@ module.exports ={
             "window.jQuery": "jquery"
 
         }),
-        new CleanWebpackPlugin(),
         new CopyPlugin({
             patterns: [
                 {
@@ -47,6 +46,7 @@ module.exports ={
                 }
             ]
         }),
+        new CleanWebpackPlugin()
     ]
 }
 
