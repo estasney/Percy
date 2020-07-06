@@ -7,12 +7,14 @@ from app_folder.webex_api import routes
 
 
 @bp.cli.command('create')
-def create_api_user():
+@click.option('--username', type=str, required=True, prompt=True)
+@click.password_option()
+def create_api_user(username, password):
     from app_folder.webex_models import APIUser, db
 
     new_user = APIUser()
+    new_user.username = username
+    new_user.password = password
     db.session.add(new_user)
     db.session.commit()
-    user_token = new_user.generate_api_token()
-    print(user_token)
-    db.session.commit()
+    print(f"Added User {new_user.username}")
