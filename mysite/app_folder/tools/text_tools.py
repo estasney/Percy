@@ -160,15 +160,12 @@ def process_graph_text(text, stopwords=STOPWORDS):
             return False
 
     def normalize_chunk(chunk, stopwords=stopwords):
-        normed = [word for word in chunk.lemmata if word not in stopwords and len(word) > 4]
+        normed = [word for word in chunk.lemmata if word not in stopwords]
         if not normed:
             return None
         else:
             normed = " ".join(normed)
-            if len(normed) > 4:
-                return normed
-            else:
-                return None
+            return normed
 
     tree = parsetree(text, tokenize=True, tags=True, chunks=True, relations=False, lemmata=True)
 
