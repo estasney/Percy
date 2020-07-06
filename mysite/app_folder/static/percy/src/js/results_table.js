@@ -14,28 +14,6 @@ function int2progress(value, row, index, field) {
     </div>`;
 }
 
-function fetchSearch(json_data) {
-    return new Promise(function (resolve) {
-        fetch('api/v1/related', {
-            method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(
-                json_data
-            )
-        })
-            .then(function (result) {
-                if (result.status === 201) {
-                    resolve([result.json(), true]);
-                } else {
-                    resolve([result.json(), false]);
-                }
-            });
-
-    })
-}
 
 function runSearch() {
     $table.bootstrapTable('showLoading');
@@ -72,7 +50,7 @@ $(function () {
 
     // make enter key submit
     $(window).keydown(function (event) {
-        if (event.keyCode == 13) {
+        if (event.keyCode === 13) {
             runSearch();
         }
     });
