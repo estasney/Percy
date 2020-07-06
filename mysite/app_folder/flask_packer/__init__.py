@@ -1,74 +1,73 @@
 import os
-import glob
-from flask import current_app
+import fnmatch
+
+from flask import current_app, url_for
+import json
 
 
 class Packer(object):
+    MANIFEST_NAME = ".packer_manifest.json"
 
     def __init__(self, app=None):
         self.app = app
         self.static_folder = None
-        self.cache_assets = True
+        self.static_manifest_path = None
         self.asset_manifest = {}
-
         if app is not None:
             self.init_app(app)
 
     def init_app(self, app):
-
-        self.static_folder = app.static_folder
+        self.static_folder = os.path.basename(app.static_folder)
+        self._build_manifest_path()
         app.add_template_global(self.asset_url_for)
 
-        if app.config.get('DEBUG', False):
-            self.cache_assets = False
+    def _build_manifest_path(self):
+        self.static_manifest_path = os.path.join(self.static_folder, self.MANIFEST_NAME)
 
-    def _file_search(self, path, filename, file_ext):
+    def _build_manifest(self):
+        from flask import current_app
+        current_app.logger.info("Build Manifest")
+        manifest = {}
+        ignored = set(current_app.config.get("PACKER_IGNORE", set([])))
+        ignored.add("**/{}".format(Packer.MANIFEST_NAME))
+        for root_dir, folders, files in os.walk(self.static_folder):
+            root_dir = os.path.relpath(root_dir, "static")
+            for file in files:
+                full_path = os.path.join(root_dir, file)
+                if any([fnmatch.fnmatch(full_path, i) for i in ignored]):
+                    continue
+                try:
+                    filename, file_hash, *file_ext = file.split(".")
+                except ValueError:
+                    continue
+                file_ext = ".".join(file_ext)
+                common_name = os.path.join(root_dir, "{}.{}".format(filename, file_ext))
+                if common_name in manifest:  # keep the newest
+                    selected = max(
+                            [manifest[common_name],
+                             os.path.join(root_dir, file)],
+                            key=lambda x: os.path.getmtime(x))
+                    manifest[common_name] = selected
+                else:
+                    manifest[common_name] = os.path.join(root_dir, file)
 
-        # check if this file is present as-is
-        filename_ext = filename + file_ext
+        with open(self.static_manifest_path, "w+") as fp:
+            json.dump(manifest, fp)
+        self.asset_manifest = manifest
 
-        straight_string = os.path.join(path, filename_ext)
-        if os.path.isfile(straight_string):
-            return filename_ext
-
-        del filename_ext, straight_string
-        filename_glob_ext = "{}*{}".format(filename, file_ext)
-        glob_str = os.path.join(path, filename_glob_ext)
-        matched_contents = glob.glob(glob_str)
-        if not matched_contents:
-            return None
-        elif len(matched_contents) == 1:
-            matched = matched_contents[0]
-            matched = os.path.split(matched)[1]
-            return matched
-        else:
-            matched = sorted(matched_contents, key=lambda x: os.path.getmtime(x), reverse=True)[0]
-            matched = os.path.split(matched)[1]
-            return matched
+    def _load_manifest(self):
+        if not self.static_manifest_path:
+            self._build_manifest_path()
+        if not os.path.isfile(self.static_manifest_path):
+            self._build_manifest()
+        with open(self.static_manifest_path, "r") as fp:
+            self.asset_manifest = json.load(fp)
 
     def asset_url_for(self, folder, filename):
 
-        if self.cache_assets and filename in self.asset_manifest:
-            return self.asset_manifest[filename]
-
-        pieces = filename.split("/")
-        path = pieces[:-1]
-        file = pieces[-1]
-
-        filename, file_ext = os.path.splitext(file)
-
-        os_path = os.sep.join(path)
-        abs_path = os.path.join(self.static_folder, os_path)
-
-        found_file_name = self._file_search(path=abs_path, filename=filename, file_ext=file_ext)
-        # file.ext
-
-        if not found_file_name:
-            return "/{}/{}".format(folder, "/".join(pieces))
-
-        result = "/{}/{}/{}".format(folder, "/".join(path), found_file_name)
-
-        if self.cache_assets:
-            self.asset_manifest[filename] = result
-
-        return result
+        if not self.asset_manifest:
+            current_app.logger.info("Load Manifest")
+            self._load_manifest()
+        manifest_path = self.asset_manifest.get(filename, filename)
+        current_app.logger.info("Asset URL For {}, Found {}".format(filename, manifest_path))
+        return url_for(folder, filename=manifest_path)
