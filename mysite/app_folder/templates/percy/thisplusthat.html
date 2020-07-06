@@ -83,7 +83,7 @@
 
   <h2 class="text-center">According to my calculations...</h2>
   <h3 class="text-center">{{user_equation}}</h3>
-<table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-search="true">
+<table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="25" data-striped="true" data-search="true">
     <thead>
       <tr>
          <th data-field="word" data-sortable="true">Closest Match</th>
@@ -92,13 +92,18 @@
       </tr>
     </thead>
     <tbody>
-        {% for word, score in result %}
+        {% for word, value in result %}
       <tr>
         <td> {{ word }} </td>
-        <td> {{ score }} </td>
+        <td><div class="progress-bar" role="progressbar"
+                 style="width: {{ value|ratio }}%"
+                 aria-valuenow="{{ value|ratio }}"
+                 aria-valuemin="0"
+                 aria-valuemax="100">
+            {{ value|ratio }}%</div></td>
       </tr>
         {% endfor %}
-      </tr>
+      
     </tbody>
   </table>
 </div>
