@@ -6,7 +6,7 @@
     <form action="/tf_idf" method="POST">
         <label for="tfidf">Paste in a Resume to Calculate Most Informative Words</label>
         <textarea class="form-control" id="tfidf_success" name="tfidf_text" rows="5">{{ original }}</textarea>
-        <div class="input-group-btn">
+        <div class="input-group-btn pt-2">
             <button class="btn btn-danger" name="button" type="tfidf" value="tfidf">Fingerprint</button>
         </div>
     </form>
@@ -16,7 +16,7 @@
     <form action="/tf_idf" method="POST">
         <label for="tfidf">Paste in a Resume to Calculate Most Informative Words</label>
         <textarea class="form-control" id="tfidf" name="tfidf_text" rows="5"></textarea>
-        <div class="input-group-btn">
+        <div class="input-group-btn pt-2">
             <button class="btn btn-danger" name="button" type="tfidf" value="tfidf">Fingerprint</button>
         </div>
     </form>
@@ -24,8 +24,6 @@
 {% endif %}
 {% if success == 'True' %}
 <div class="container bg-grey">
-    <h2 class="text-center">These words seem to stand out</h2>
-
     <table data-toggle="table" data-sort-name="score" data-sort-order="desc" data-pagination="true" data-page-size="50" data-striped="true" data-pagination="true" data-page-size="25" data-search="true">
         <thead>
         <tr>

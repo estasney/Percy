@@ -67,21 +67,16 @@
 
 {% endblock %}
 {% block js_script %}
-    <script src="{{ url_for('static', filename='percy/dist/js/ms_form.min.js', v=static_version) }}"></script>
+    <script src="{{ asset_url_for('static', filename='assets/js/ms_form.min.js'}}"></script>
 
 {% if result is defined %}
-    <script src="{{ url_for('static', filename='percy/dist/js/d3_hist.min.js', v=static_version) }}"></script>
+    <script src="{{ asset_url_for('static', filename='assets/js/d3_hist.min.js'}}"></script>
 <script>
-
-
     d3.select("#hist")
         .datum({{result.trial_means}})
       .call(histogramChart()
         .bins(d3.scale.linear().domain([{{result.trial_means_min}}, {{result.trial_means_max}}]).ticks(20))
         .tickFormat(d3.format(".02%")));
-
-
-
 </script>
 {% endif %}
 {% endblock %}

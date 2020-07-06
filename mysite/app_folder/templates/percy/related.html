@@ -2,7 +2,7 @@
 
 <div class="container">
     <div id="buttons-toolbar">
-      <div class="d-flex justify-content-center pb-4">
+      <div class="d-flex justify-content-center p-4">
         <div id="bloodhound" class="">
                     <input id="related_autocomplete" type="text" name="q" class="typeahead form-control"
                            value="" size="50" required>
@@ -21,16 +21,12 @@
         <div class="row justify-content-md-center pb-2">
         <div class="col-md-">
           <button class='btn btn-primary' id='search-btn'>Search</button>
-        
         </div>
   </div>
     </div>
     <table id="results-table" style="display:none;" data-classes="table table-bordered table-hover table-striped"></table>
 </div>
-
-
-
 {% endblock %} {% block js_script %}
-    <script type="text/javascript" src="{{ url_for('static',filename='percy/dist/js/related.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='percy/dist/js/results_table.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset_url_for('static',filename='assets/js/related.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset_url_for('static',filename='assets/js/results_table.min.js') }}"></script>
 {% endblock %}

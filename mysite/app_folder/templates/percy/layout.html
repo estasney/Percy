@@ -11,7 +11,12 @@
 {% endblock %}
 <div id="content">{% block content %}{% endblock %}</div>
 <!-- webpack -->
-<script src="{{ url_for('static', filename='percy/dist/js/vendor.min.js') }}"></script>
+<script src="{{ asset_url_for('static', filename='assets/js/vendor_jquery.min.js') }}"></script>
+<script src="{{ asset_url_for('static', filename='assets/js/vendor_moment.min.js') }}"></script>
+<script src="{{ asset_url_for('static', filename='assets/js/vendor.min.js') }}"></script>
+<script src="{{ asset_url_for('static', filename='assets/js/vendor_bs_table.min.js') }}"></script>
+<script src="{{ asset_url_for('static', filename='assets/js/vendor_d3.min.js') }}"></script>
+<script src="{{ asset_url_for('static', filename='assets/js/vendor_fa.min.js') }}"></script>
 </body>
 {% block js_script %}{% endblock %}
 </html>
