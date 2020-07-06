@@ -67,10 +67,10 @@
 
 {% endblock %}
 {% block js_script %}
-    <script src="{{ asset_url_for('static', filename='assets/js/ms_form.min.js'}}"></script>
+    <script src="{{ asset_url_for('static', filename='assets/js/ms_form.min.js')}}"></script>
 
 {% if result is defined %}
-    <script src="{{ asset_url_for('static', filename='assets/js/d3_hist.min.js'}}"></script>
+    <script src="{{ asset_url_for('static', filename='assets/js/d3_hist.min.js')}}"></script>
 <script>
     d3.select("#hist")
         .datum({{result.trial_means}})
