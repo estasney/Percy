@@ -25,6 +25,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_POOL_RECYCLE = 299
     ENV = 'development'
+    PACKER_IGNORE = {"**/package*.json", "**/*.config.js", "**/node_modules/*", "**/src/*"}
 
 
 class FConfig(object):
