@@ -19,6 +19,7 @@ class APIUser(db.Model):
     api_key = Column(String(512), unique=True)
     username = Column(String(128), unique=True)
     password_hash = Column(String(512))
+    local_tz = Column(String(128), default=None)
 
     @staticmethod
     def verify_auth_token(request):
