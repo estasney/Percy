@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app_folder import db
+from app_folder.tools.time_utils import last_seen_time
 
 
 class APIUser(db.Model):
@@ -103,7 +104,8 @@ class Person(db.Model):
             "displayName":  self.displayName,
             "email":        self.email,
             "lastActivity": self.lastActivity,
-            "lastStatus":   self.lastStatus
+            "lastStatus":   self.lastStatus,
+            "lastSeen":     last_seen_time(self.lastActivity)
             }
 
 
