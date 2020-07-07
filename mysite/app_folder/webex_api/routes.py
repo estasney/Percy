@@ -19,6 +19,6 @@ def login():
     verified_user = APIUser.verify_auth_basic(request)
     if not verified_user:
         return jsonify(message="Unauthorized"), 403
-    token = verified_user.generate_token()
+    token = verified_user.generate_api_token()
     db.session.commit()
     return jsonify(token=token), 200

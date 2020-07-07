@@ -48,7 +48,7 @@ class APIUser(db.Model):
             auth = auth.replace('Basic ', '', 1)
             auth = base64.b64decode(auth).decode()
             if auth.count(":") != 1:
-                current_app.logger.warning(f"Expected ':' in Authorization header, got {api_key.count(':')}")
+                current_app.logger.warning(f"Expected ':' in Authorization header, got {auth.count(':')}")
                 return None
 
             username, password = auth.split(":")
