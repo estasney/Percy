@@ -40,8 +40,8 @@ module.exports ={
         new CopyPlugin({
             patterns: [
                 {
-                    from: path.resolve(__dirname, 'src', 'css', '*.css'),
-                    to: "../../../assets/anode/css/[name].[hash:8].css",
+                    from: "./src/css/",
+                    to: "../css/[name].[hash].[ext]",
                     toType: 'template'
                 }
             ]

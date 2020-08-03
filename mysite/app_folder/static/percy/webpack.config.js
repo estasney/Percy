@@ -54,15 +54,16 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 {
-                    from: path.resolve(__dirname, 'src', 'css', '*.css'),
-                    to: "../../assets/css/[name].[hash:8].css",
+                    from: "./src/css/",
+                    to: "../css/[name].[hash].[ext]",
                     toType: 'template'
                 },
                 {
-                    from: path.resolve(__dirname, 'src', 'img', '*'),
-                    to: "../../assets/img/[name].[hash:8].[ext]",
+                    from: "./src/img/",
+                    to: "../img/[name].[ext]",
                     toType: 'template'
                 }
+
             ]
         }),
         new CleanWebpackPlugin()
