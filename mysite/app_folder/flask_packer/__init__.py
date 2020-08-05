@@ -1,5 +1,7 @@
 import os
 import fnmatch
+from pathlib import Path
+
 from flask import current_app, url_for
 
 
@@ -36,7 +38,7 @@ class Packer(object):
 
         # We only include path info after the dirname of self.static_folder_abs
 
-        for root_dir, folders, files in os.walk(self.static_folder_abs):
+        for root_dir, folders, files in os.walk(os.path.join(self.static_folder_abs, "assets")):
             for file in files:
                 full_path = os.path.join(root_dir, file)  # full path is used for fnmatch
                 if any([fnmatch.fnmatch(full_path, i) for i in ignored]):
@@ -50,11 +52,11 @@ class Packer(object):
                 except ValueError:
                     continue
                 file_ext = ".".join(file_ext)
-                common_name = os.path.join(root_rel, "{}.{}".format(filename, file_ext))
+                common_name = str(Path(os.path.join(root_rel, "{}.{}".format(filename, file_ext))).as_posix())
                 if common_name in manifest:  # keep the newest
                     current_app.logger.warning("Duplicate File Matched for {}".format(common_name))
                 else:
-                    manifest[common_name] = os.path.join(root_rel, file)
+                    manifest[common_name] = str(Path(os.path.join(root_rel, file)).as_posix())
 
         if self.debug:
             current_app.logger.info("Built Manifest with {} items".format(len(manifest)))

@@ -21,7 +21,8 @@ module.exports = {
     },
     resolve: {
         alias: {
-            jquery: "jquery/src/jquery"
+            jquery: "jquery/src/jquery",
+            histogramChart: "./src/js/d3_hist.js"
         }
     },
     devtool: 'source-map',
