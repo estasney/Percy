@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import current_app
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, VARCHAR
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, VARCHAR, Boolean
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -95,6 +95,7 @@ class Person(db.Model):
     email = Column(VARCHAR(128), nullable=False, unique=True)
     lastActivity = Column(DateTime, nullable=True)
     lastStatus = Column(VARCHAR(512), nullable=True)
+    tracking = Column(Boolean, nullable=True, default=True)
 
     statuses = relationship("Status", back_populates='person', cascade='all, delete-orphan')
 
@@ -105,7 +106,8 @@ class Person(db.Model):
             "email":        self.email,
             "lastActivity": self.lastActivity,
             "lastStatus":   self.lastStatus,
-            "lastSeen":     last_seen_time(self.lastActivity)
+            "lastSeen":     last_seen_time(self.lastActivity),
+            "tracking":     self.tracking
             }
 
 
