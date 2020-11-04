@@ -9,7 +9,7 @@ from app_folder.webex_models import Person, APIUser
 @bp.route('/status', methods=['GET'])
 @requires_api_key
 def related():
-    people = Person.query.filter(Person.tracking == True).all()
+    people = db.session.query(Person).filter(Person.tracking.is_(True)).all()
     data = [person.to_dict() for person in people]
     return jsonify({"data": data}), 200
 
