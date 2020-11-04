@@ -23,8 +23,8 @@ class APIUser(db.Model):
     local_tz = Column(String(128), default=None)
 
     @staticmethod
-    def verify_auth_token(request):
-        token = request.headers.get("Authorization")
+    def verify_api_key(request):
+        token = request.headers.get("Api-Key")
         if not token:
             return False
         s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'], salt='user-token',
@@ -37,8 +37,10 @@ class APIUser(db.Model):
         except BadSignature:
             current_app.logger.info("Bad Signature")
             return None  # invalid token
-        user = APIUser.query.get(data['id'])
-        if user:
+        user = db.session.query(APIUser).filter(APIUser.api_key == token).first()
+        if not user:
+            return False
+        if user.id == data['id']:
             return user
         else:
             return False
